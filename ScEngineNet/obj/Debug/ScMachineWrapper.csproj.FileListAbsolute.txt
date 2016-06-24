@@ -1,0 +1,5 @@
+D:\install\OSTIS\ScMachineWrapper\ScMachineWrapper\bin\Debug\ScMachineWrapper.dll
+D:\install\OSTIS\ScMachineWrapper\ScMachineWrapper\bin\Debug\ScMachineWrapper.pdb
+D:\install\OSTIS\ScMachineWrapper\ScMachineWrapper\obj\Debug\ScMachineWrapper.csprojResolveAssemblyReference.cache
+D:\install\OSTIS\ScMachineWrapper\ScMachineWrapper\obj\Debug\ScMachineWrapper.dll
+D:\install\OSTIS\ScMachineWrapper\ScMachineWrapper\obj\Debug\ScMachineWrapper.pdb

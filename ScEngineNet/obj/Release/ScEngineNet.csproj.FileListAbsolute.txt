@@ -1,0 +1,4 @@
+d:\OSTIS\sc-machine-iot\bin\ScEngineNet.dll
+d:\OSTIS\sc-machine-iot\bin\ScEngineNet.pdb
+d:\OSTIS\ScMachineWrapper\ScEngineNet\obj\Release\ScEngineNet.dll
+d:\OSTIS\ScMachineWrapper\ScEngineNet\obj\Release\ScEngineNet.pdb

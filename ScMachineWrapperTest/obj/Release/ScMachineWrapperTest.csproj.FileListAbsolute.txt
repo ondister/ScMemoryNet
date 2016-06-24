@@ -1,0 +1,9 @@
+D:\OSTIS\ScMachineWrapper\ScMachineWrapperTest\bin\Release\ScMachineWrapperTest.dll
+D:\OSTIS\ScMachineWrapper\ScMachineWrapperTest\bin\Release\ScMachineWrapperTest.pdb
+D:\OSTIS\ScMachineWrapper\ScMachineWrapperTest\bin\Release\ScMachineWrapper.dll
+D:\OSTIS\ScMachineWrapper\ScMachineWrapperTest\bin\Release\ScMachineWrapper.pdb
+d:\OSTIS\sc-machine-iot\bin\ScMachineWrapperTest.dll
+d:\OSTIS\sc-machine-iot\bin\ScMachineWrapperTest.pdb
+d:\OSTIS\ScMachineWrapper\ScMachineWrapperTest\obj\Release\ScMachineWrapperTest.csprojResolveAssemblyReference.cache
+d:\OSTIS\ScMachineWrapper\ScMachineWrapperTest\obj\Release\ScMachineWrapperTest.dll
+d:\OSTIS\ScMachineWrapper\ScMachineWrapperTest\obj\Release\ScMachineWrapperTest.pdb

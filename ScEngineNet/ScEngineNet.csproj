@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E34AB4BE-7FB2-45C1-944F-6B403BECCF7F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ScEngineNet</RootNamespace>
+    <AssemblyName>ScEngineNet</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\..\..\OSTIS\sc-machine-iot\bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="SafeElements\ScAccessLevels.cs" />
+    <Compile Include="SafeElements\ScResultExtensionMethods.cs" />
+    <Compile Include="ExtensionsNet\IScExtensionNet.cs" />
+    <Compile Include="SafeElements\Identifier.cs" />
+    <Compile Include="SafeElements\ScAddress.cs" />
+    <Compile Include="SafeElements\ScEventArgs.cs" />
+    <Compile Include="SafeElements\ScLink.cs" />
+    <Compile Include="SafeElements\ScNode.cs" />
+    <Compile Include="SafeElements\ScArc.cs" />
+    <Compile Include="SafeElements\ScElement.cs" />
+    <Compile Include="SafeElements\ScEvent.cs" />
+    <Compile Include="SafeElements\Construction.cs" />
+    <Compile Include="SafeElements\ScContainer.cs" />
+    <Compile Include="ScEventNativeMethods.cs" />
+    <Compile Include="ScHelperNativeMethods.cs" />
+    <Compile Include="ScIterator5NativeMethods.cs" />
+    <Compile Include="SafeElements\ScLinkContent.cs" />
+    <Compile Include="ScMemory.cs" />
+    <Compile Include="ScMemoryNativeMethods.cs" />
+    <Compile Include="ScIterator3NativeMethods.cs" />
+    <Compile Include="ScEngineNet.cs" />
+    <Compile Include="ScMemoryParams.cs" />
+    <Compile Include="ScMemorySafeMethods.cs" />
+    <Compile Include="ScStreamNativeMethods.cs" />
+    <Compile Include="SafeElements\ElementType.cs" />
+    <Compile Include="SafeElements\ElementTypeExtensionMethods.cs" />
+    <Compile Include="NativeElements\KeyNode.cs" />
+    <Compile Include="NativeElements\WScAddress.cs" />
+    <Compile Include="ScMemoryContext.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="NativeElements\WScEvent.cs" />
+    <Compile Include="SafeElements\ScEventType.cs" />
+    <Compile Include="NativeElements\ScIterator5Type.cs" />
+    <Compile Include="NativeElements\ScIterator5.cs" />
+    <Compile Include="NativeElements\ScIterator3.cs" />
+    <Compile Include="NativeElements\ScIterator3Type.cs" />
+    <Compile Include="NativeElements\ScIteratorParam.cs" />
+    <Compile Include="NativeElements\WScMemoryContext.cs" />
+    <Compile Include="NativeElements\WScMemoryParams.cs" />
+    <Compile Include="SafeElements\ScResult.cs" />
+    <Compile Include="SafeElements\ScStat.cs" />
+    <Compile Include="NativeElements\ScStream.cs" />
+    <Compile Include="NativeElements\ScStreamFlags.cs" />
+    <Compile Include="NativeElements\ScStreamSeekOrigin.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

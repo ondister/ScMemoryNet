@@ -1,0 +1,6 @@
+d:\install\OSTIS\ScMachineWrapper\ScMachineWrapper\obj\Release\ScMachineWrapper.dll
+d:\install\OSTIS\ScMachineWrapper\ScMachineWrapper\obj\Release\ScMachineWrapper.pdb
+d:\OSTIS\sc-machine-iot\bin\ScMemoryNet.dll
+d:\OSTIS\sc-machine-iot\bin\ScMemoryNet.pdb
+d:\OSTIS\ScMachineWrapper\ScMachineWrapper\obj\Release\ScMemoryNet.dll
+d:\OSTIS\ScMachineWrapper\ScMachineWrapper\obj\Release\ScMemoryNet.pdb
