@@ -1,15 +1,13 @@
 ﻿using System;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using ScEngineNet;
 using ScEngineNet.NativeElements;
-using System.Threading;
 using ScEngineNet.SafeElements;
 
 namespace ScEngineNetTest
 {
-
-
-
     [TestClass]
     public class ScIterator3FunctionsTest
     {
@@ -18,13 +16,14 @@ namespace ScEngineNetTest
         [TestMethod]
         public void ScIterator3FunctionsTestMethod()
         {
+            var scParams = new WScMemoryParams
+            {
+                Clear = true,
+                ConfigFile = @"sc-memory.ini",
+                RepoPath = @"repo",
+                ExtensionsPath = @"extensions"
+            };
 
-            WScMemoryParams scParams = new WScMemoryParams();
-
-            scParams.Clear = true;
-            scParams.ConfigFile = @"sc-memory.ini";
-            scParams.RepoPath = @"repo";
-            scParams.ExtensionsPath = @"extensions";
             //sc_memory_initialize 
             scMemoryContext = NativeMethods.sc_memory_initialize(scParams);
 
@@ -42,12 +41,6 @@ namespace ScEngineNetTest
             //sc_iterator3_value
             //sc_iterator_compare_type
 
-
-
-
-
-
-
             //IntPtr iter5 = ScIterator5Functions.sc_iterator5_f_a_a_a_a_new(scMemoryContext, addrNode, ElementType.PositiveConstantPermanentAccessArc_c, ElementType.Link_a, ElementType.CommonArc_a, ElementType.NonRoleNode_a);
 
             //while (ScIterator5Functions.sc_iterator5_next(iter5) == true)
@@ -59,26 +52,13 @@ namespace ScEngineNetTest
             //        + ScIterator5Functions.sc_iterator5_value(iter5, 4).Offset);
             //}
 
-
-
             //sc_memory_shutdown
             bool isShutDown = NativeMethods.sc_memory_shutdown(false);
-            if (isShutDown == true)
+            if (isShutDown)
             {
                 scMemoryContext = IntPtr.Zero;
-            };
+            }
             Assert.IsTrue(isShutDown);
-
-
         }
-
-
-
-
-
     }
-
-
-
-
 }

@@ -1,38 +1,37 @@
 ﻿using System;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using ScEngineNet;
 using ScEngineNet.NativeElements;
 using ScEngineNet.SafeElements;
+
 namespace ScEngineNetTest
 {
-
-
-
     [TestClass]
     public class ScHelperFunctionsTest
     {
-
         [TestMethod]
         public void ScHelperFunctionsTestMethod()
         {
-            IntPtr scMemoryContext;
-            WScMemoryParams scParams = new WScMemoryParams();
-
-            scParams.Clear = true;
-            scParams.ConfigFile = @"sc-memory.ini";
-            scParams.RepoPath = @"repo";
-            scParams.ExtensionsPath = @"extensions";
+            var scParams = new WScMemoryParams
+            {
+                Clear = true,
+                ConfigFile = @"sc-memory.ini",
+                RepoPath = @"repo",
+                ExtensionsPath = @"extensions"
+            };
             //sc_memory_initialize 
-            scMemoryContext = NativeMethods.sc_memory_initialize(scParams);
+            IntPtr scMemoryContext = NativeMethods.sc_memory_initialize(scParams);
 
             //sc_memory_is_initialized
             bool isInitialized = NativeMethods.sc_memory_is_initialized();
             Assert.IsTrue(isInitialized);
                         
             //sc_helper_set_system_identifier
-            ScLinkContent identifier=new ScLinkContent("sc_helper_test_idtf");
-            WScAddress nodeAddr = NativeMethods.sc_memory_node_new(  scMemoryContext, ElementType.ClassNode_a);
-            ScResult resultSetIdtf = NativeMethods.sc_helper_set_system_identifier(  scMemoryContext, nodeAddr, identifier.Content, (uint)identifier.Content.Length);
+            var identifier=new ScLinkContent("sc_helper_test_idtf");
+            var nodeAddr = NativeMethods.sc_memory_node_new(scMemoryContext, ElementType.ClassNode_a);
+            var resultSetIdtf = NativeMethods.sc_helper_set_system_identifier(scMemoryContext, nodeAddr, identifier.Content, (uint)identifier.Content.Length);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultSetIdtf);
 
             //sc_helper_resolve_system_identifier
@@ -40,12 +39,13 @@ namespace ScEngineNetTest
             bool isResolve = NativeMethods.sc_helper_resolve_system_identifier(  scMemoryContext, identifier.Content, out resolvedAddr);
             Assert.IsTrue(isResolve);
             Assert.AreEqual(nodeAddr.Offset, resolvedAddr.Offset);
-                        
+
             //sc_helper_get_system_identifier_link
             WScAddress linkAddress;
             ScResult resultGetIdtfLink = NativeMethods.sc_helper_get_system_identifier_link(  scMemoryContext, resolvedAddr, out linkAddress);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultGetIdtfLink);
             Assert.AreNotEqual(0, linkAddress.Offset);
+
             //проверяем идентичность содержимого ссылок
             IntPtr stream;
             ScResult resultgetlinkContent = NativeMethods.sc_memory_get_link_content(  scMemoryContext, linkAddress, out stream);
@@ -78,30 +78,13 @@ namespace ScEngineNetTest
             bool isRight = NativeMethods.sc_helper_check_version_equal(major, minor, patch);
             Assert.IsTrue(isRight, "Тест может и не проходить, если версия библиотеки не верна");
 
-                
             //sc_memory_shutdown
             bool isShutDown = NativeMethods.sc_memory_shutdown(false);
-            if (isShutDown == true)
+            if (isShutDown)
             {
                 scMemoryContext = IntPtr.Zero;
-            };
+            }
             Assert.IsTrue(isShutDown);
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 }

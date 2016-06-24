@@ -1,29 +1,29 @@
 ﻿using System;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using ScEngineNet;
 using ScEngineNet.NativeElements;
 using ScEngineNet.SafeElements;
+
 namespace ScEngineNetTest
 {
-
-
-
     [TestClass]
     public class ScMemoryFunctionsTest
     {
-
         [TestMethod]
         public void ScMemoryFunctionsTestMethod()
         {
-            IntPtr scMemoryContext;
-            WScMemoryParams scParams = new WScMemoryParams();
+            var scParams = new WScMemoryParams
+            {
+                Clear = true,
+                ConfigFile = @"sc-memory.ini",
+                RepoPath = @"repo",
+                ExtensionsPath = @"extensions"
+            };
 
-            scParams.Clear = true;
-            scParams.ConfigFile = @"sc-memory.ini";
-            scParams.RepoPath = @"repo";
-            scParams.ExtensionsPath = @"extensions";
             //sc_memory_initialize 
-            scMemoryContext = NativeMethods.sc_memory_initialize(scParams);
+            IntPtr scMemoryContext = NativeMethods.sc_memory_initialize(scParams);
 
             //sc_memory_is_initialized
             bool isInitialized = NativeMethods.sc_memory_is_initialized();
@@ -37,26 +37,24 @@ namespace ScEngineNetTest
             bool isExist = NativeMethods.sc_memory_is_element( scMemoryContext, nodeAddr);
             Assert.IsTrue(isExist);
 
-
             //sc_memory_change_element_subtype
-            ElementType newType = ElementType.Constant_a;
+            const ElementType newType = ElementType.Constant_a;
             ScResult resultChangeType = NativeMethods.sc_memory_change_element_subtype( scMemoryContext, nodeAddr, newType);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultChangeType);
 
             //sc_memory_get_element_type
-            ElementType gettingType = ElementType.Unknown;
-            ScResult resultGetElementType = NativeMethods.sc_memory_get_element_type( scMemoryContext, nodeAddr, out gettingType);
+            var gettingType = ElementType.Unknown;
+            var resultGetElementType = NativeMethods.sc_memory_get_element_type( scMemoryContext, nodeAddr, out gettingType);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultGetElementType);
             Assert.AreEqual(ElementType.ConstantNode_c, gettingType);
-
 
             //sc_memory_link_new
             WScAddress linkAddr = NativeMethods.sc_memory_link_new( scMemoryContext);
             Assert.AreNotEqual(0, linkAddr.Offset);
 
             //sc_memory_set_link_content
-            ScLinkContent linkContent = new ScLinkContent("Test Content 1234567890 Тест Контент");
-            ScResult resultSetLinkContent = NativeMethods.sc_memory_set_link_content( scMemoryContext, linkAddr, linkContent.ScStream);
+            var linkContent = new ScLinkContent("Test Content 1234567890 Тест Контент");
+            var resultSetLinkContent = NativeMethods.sc_memory_set_link_content( scMemoryContext, linkAddr, linkContent.ScStream);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultSetLinkContent);
 
             //sc_memory_get_link_content
@@ -76,7 +74,6 @@ namespace ScEngineNetTest
 
             //sc_memory_free_buff
             NativeMethods.sc_memory_free_buff(addressesPtr);
-
 
             //sc_memory_arc_new
             WScAddress arcAddr = NativeMethods.sc_memory_arc_new( scMemoryContext, ElementType.PositiveConstantPermanentAccessArc_c, nodeAddr, linkAddr);
@@ -120,7 +117,6 @@ namespace ScEngineNetTest
             ScResult resultSaveState = NativeMethods.sc_memory_save( scMemoryContext);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultSaveState);
 
-
             //sc_memory_element_free
             ScResult resultFree = NativeMethods.sc_memory_element_free( scMemoryContext, nodeAddr);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultFree);
@@ -132,27 +128,11 @@ namespace ScEngineNetTest
 
             //sc_memory_shutdown
             bool isShutDown = NativeMethods.sc_memory_shutdown(false);
-            if (isShutDown == true)
+            if (isShutDown)
             {
                 scMemoryContext = IntPtr.Zero;
-            };
+            }
             Assert.IsTrue(isShutDown);
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 }
