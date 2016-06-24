@@ -1,5 +1,0 @@
-d:\OSTIS\sc-machine-iot\bin\Demo.exe
-d:\OSTIS\sc-machine-iot\bin\Demo.pdb
-d:\OSTIS\ScMachineWrapper\ScMemoryWrapperTest\obj\Release\Demo.csprojResolveAssemblyReference.cache
-d:\OSTIS\ScMachineWrapper\ScMemoryWrapperTest\obj\Release\Demo.exe
-d:\OSTIS\ScMachineWrapper\ScMemoryWrapperTest\obj\Release\Demo.pdb

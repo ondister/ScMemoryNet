@@ -1,6 +1,0 @@
-d:\OSTIS\ScMachineWrapper\ScMachineWrapper\obj\Release\ScMemoryNet.dll
-d:\OSTIS\ScMachineWrapper\ScMachineWrapper\obj\Release\ScMemoryNet.pdb
-d:\OSTIS\sc-machine-iot\bin\ScEngineNet.dll
-d:\OSTIS\sc-machine-iot\bin\ScEngineNet.pdb
-d:\OSTIS\ScMachineWrapper\ScMemoryNet\obj\Release\ScEngineNet.dll
-d:\OSTIS\ScMachineWrapper\ScMemoryNet\obj\Release\ScEngineNet.pdb

@@ -1,5 +1,0 @@
-D:\install\OSTIS\ScMachineWrapper\ScMemoryWrapperTest\bin\Debug\ScMemoryWrapperTest.exe
-D:\install\OSTIS\ScMachineWrapper\ScMemoryWrapperTest\bin\Debug\ScMemoryWrapperTest.pdb
-D:\install\OSTIS\ScMachineWrapper\ScMemoryWrapperTest\obj\Debug\ScMemoryWrapperTest.csprojResolveAssemblyReference.cache
-D:\install\OSTIS\ScMachineWrapper\ScMemoryWrapperTest\obj\Debug\ScMemoryWrapperTest.exe
-D:\install\OSTIS\ScMachineWrapper\ScMemoryWrapperTest\obj\Debug\ScMemoryWrapperTest.pdb

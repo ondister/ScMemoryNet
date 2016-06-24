@@ -1,9 +1,0 @@
-D:\OSTIS\ScMachineWrapper\ExNetPullEnty\bin\Release\ExNetPullEnty.dll
-D:\OSTIS\ScMachineWrapper\ExNetPullEnty\bin\Release\ExNetPullEnty.pdb
-D:\OSTIS\ScMachineWrapper\ExNetPullEnty\bin\Release\ScMemoryNet.dll
-D:\OSTIS\ScMachineWrapper\ExNetPullEnty\bin\Release\ScMemoryNet.pdb
-d:\OSTIS\sc-machine-iot\bin\netextensions\ExNetPullEnty.dll
-d:\OSTIS\sc-machine-iot\bin\netextensions\ExNetPullEnty.pdb
-d:\OSTIS\ScMachineWrapper\ExNetPullEnty\obj\Release\ExNetPullEnty.csprojResolveAssemblyReference.cache
-d:\OSTIS\ScMachineWrapper\ExNetPullEnty\obj\Release\ExNetPullEnty.dll
-d:\OSTIS\ScMachineWrapper\ExNetPullEnty\obj\Release\ExNetPullEnty.pdb
