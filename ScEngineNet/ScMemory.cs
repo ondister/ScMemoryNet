@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+
 using ScEngineNet;
 using ScEngineNet.ExtensionsNet;
-using ScEngineNet.SafeElements;
 
 namespace ScMemoryNet
 {
@@ -16,6 +16,7 @@ namespace ScMemoryNet
         {
             get { return baseContext; }
         }
+
         private static List<IScExtensionNet> listExtensionsNet;
 
         public static void Initialize(bool clearBeforeInit,string configFile, string repoPath, string extensionsPath, string netExtensionsPath)
@@ -25,22 +26,18 @@ namespace ScMemoryNet
             if (!Directory.Exists(extensionsPath)) { throw new Exception("Отсутствует указанная директория расширений"); }
             if (!Directory.Exists(netExtensionsPath)) { throw new Exception("Отсутствует указанная директория расширений .net"); }
           
-            ScMemoryParams parameters = new ScMemoryParams(clearBeforeInit, configFile, repoPath, extensionsPath, netExtensionsPath);
+            var parameters = new ScMemoryParams(clearBeforeInit, configFile, repoPath, extensionsPath, netExtensionsPath);
             if (ScMemoryContext.IsMemoryInitialized() == false)
             {
                 IntPtr wcontext = NativeMethods.sc_memory_initialize(parameters.scParams);
                 baseContext = new ScMemoryContext(wcontext);
-
                 ScMemory.LoadExtensionsNets(netExtensionsPath);
-
             }
             else
             {
                 throw new Exception("Память уже инициализирована. Нельзя использовать одновременно несколько экземпляров памяти. Создайте новый ScMemoryContext");
             }
-
         }
-
 
         private static void LoadExtensionsNets(string netExtensionsPath)
         {
@@ -54,7 +51,7 @@ namespace ScMemoryNet
                 {
                     if (typeof(IScExtensionNet).IsAssignableFrom(t))
                     {
-                        IScExtensionNet exNet = (IScExtensionNet)assembly.CreateInstance(t.FullName);
+                        var exNet = (IScExtensionNet) assembly.CreateInstance(t.FullName);
                         Console.WriteLine("** Message: Initialize .net module: " + fName);
                         exNet.Initialize();
                         listExtensionsNet.Add(exNet);
@@ -72,8 +69,6 @@ namespace ScMemoryNet
             }
             return true;
         }
-
-
 
         public static bool ShutDown(bool SaveMemoryState)
         {
@@ -93,8 +88,5 @@ namespace ScMemoryNet
 
             return IsShutDown;
         }
-
-
-
     }
 }

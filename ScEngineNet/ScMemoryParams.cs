@@ -5,19 +5,17 @@ namespace ScMemoryNet
    public class ScMemoryParams
     {
        internal WScMemoryParams scParams;
-       private string netExtensionsPath;
-     
+       private readonly string netExtensionsPath;
 
        public string ExtensionsPath
        {
            get { return scParams.ExtensionsPath; }
-
        }
+
        public string ConfigFile
        {
            get { return scParams.ConfigFile; }
        }
-
 
        public string RepoPath
        {

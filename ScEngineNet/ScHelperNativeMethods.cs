@@ -1,6 +1,7 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
+
 using ScEngineNet.NativeElements;
-using System;
 using ScEngineNet.SafeElements;
 namespace ScEngineNet
 {
@@ -17,7 +18,6 @@ namespace ScEngineNet
         //_SC_EXTERN sc_result sc_helper_get_system_identifier_link(sc_memory_context const * ctx, sc_addr el, sc_addr *sys_idtf_addr);
         [DllImport(ScEngineNet.ScMemoryDllName, CallingConvention = ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
         internal static extern ScResult sc_helper_get_system_identifier_link(IntPtr context,  WScAddress elementAddress, out WScAddress linkAddress);
-
 
         //_SC_EXTERN sc_result sc_helper_get_keynode(sc_memory_context const * ctx, sc_keynode keynode, sc_addr *keynode_addr);
         [DllImport(ScEngineNet.ScMemoryDllName, CallingConvention = ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
@@ -36,7 +36,5 @@ namespace ScEngineNet
         //на момент написания версия была 0.2.0
         [DllImport(ScEngineNet.ScMemoryDllName, CallingConvention = ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
         internal static extern bool sc_helper_check_version_equal(byte major,byte minor,byte path);
-
-
     }
 }

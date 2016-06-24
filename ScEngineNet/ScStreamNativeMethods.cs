@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+
 using ScEngineNet.NativeElements;
 using ScEngineNet.SafeElements;
+
 namespace ScEngineNet
 {
     internal static partial class NativeMethods
@@ -23,12 +25,12 @@ namespace ScEngineNet
         internal static extern ScResult sc_stream_free(IntPtr stream);
 
         /*! Create file data stream
-  * @param file_name Path to file for streaming
-  * @param flags Data stream flags
-  * @remarks Allocate and create file data stream. The returned stream pointer should be freed
-  * with sc_stream_free function, when done using it.
-  * @return Returns stream pointer if the stream was successfully created, or NULL if an error occurred
-  */
+        * @param file_name Path to file for streaming
+        * @param flags Data stream flags
+        * @remarks Allocate and create file data stream. The returned stream pointer should be freed
+        * with sc_stream_free function, when done using it.
+        * @return Returns stream pointer if the stream was successfully created, or NULL if an error occurred
+        */
         //_SC_EXTERN sc_stream* sc_stream_file_new(const sc_char *file_name, sc_uint8 flags);
         [DllImport(ScEngineNet.ScMemoryDllName, CallingConvention = ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
         internal static extern IntPtr sc_stream_file_new(string fileName, ScStreamFlag flags);

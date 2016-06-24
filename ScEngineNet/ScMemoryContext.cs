@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+
 using ScEngineNet.SafeElements;
 using ScEngineNet.NativeElements;
 
@@ -8,26 +8,21 @@ namespace ScEngineNet
 {
    public class ScMemoryContext
     {
-       private IntPtr scMemoryContext;
+        private IntPtr scMemoryContext;
 
         #region initialize
 
-
         public bool IsValid()
         {
-            bool isValid = false;
-
-            if (scMemoryContext != IntPtr.Zero)
-            {
-                isValid = true;
-            }
-
+            bool isValid = scMemoryContext != IntPtr.Zero;
             return isValid;
         }
+
         public static bool IsMemoryInitialized()
         {
             return NativeMethods.sc_memory_is_initialized();
         }
+
         internal ScMemoryContext(IntPtr context)
         {
             this.scMemoryContext = context;
@@ -38,8 +33,7 @@ namespace ScEngineNet
             if (ScMemoryContext.IsMemoryInitialized())
             {
                 this.scMemoryContext = NativeMethods.sc_memory_context_new((byte)accessLevels);
-            } 
-            
+            }
         }
 
         public void Delete()
@@ -49,34 +43,33 @@ namespace ScEngineNet
                 NativeMethods.sc_memory_context_free(this.scMemoryContext);
                 this.scMemoryContext = IntPtr.Zero;
             }
-           
         }
 
-     
         public ScStat GetStatistics()
         {
-            ScStat stat = new ScStat();
-            if (ScMemoryContext.IsMemoryInitialized() == true)
+            var stat = new ScStat();
+            if (ScMemoryContext.IsMemoryInitialized())
             {
-                NativeMethods.sc_memory_stat( this.scMemoryContext, out stat);
+                NativeMethods.sc_memory_stat(this.scMemoryContext, out stat);
             }
             return stat;
         }
+
         public bool SaveState()
         {
-            ScResult result = ScResult.SC_RESULT_ERROR;
-            if (ScMemoryContext.IsMemoryInitialized() == true)
+            var result = ScResult.SC_RESULT_ERROR;
+            if (ScMemoryContext.IsMemoryInitialized())
             {
                 result = NativeMethods.sc_memory_save(this.scMemoryContext);
             }
-            return result == ScResult.SC_RESULT_OK ? true : false;
+            return result == ScResult.SC_RESULT_OK;
         }
      
         #endregion
 
         #region Elements
+
         #region Common
-      
 
         public Identifier CreateUniqueIdentifier(ScNode node)
         {
@@ -87,14 +80,11 @@ namespace ScEngineNet
         {
             return Identifier.GetUnique( this.scMemoryContext, prefix, node);
         }
-       
 
         public bool IsElementExist(ScAddress elementAddress)
         {
             return ScMemorySafeMethods.IsElementExist(this.scMemoryContext, elementAddress);
         }
-
-       
 
         public bool DeleteElement(ScElement element)
         {
@@ -104,9 +94,10 @@ namespace ScEngineNet
         #endregion
 
         #region Arcs
+
         public ScArc CreateArc(ScElement beginElement, ScElement endElement, ElementType elementType)
         {
-            ScArc createdArc = new ScArc(ScAddress.Invalid, this.scMemoryContext);
+            var createdArc = new ScArc(ScAddress.Invalid, this.scMemoryContext);
             if (ScMemoryContext.IsMemoryInitialized() == true)
             {
                 createdArc = new ScArc(new ScAddress(NativeMethods.sc_memory_arc_new(this.scMemoryContext, elementType, beginElement.ScAddress.WScAddress, endElement.ScAddress.WScAddress)), this.scMemoryContext);
@@ -129,18 +120,19 @@ namespace ScEngineNet
             return result;
 
         }
+
         #endregion
 
         #region Nodes
+
         public ScNode CreateNode(ElementType elementType)
         {
-            ScNode createdNode = new ScNode(ScAddress.Invalid, this.scMemoryContext);
+            var createdNode = new ScNode(ScAddress.Invalid, this.scMemoryContext);
             if (ScMemoryContext.IsMemoryInitialized() == true) 
             {
                 createdNode = new ScNode(new ScAddress(NativeMethods.sc_memory_node_new( this.scMemoryContext, elementType)), this.scMemoryContext);
             }
             return createdNode;
-
         }
 
         public ScNode CreateNode(ElementType elementType, Identifier identifier)
@@ -151,11 +143,8 @@ namespace ScEngineNet
                 createdNode = this.CreateNode(elementType);
                 createdNode.Identifier = identifier;
             }
-            
             return createdNode;
         }
-
-       
 
         public ScNode FindNode(Identifier identifier)
         {
@@ -167,19 +156,18 @@ namespace ScEngineNet
             return new ScNode(nodeAddress, this.scMemoryContext);
         }
 
-
         #endregion
 
         #region Links
+
         public ScLink CreateLink()
         {
-            ScLink createdLink = new ScLink(ScAddress.Invalid,  this.scMemoryContext);
+            var createdLink = new ScLink(ScAddress.Invalid,  this.scMemoryContext);
             if (ScMemoryContext.IsMemoryInitialized() == true)
             {
                 createdLink = new ScLink(new ScAddress(NativeMethods.sc_memory_link_new( this.scMemoryContext)),  this.scMemoryContext);
             }
             return createdLink;
-
         }
 
         public ScLink CreateLink(ScLinkContent content)
@@ -192,7 +180,6 @@ namespace ScEngineNet
             ScLink createdLink = this.CreateLink();
             createdLink.LinkContent = content;
             return createdLink;
-
         }
 
         public ScLink FindLink(ScAddress linkAddress)
@@ -223,9 +210,10 @@ namespace ScEngineNet
         #endregion
 
         #region Events
+
         public ScEvent CreateEvent(ScElement element, ScEventType eventType)
         {
-            ScEvent scEvent = new ScEvent(element.ScAddress, eventType);
+            var scEvent = new ScEvent(element.ScAddress, eventType);
             if (ScMemoryContext.IsMemoryInitialized() == true)
             {
 
@@ -233,53 +221,58 @@ namespace ScEngineNet
             }
             return scEvent;
         }
+
         #endregion
 
         #region Iterators
-       
 
         public ScContainer CreateContainer(ScElement e1, ElementType t1, ElementType t2)
         {
             return new ScContainer( this.scMemoryContext, e1, t1, t2);
         }
+
         public ScContainer CreateContainer(ElementType t1, ElementType t2, ScElement e1)
         {
             return new ScContainer( this.scMemoryContext, t1, t2, e1);
         }
+
         public ScContainer CreateContainer(ScElement e1, ElementType t1, ScElement e2)
         {
             return new ScContainer(this.scMemoryContext, e1, t1, e2);
         }
+
         public ScContainer CreateContainer(ElementType t1, ElementType t2, ScElement e1, ElementType t3, ElementType t4)
         {
             return new ScContainer( this.scMemoryContext, t1, t2, e1, t3, t4);
         }
+
         public ScContainer CreateContainer(ElementType t1, ElementType t2, ScElement e1, ElementType t3, ScElement e2)
         {
             return new ScContainer( this.scMemoryContext, t1, t2, e1, t3, e2);
         }
+
         public ScContainer CreateContainer(ScElement e1, ElementType t1, ElementType t2, ElementType t3, ElementType t4)
         {
             return new ScContainer( this.scMemoryContext, e1, t1, t2, t3, t4);
         }
+
         public ScContainer CreateContainer(ScElement e1, ElementType t1, ElementType t2, ElementType t3, ScElement e2)
         {
             return new ScContainer( this.scMemoryContext, e1, t1, t2, t3, e2);
         }
+
         public ScContainer CreateContainer(ScElement e1, ElementType t1, ScElement e2, ElementType t2, ElementType t3)
         {
             return new ScContainer( this.scMemoryContext, e1, t1, e2, t2, t3);
         }
+
         public ScContainer CreateContainer(ScElement e1, ElementType t1, ScElement e2, ElementType t2, ScElement e3)
         {
             return new ScContainer( this.scMemoryContext, e1, t1, e2, t2, e3);
         }
 
-
-
-
         #endregion
-       
+
         #region Члены IDisposable
 
         private bool disposed = false;
@@ -293,10 +286,8 @@ namespace ScEngineNet
 
                 }
                 //unmanaged
-                  this.Delete();
-                  this.scMemoryContext = IntPtr.Zero;
-
-
+                this.Delete();
+                this.scMemoryContext = IntPtr.Zero;
             }
         }
 
@@ -310,7 +301,6 @@ namespace ScEngineNet
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-       
 
         #endregion
     }
