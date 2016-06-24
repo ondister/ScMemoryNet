@@ -11,6 +11,5 @@ namespace ScEngineNet.NativeElements
         internal ScIteratorParam[] IteratorParams;
         internal IntPtr Context;
         internal bool Finished;
-
     }
 }

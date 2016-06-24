@@ -15,6 +15,5 @@ namespace ScEngineNet.NativeElements
         internal IntPtr IteratorAttr;
         internal uint TimeStamp;
         internal IntPtr Context;
-
     }
 }

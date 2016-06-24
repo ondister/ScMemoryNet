@@ -3,7 +3,6 @@ using ScEngineNet.SafeElements;
 
 namespace ScEngineNet.NativeElements
 {
-
     [StructLayout(LayoutKind.Explicit, CharSet = ScEngineNet.DefaultCharset)]
     internal struct ScIteratorParam
     {
@@ -13,6 +12,5 @@ namespace ScEngineNet.NativeElements
         internal WScAddress Address;
         [FieldOffset(4)]
         internal ElementType Type;
-       
     }
 }

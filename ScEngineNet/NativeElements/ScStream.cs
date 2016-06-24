@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+
 using ScEngineNet.SafeElements;
 
 namespace ScEngineNet.NativeElements
 {
-
     //  typedef sc_result (*fStreamRead)(const sc_stream *stream, sc_char *data, sc_uint32 length, sc_uint32 *bytes_read);
-   [UnmanagedFunctionPointer(ScEngineNet.DefaultCallingConvention,CharSet=ScEngineNet.DefaultCharset)]
+    [UnmanagedFunctionPointer(ScEngineNet.DefaultCallingConvention,CharSet=ScEngineNet.DefaultCharset)]
     internal delegate ScResult fStreamRead(IntPtr stream, byte[] data, uint lenth, out uint bytesRead);
 
     //typedefsc_result (*fStreamWrite)(const sc_stream *stream, sc_char *data, sc_uint32 length, sc_uint32 *bytes_written);
     [UnmanagedFunctionPointer(ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
-   internal delegate ScResult fStreamWrite(IntPtr stream, byte[] data, uint lenth, out uint bytesWritten);
+    internal delegate ScResult fStreamWrite(IntPtr stream, byte[] data, uint lenth, out uint bytesWritten);
 
     [UnmanagedFunctionPointer(ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
     //typedef sc_result (*fStreamSeek)(const sc_stream *stream, sc_stream_seek_origin origin, sc_uint32 offset);
@@ -29,12 +29,9 @@ namespace ScEngineNet.NativeElements
     //typedef sc_bool (*fStreamEof)(const sc_stream *stream);
     internal delegate bool fStreamEof(IntPtr stream);
 
-    
-
     [StructLayout(LayoutKind.Sequential, CharSet=ScEngineNet.DefaultCharset)]
     internal struct ScStream
     {
-
         internal IntPtr Handler;
         internal ScStreamFlag Flags;
         internal fStreamRead ReadFunction;
@@ -43,7 +40,5 @@ namespace ScEngineNet.NativeElements
         internal fStreamTell TellFunction;
         internal fStreamFreeHandler FreeFunction;
         internal fStreamEof EofFunction;
-
-        
     }
 }

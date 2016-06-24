@@ -1,5 +1,4 @@
-﻿
-namespace ScEngineNet.NativeElements
+﻿namespace ScEngineNet.NativeElements
 {
     internal enum ScIterator5Type
     {

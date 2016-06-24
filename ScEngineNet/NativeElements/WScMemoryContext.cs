@@ -3,7 +3,7 @@
 namespace ScEngineNet.NativeElements
 {
     [StructLayout(LayoutKind.Sequential)]
-      internal struct WScMemoryContext
+    internal struct WScMemoryContext
     {
         public ushort Id;
         public byte AccessLevels;
