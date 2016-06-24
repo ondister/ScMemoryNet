@@ -1,6 +1,7 @@
-﻿using ScEngineNet.NativeElements;
-using System;
+﻿using System;
 using System.Linq;
+
+using ScEngineNet.NativeElements;
 
 namespace ScEngineNet.SafeElements
 {
@@ -20,31 +21,25 @@ namespace ScEngineNet.SafeElements
             set { this.SetStream(value); }
         }
 
-
         public ScLinkContent(byte[] Content)
         {
             this.content = Content;
             scStream = NativeMethods.sc_stream_memory_new(this.content, (uint)Content.Length, ScStreamFlag.SC_STREAM_FLAG_READ, false);
-
         }
 
         public ScLinkContent(string Content) :
             this(ScEngineNet.TextEncoding.GetBytes(Content))
-        {
-        }
+        { }
 
         internal ScLinkContent(IntPtr Stream) :
             this(new byte[0])
         {
             this.SetStream(Stream);
-
         }
 
         internal ScLinkContent() :
             this(new byte[0])
-        {
-
-        }
+        { }
 
         private void SetStream(IntPtr stream)
         {
@@ -53,7 +48,7 @@ namespace ScEngineNet.SafeElements
                 uint buffersize = 0;
                 if (NativeMethods.sc_stream_get_length(stream, out buffersize) == ScResult.SC_RESULT_OK)
                 {
-                    byte[] buffer = new byte[buffersize];
+                    var buffer = new byte[buffersize];
                     uint receivedBytes = 0;
                     if (NativeMethods.sc_stream_read_data(stream, buffer, buffersize, out receivedBytes) == ScResult.SC_RESULT_OK)
                     {
@@ -79,10 +74,8 @@ namespace ScEngineNet.SafeElements
             : this(BitConverter.GetBytes(value))
         { }
 
-
-
-
         #region Статические члены
+
         /// <summary>
         /// Возвращает <see cref="System.String" /> из массива байт
         /// </summary>
@@ -137,21 +130,15 @@ namespace ScEngineNet.SafeElements
 
         #endregion
 
-
-
-
-
         #region Реализация сравнения
+
         /// <summary>
         /// Определяет равен ли заданный объект <see cref="ScLinkContent"/> текущему объекту
         /// </summary>
         /// <param name="obj">объект <see cref="ScLinkContent"/></param>
         public bool Equals(ScLinkContent obj)
         {
-            if (obj == null)
-                return false;
-
-            return obj.Content.SequenceEqual(this.Content);
+            return obj != null && obj.Content.SequenceEqual(this.Content);
         }
 
         /// <summary>
@@ -179,8 +166,8 @@ namespace ScEngineNet.SafeElements
         /// <summary>
         /// Оператор сравнения контента
         /// </summary>
-        /// <param name="ScLinkContent">Первый  контент</param>
-        /// <param name="ScLinkContent">Второй контент</param>
+        /// <param name="scLinkContent1">Первый  контент</param>
+        /// <param name="scLinkContent2">Второй контент</param>
         /// <returns>Возвращает True, если контенты равны</returns>
         public static bool operator ==(ScLinkContent scLinkContent1, ScLinkContent scLinkContent2)
         {
@@ -196,8 +183,8 @@ namespace ScEngineNet.SafeElements
         /// <summary>
         /// Оператор сравнения контента
         /// </summary>
-        /// <param name="ScLinkContent">Первый контент</param>
-        /// <param name="ScLinkContent">Второй контент</param>
+        /// <param name="scLinkContent1">Первый контент</param>
+        /// <param name="scLinkContent2">Второй контент</param>
         /// <returns>Возвращает True, если контенты равны</returns>
         public static bool operator !=(ScLinkContent scLinkContent1, ScLinkContent scLinkContent2)
         {
@@ -210,10 +197,6 @@ namespace ScEngineNet.SafeElements
         {
             NativeMethods.sc_stream_free(this.scStream);
         }
-
-
-
-
 
         private bool disposed = false;
 
@@ -228,8 +211,6 @@ namespace ScEngineNet.SafeElements
                 //unmanaged
                 this.StreamFree();
                 this.scStream = IntPtr.Zero;
-
-
             }
         }
 
@@ -243,8 +224,5 @@ namespace ScEngineNet.SafeElements
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
-
-
     }
 }

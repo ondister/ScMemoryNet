@@ -55,7 +55,5 @@ namespace ScEngineNet.SafeElements
         {
             return elementTypes & ~removeElementTypes;
         }
-
     }
-
 }

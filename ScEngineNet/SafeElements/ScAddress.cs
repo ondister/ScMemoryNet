@@ -1,6 +1,6 @@
 ﻿using System;
-using ScEngineNet.NativeElements;
 
+using ScEngineNet.NativeElements;
 
 namespace ScEngineNet.SafeElements
 {
@@ -18,16 +18,12 @@ namespace ScEngineNet.SafeElements
         /// </summary>
         public static readonly ScAddress Invalid = new ScAddress(0, 0);
 
-
-        private WScAddress wScAddress;
+        private readonly WScAddress wScAddress;
 
         internal WScAddress WScAddress
         {
             get { return wScAddress; }
         }
-
-
-
 
         /// <summary>
         /// Возвращает известность адреса
@@ -39,9 +35,6 @@ namespace ScEngineNet.SafeElements
                return !this.Equals(ScAddress.Invalid);
             }
         }
-
-      
-
 
         /// <summary>
         /// Сегмент.
@@ -70,14 +63,12 @@ namespace ScEngineNet.SafeElements
             this.wScAddress = new WScAddress() { Offset=offset,Segment=segment};
         }
 
-
         internal ScAddress(WScAddress wScAddress)
         {
             this.segment = wScAddress.Segment;
             this.offset = wScAddress.Offset;
             this.wScAddress = wScAddress;
         }
-      
 
         /// <summary>
         /// Returns the fully qualified type name of this instance.
@@ -87,11 +78,12 @@ namespace ScEngineNet.SafeElements
         /// </returns>
         /// <filterpriority>2</filterpriority>
         public override string ToString()
-		{
-		    return string.Format("segment: {0}, offset: {1}", segment, offset);
-		}
+        {
+            return string.Format("segment: {0}, offset: {1}", segment, offset);
+        }
 
         #region Реализация сравнения
+
         /// <summary>
         /// Определяет равен ли заданный объект <see cref="ScAddress"/> текущему объекту
         /// </summary>
@@ -139,7 +131,6 @@ namespace ScEngineNet.SafeElements
             {
                 isEqual = scAddress1.Equals(scAddress2);
             }
-
             return isEqual;
         }
 
@@ -155,7 +146,5 @@ namespace ScEngineNet.SafeElements
         }
 
         #endregion 
-
-      
     }
 }

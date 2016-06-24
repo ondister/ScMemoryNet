@@ -1,14 +1,10 @@
-﻿using ScEngineNet.SafeElements;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace ScEngineNet.SafeElements
 {
    public  class Construction
     {
-        private List<ScElement> elements;
+        private readonly List<ScElement> elements;
 
         public List<ScElement> Elements
         {
@@ -17,9 +13,7 @@ namespace ScEngineNet.SafeElements
 
         internal Construction()
         {
-            this.elements = new List<ScElement>();
-
+            elements = new List<ScElement>();
         }
-
     }
 }

@@ -1,11 +1,8 @@
-﻿
-using System;
-namespace ScEngineNet.SafeElements
+﻿namespace ScEngineNet.SafeElements
 {
-     public enum ScAccessLevels:byte
+    public enum ScAccessLevels : byte
     {
         MinLevel = 0,
-
         MaxLevel = 255
     }
 }

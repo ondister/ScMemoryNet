@@ -1,26 +1,22 @@
-﻿using ScEngineNet.NativeElements;
-using System;
+﻿using System;
 
 namespace ScEngineNet.SafeElements
 {
     public class ScEventArgs : EventArgs
     {
+        private readonly ScEventType eventType;
+        private readonly ScElement element;
+        private readonly ScArc arc;
 
-
-        private ScEventType eventType;
-        private ScElement element;
-        private ScArc arc;
-       
         public ScEventType EventType
         {
             get { return eventType; }
         }
 
-             public ScElement Element
+        public ScElement Element
         {
             get { return this.element; }
         }
-     
 
         public ScArc Arc
         {
@@ -33,6 +29,5 @@ namespace ScEngineNet.SafeElements
             this.element = element;
             this.arc = arc;
         }
-
     }
 }

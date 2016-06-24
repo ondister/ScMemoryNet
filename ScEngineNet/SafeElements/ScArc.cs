@@ -1,11 +1,9 @@
-﻿using ScEngineNet.NativeElements;
-using System;
+﻿using System;
 
 namespace ScEngineNet.SafeElements
 {
     public class ScArc : ScElement
     {
-
         ScElement beginElement;
 
         public ScElement BeginElement
@@ -16,7 +14,8 @@ namespace ScEngineNet.SafeElements
                 return beginElement;
             }
         }
-        ScElement endElement;
+
+        private ScElement endElement;
 
         public ScElement EndElement
         {
@@ -27,16 +26,8 @@ namespace ScEngineNet.SafeElements
             }
         }
 
-
-
-
         internal ScArc(ScAddress arcAddress, IntPtr scExtContent)
             : base(arcAddress, scExtContent)
-        {
-
-        }
-
-
-
+        { }
     }
 }

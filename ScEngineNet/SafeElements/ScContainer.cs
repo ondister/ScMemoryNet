@@ -1,29 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ScEngineNet.NativeElements;
 using System.Collections;
+using System.Collections.Generic;
+
+using ScEngineNet.NativeElements;
 
 namespace ScEngineNet.SafeElements
 {
     public sealed class ScContainer : IEnumerable<Construction>, IEnumerator<Construction>, IDisposable
     {
-
-
-
-        private IntPtr scContext;
-        private ScIterator3Type iterator3type;
+        private readonly IntPtr scContext;
+        private readonly ScIterator3Type iterator3type;
         private ScIterator5Type iterator5type;
         private Construction construction;
         IntPtr iterator = IntPtr.Zero;
 
         #region Конструкторы
+
         private ScContainer(IntPtr scContext)
         {
             this.scContext = scContext;
             this.construction = new Construction();
         }
+
         internal ScContainer(IntPtr scContext,ScElement e1, ElementType t1, ElementType t2)
             : this( scContext)
         {
@@ -62,7 +60,6 @@ namespace ScEngineNet.SafeElements
 
             this.iterator = ScMemorySafeMethods.CreateIterator3(this.scContext, this.iterator3type, p1, p2, p3);
         }
-
 
         internal ScContainer(IntPtr scContext, ElementType t1, ElementType t2, ScElement e1, ElementType t3, ElementType t4)
             : this( scContext)
@@ -109,7 +106,6 @@ namespace ScEngineNet.SafeElements
             this.iterator = ScMemorySafeMethods.CreateIterator5(this.scContext, this.iterator5type, p1, p2, p3, p3, p4);
         }
 
-
         internal ScContainer(IntPtr scContext, ScElement e1, ElementType t1, ElementType t2, ElementType t3, ScElement e2)
             : this( scContext)
         {
@@ -155,12 +151,9 @@ namespace ScEngineNet.SafeElements
             this.iterator = ScMemorySafeMethods.CreateIterator5(this.scContext, this.iterator5type, p1, p2, p3, p3, p4);
         }
 
-
         #endregion
 
-
         #region перечислители
-
 
         IEnumerator<Construction> IEnumerable<Construction>.GetEnumerator()
         {
@@ -171,7 +164,6 @@ namespace ScEngineNet.SafeElements
         {
             get
             {
-
                 return this.construction;
             }
         }
@@ -188,8 +180,6 @@ namespace ScEngineNet.SafeElements
                 return this.construction;
             }
         }
-
-
 
         public bool MoveNext()
         {
@@ -244,7 +234,6 @@ namespace ScEngineNet.SafeElements
                 //unmanaged
                 this.Delete();
                 this.iterator = IntPtr.Zero;
-
             }
         }
 
@@ -261,6 +250,7 @@ namespace ScEngineNet.SafeElements
             }
             return isDeleted;
         }
+
         ~ScContainer()
         {
             Dispose(false);
@@ -273,8 +263,5 @@ namespace ScEngineNet.SafeElements
         }
 
         #endregion
-
-
-
     }
 }

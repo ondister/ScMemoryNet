@@ -1,5 +1,6 @@
-using ScEngineNet.NativeElements;
 using System;
+
+using ScEngineNet.NativeElements;
 
 namespace ScEngineNet.SafeElements
 {
@@ -13,16 +14,13 @@ namespace ScEngineNet.SafeElements
         public event ElementEventHandler ElementEvent;
         public event ElementDeleteHandler ElementDelete;
 
-
         internal void OnElementEvent(ScEventType eventType, ScAddress elementAddress, ScAddress arcAddress)
         {
             if (ElementEvent != null)
             {
-                ScEventArgs args = new ScEventArgs(eventType, new ScElement(elementAddress,this.context), new ScArc(arcAddress,this.context));
-
+                ScEventArgs args = new ScEventArgs(eventType, new ScElement(elementAddress,this.context), new ScArc(arcAddress, this.context));
                 ElementEvent(this, args);
             }
-
         }
 
         internal void OnElementDelete(ScAddress elementAddress)
@@ -34,13 +32,12 @@ namespace ScEngineNet.SafeElements
             }
         }
 
-
-
         public ScAddress ElementAddress
         {
             get { return elementAddress; }
         }
-        private ScEventType eventType;
+
+        private readonly ScEventType eventType;
 
         public ScEventType EventType
         {
@@ -66,7 +63,6 @@ namespace ScEngineNet.SafeElements
         {
             this.elementAddress = elementAddress;
             this.eventType = eventType;
-
         }
 
         internal bool Subscribe(IntPtr context)
@@ -104,11 +100,6 @@ namespace ScEngineNet.SafeElements
             return ScResult.SC_RESULT_OK;
         }
 
-
-
-
-
-
         private bool disposed = false;
 
         protected virtual void Dispose(bool disposing)
@@ -121,9 +112,7 @@ namespace ScEngineNet.SafeElements
                 }
                 //unmanaged
                 this.Delete();
-              wScEvent = IntPtr.Zero;
-
-
+                wScEvent = IntPtr.Zero;
             }
         }
 
@@ -137,13 +126,5 @@ namespace ScEngineNet.SafeElements
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
-
-
-
-
-
     }
-
 }
-

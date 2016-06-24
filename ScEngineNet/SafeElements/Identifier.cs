@@ -1,5 +1,5 @@
 ﻿using System;
-using ScEngineNet.NativeElements;
+
 namespace ScEngineNet.SafeElements
 {
     /// <summary>
@@ -35,14 +35,12 @@ namespace ScEngineNet.SafeElements
 
         internal static Identifier GetUnique(IntPtr scExtContext,  ScNode node)
         {
-
             Identifier identifier = Identifier.Invalid;
-            identifier = "idtf_"+node.ScAddress.GetHashCode().ToString();
+            identifier = "idtf_"+node.ScAddress.GetHashCode();
             while (ScMemorySafeMethods.IsElementExist(scExtContext, (ScMemorySafeMethods.FindNode(scExtContext, identifier)).ScAddress) != false)
             {
                 Random rand = new Random();
-                identifier =  identifier + "_" + rand.Next().ToString();
-
+                identifier =  identifier + "_" + rand.Next();
             }
 
             return identifier;
@@ -51,10 +49,8 @@ namespace ScEngineNet.SafeElements
         internal static Identifier GetUnique(IntPtr scExtContext, string prefix, ScNode node)
         {
             Identifier initialIdentifier = Identifier.GetUnique( scExtContext,node);
-
             return prefix + "_" + initialIdentifier;
         }
-
 
         /// <summary>
         /// Преобразование Идентификатора из строки.
@@ -84,10 +80,7 @@ namespace ScEngineNet.SafeElements
         /// <param name="obj">объект <see cref="Identifier"/></param>
         public bool Equals(Identifier obj)
         {
-            if (obj == null)
-                return false;
-
-            return obj.Value == this.Value;
+            return obj != null && obj.Value == this.Value;
         }
 
         /// <summary>
@@ -98,10 +91,8 @@ namespace ScEngineNet.SafeElements
         {
             if (obj == null)
                 return false;
-            Identifier identifier = obj as Identifier;
-            if (identifier as Identifier == null)
-                return false;
-            return identifier.Value == this.Value;
+            var identifier = obj as Identifier;
+            return identifier != null && identifier.Value == this.Value;
         }
 
         /// <summary>
@@ -126,7 +117,6 @@ namespace ScEngineNet.SafeElements
             {
                 isEqual = identifier1.Equals(identifier2);
             }
-
             return isEqual;
         }
 
@@ -141,8 +131,6 @@ namespace ScEngineNet.SafeElements
             return !(identifier1 == identifier2);
         }
 
-
-
         /// <summary>
         /// Получить массив байт для передачи.
         /// </summary>
@@ -150,7 +138,5 @@ namespace ScEngineNet.SafeElements
         {
             return ScEngineNet.TextEncoding.GetBytes(value);
         }
-
-
     }
 }

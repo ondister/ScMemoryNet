@@ -1,13 +1,11 @@
-﻿
-namespace ScEngineNet.SafeElements
+﻿namespace ScEngineNet.SafeElements
 {
-   public struct ScStat
+    public struct ScStat
     {
-       public uint NodeCount;
-       public uint ArcCount;
-       public uint LinkCount;
-       public uint EmptyCount;
-       public uint SegmentsCount;
-
+        public uint NodeCount;
+        public uint ArcCount;
+        public uint LinkCount;
+        public uint EmptyCount;
+        public uint SegmentsCount;
     }
 }

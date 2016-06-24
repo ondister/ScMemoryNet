@@ -1,5 +1,4 @@
-﻿using ScEngineNet.NativeElements;
-using System;
+﻿using System;
 
 namespace ScEngineNet.SafeElements
 {
@@ -7,7 +6,6 @@ namespace ScEngineNet.SafeElements
     {
         internal IntPtr scContext;
         private ScAddress scAddress;
-      
 
         public ElementType ElementType
         {
@@ -16,6 +14,7 @@ namespace ScEngineNet.SafeElements
                 return ScMemorySafeMethods.GetElementType(this.scContext, this);
             }
         }
+
         public ScAddress ScAddress
         {
             get { return scAddress; }
@@ -25,9 +24,10 @@ namespace ScEngineNet.SafeElements
         {
             bool isDeleted = false;
             isDeleted = ScMemorySafeMethods.DeleteElement(this.scContext, this);
-             this.scAddress = ScAddress.Invalid;
+            this.scAddress = ScAddress.Invalid;
             return isDeleted;
         }
+
         internal ScElement(ScAddress scAddress,IntPtr scContext)
         {
             this.scContext = scContext;
@@ -39,10 +39,8 @@ namespace ScEngineNet.SafeElements
             return NativeMethods.sc_memory_change_element_subtype(this.scContext, this.ScAddress.WScAddress, subType).ToBool();
         }
 
-
-       
-
         #region Реализация сравнения
+
         /// <summary>
         /// Определяет равен ли заданный объект <see cref="ScElement"/> текущему объекту
         /// </summary>
@@ -106,7 +104,5 @@ namespace ScEngineNet.SafeElements
         }
 
         #endregion
-
-
     }
 }
