@@ -1,5 +1,8 @@
 ﻿namespace ScEngineNet.NativeElements
 {
+    /// <summary>
+    /// Перечислитель указывает направление поиска в потоке. Не используется.
+    /// </summary>
     internal enum ScStreamSeekOrigin
     {
         SC_STREAM_SEEK_SET = 1,

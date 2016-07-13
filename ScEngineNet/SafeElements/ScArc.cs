@@ -2,10 +2,19 @@
 
 namespace ScEngineNet.SafeElements
 {
+    /// <summary>
+    /// Sc-дуга. Создается в классе <see cref="ScMemoryContext" />
+    /// </summary>
     public class ScArc : ScElement
     {
         ScElement beginElement;
 
+        /// <summary>
+        /// Возвращает начальный элемент дуги
+        /// </summary>
+        /// <value>
+        /// Начальный элемент. Его можно приводить к необходимому типу.
+        /// </value>
         public ScElement BeginElement
         {
             get
@@ -17,6 +26,13 @@ namespace ScEngineNet.SafeElements
 
         private ScElement endElement;
 
+
+        /// <summary>
+        /// Возарвщает конечный элемент дуги
+        /// </summary>
+        /// <value>
+        /// Конечный элемент. Его можно приводить к необходимому типу.
+        /// </value>
         public ScElement EndElement
         {
             get

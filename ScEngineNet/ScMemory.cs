@@ -5,13 +5,34 @@ using System.Reflection;
 
 using ScEngineNet;
 using ScEngineNet.ExtensionsNet;
+using ScEngineNet.NetHelpers;
 
 namespace ScMemoryNet
 {
+    /// <summary>
+    /// Класс, имплементирующий Sc-хранилище
+    /// </summary>
     public sealed class ScMemory
     {
         private static ScMemoryContext baseContext;
+        /// <summary>
+        /// Определяет, инициализирована ли память
+        /// </summary>
+        /// <value>
+        /// <c>true</c> если память инициализирована, в противном случае <c>false</c>.
+        /// </value>
+        public static bool IsInitialized
+        {
+            get { return ScMemoryContext.IsMemoryInitialized(); }
+        }
 
+        /// <summary>
+        /// Возвращает базовый контекст памяти.
+        /// Используйте его только для чтения элементов, так как он инициализируется с максимальными правами доступа, и элементы, созданные в нем могут быть невидимы для других контекстов.
+        /// </summary>
+        /// <value>
+        /// Базовый контекст.
+        /// </value>
         public static ScMemoryContext BaseContext
         {
             get { return baseContext; }
@@ -19,25 +40,72 @@ namespace ScMemoryNet
 
         private static List<IScExtensionNet> listExtensionsNet;
 
+        /// <summary>
+        /// Инициализирует память
+        /// </summary>
+        /// <param name="clearBeforeInit"> если  <c>true</c> то память очищается при инициализации.</param>
+        /// <param name="configFile">Путь к конфигурационному файлу</param>
+        /// <param name="repoPath">Путь к репозиторию</param>
+        /// <param name="extensionsPath">Путь к расширениям</param>
+        /// <param name="netExtensionsPath">Путь к расширениям .net</param>
+        /// <exception cref="System.Exception">
+        /// Отсутствует указанный конфигурационный файл
+        /// or
+        /// Отсутствует указанная директория репозитория
+        /// or
+        /// Отсутствует указанная директория расширений
+        /// or
+        /// Отсутствует указанная директория расширений .net
+        /// or
+        /// Память уже инициализирована. Нельзя использовать одновременно несколько экземпляров памяти. Создайте новый ScMemoryContext
+        /// </exception>
         public static void Initialize(bool clearBeforeInit,string configFile, string repoPath, string extensionsPath, string netExtensionsPath)
         {
-            if (!File.Exists(configFile)) { throw new Exception("Отсутствует указанный конфигурационный файл"); }
-            if (!Directory.Exists(repoPath)) { throw new Exception("Отсутствует указанная директория репозитория"); }
-            if (!Directory.Exists(extensionsPath)) { throw new Exception("Отсутствует указанная директория расширений"); }
-            if (!Directory.Exists(netExtensionsPath)) { throw new Exception("Отсутствует указанная директория расширений .net"); }
           
             var parameters = new ScMemoryParams(clearBeforeInit, configFile, repoPath, extensionsPath, netExtensionsPath);
+            ScMemory.Initialize(parameters);
+        }
+
+        /// <summary>
+        /// Инициализирует память
+        /// </summary>
+        /// <param name="parameters">Параметры памяти</param>
+        /// <exception cref="System.Exception">
+        /// Отсутствует указанный конфигурационный файл
+        /// or
+        /// Отсутствует указанная директория репозитория
+        /// or
+        /// Отсутствует указанная директория расширений
+        /// or
+        /// Отсутствует указанная директория расширений .net
+        /// or
+        /// Память уже инициализирована. Нельзя использовать одновременно несколько экземпляров памяти. Создайте новый ScMemoryContext
+        /// </exception>
+        public static void Initialize(ScMemoryParams parameters)
+        {
+            if (!File.Exists(parameters.ConfigFile)) { throw new Exception("Отсутствует указанный конфигурационный файл"); }
+            if (!Directory.Exists(parameters.RepoPath)) { throw new Exception("Отсутствует указанная директория репозитория"); }
+            if (!Directory.Exists(parameters.ExtensionsPath)) { throw new Exception("Отсутствует указанная директория расширений"); }
+            if (!Directory.Exists(parameters.NetExtensionsPath)) { throw new Exception("Отсутствует указанная директория расширений .net"); }
+
             if (ScMemoryContext.IsMemoryInitialized() == false)
             {
                 IntPtr wcontext = NativeMethods.sc_memory_initialize(parameters.scParams);
                 baseContext = new ScMemoryContext(wcontext);
-                ScMemory.LoadExtensionsNets(netExtensionsPath);
+
+                ScMemory.LoadExtensionsNets(parameters.NetExtensionsPath);
+
+                NLanguages.CreateKeyNodes();
+                DataTypes.CreateKeyNodes();
             }
             else
             {
                 throw new Exception("Память уже инициализирована. Нельзя использовать одновременно несколько экземпляров памяти. Создайте новый ScMemoryContext");
             }
         }
+
+
+
 
         private static void LoadExtensionsNets(string netExtensionsPath)
         {
@@ -70,6 +138,11 @@ namespace ScMemoryNet
             return true;
         }
 
+        /// <summary>
+        /// Останавливает движок sc-хранилища.
+        /// </summary>
+        /// <param name="SaveMemoryState">если установлено <c>true</c> то сохраняет состояние памяти.</param>
+        /// <returns><c>true</c>, если память остановилась </returns>
         public static bool ShutDown(bool SaveMemoryState)
         {
             bool IsShutDown = false;
@@ -77,12 +150,7 @@ namespace ScMemoryNet
             {
                 if (ScMemory.UnLoadExtensionsNet())
                 {
-
                     IsShutDown = NativeMethods.sc_memory_shutdown(SaveMemoryState);
-                    //if (IsShutDown == true)
-                    //{
-                    //    ScMemory.baseContext = null;
-                    //};
                 }
             }
 

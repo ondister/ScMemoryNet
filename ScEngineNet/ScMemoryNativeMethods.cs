@@ -1,11 +1,13 @@
-﻿using System;
-using System.Runtime.InteropServices;
-
-using ScEngineNet.NativeElements;
+﻿using ScEngineNet.NativeElements;
 using ScEngineNet.SafeElements;
+using System;
+using System.Runtime.InteropServices;
 
 namespace ScEngineNet
 {
+    /// <summary>
+    /// Нативные функции библиотеки sc-memory.dll
+    /// </summary>
     internal static partial class NativeMethods
     {
         [DllImport(ScEngineNet.ScMemoryDllName, CallingConvention = ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]

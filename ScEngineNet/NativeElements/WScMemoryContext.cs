@@ -2,10 +2,19 @@
 
 namespace ScEngineNet.NativeElements
 {
+    /// <summary>
+    /// Имплементация виртуальной памяти. Практически не используется, вместо нее используется указатели.
+    /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     internal struct WScMemoryContext
     {
-        public ushort Id;
-        public byte AccessLevels;
+        /// <summary>
+        /// The identifier
+        /// </summary>
+        internal ushort Id;
+        /// <summary>
+        /// The access levels
+        /// </summary>
+        internal byte AccessLevels;
     }
 }

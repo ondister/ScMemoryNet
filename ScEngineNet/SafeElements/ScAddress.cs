@@ -7,11 +7,7 @@ namespace ScEngineNet.SafeElements
     /// <summary>
     /// Адрес SC-элемента в памяти.
     /// </summary>
-    /// /// <example>
-    /// Следующий пример демонстрирует использование класса: <see cref="ScAddress"/>
-    /// <code source="..\Ostis.Tests\SafeElementsTest.cs" region="ScAddress" lang="C#" />
-    /// </example>
-    public class ScAddress:IEquatable<ScAddress>
+    public class ScAddress : IEquatable<ScAddress>
     {
         /// <summary>
         /// Возвращает неизвестный  Sc адрес
@@ -32,7 +28,7 @@ namespace ScEngineNet.SafeElements
         {
             get
             {
-               return !this.Equals(ScAddress.Invalid);
+                return !this.Equals(ScAddress.Invalid);
             }
         }
 
@@ -60,7 +56,7 @@ namespace ScEngineNet.SafeElements
         {
             this.segment = segment;
             this.offset = offset;
-            this.wScAddress = new WScAddress() { Offset=offset,Segment=segment};
+            this.wScAddress = new WScAddress() { Offset = offset, Segment = segment };
         }
 
         internal ScAddress(WScAddress wScAddress)
@@ -88,12 +84,12 @@ namespace ScEngineNet.SafeElements
         /// Определяет равен ли заданный объект <see cref="ScAddress"/> текущему объекту
         /// </summary>
         /// <param name="obj">объект <see cref="ScAddress"/></param>
-        public bool Equals(ScAddress obj) 
+        public bool Equals(ScAddress obj)
         {
             if (obj == null)
                 return false;
-          
-            return obj.Offset == this.Offset && obj.Segment== this.Segment;
+
+            return obj.Offset == this.Offset && obj.Segment == this.Segment;
         }
 
         /// <summary>
@@ -107,15 +103,15 @@ namespace ScEngineNet.SafeElements
             ScAddress scAddress = obj as ScAddress;
             if (scAddress as ScAddress == null)
                 return false;
-            return scAddress.Offset == this.Offset && scAddress.Segment== this.Segment;
+            return scAddress.Offset == this.Offset && scAddress.Segment == this.Segment;
         }
 
         /// <summary>
         /// Возвращает Hash код текущего объекта
         /// </summary>
         public override int GetHashCode()
-        {  
-            return Convert.ToInt32(this.Offset.ToString()+this.Segment.ToString());
+        {
+            return Convert.ToInt32(this.Offset.ToString() + this.Segment.ToString());
         }
 
         /// <summary>
@@ -145,6 +141,6 @@ namespace ScEngineNet.SafeElements
             return !(scAddress1 == scAddress2);
         }
 
-        #endregion 
+        #endregion
     }
 }

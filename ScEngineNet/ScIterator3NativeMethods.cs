@@ -1,8 +1,7 @@
-﻿using System;
-using System.Runtime.InteropServices;
-
-using ScEngineNet.NativeElements;
+﻿using ScEngineNet.NativeElements;
 using ScEngineNet.SafeElements;
+using System;
+using System.Runtime.InteropServices;
 
 namespace ScEngineNet
 {
@@ -37,7 +36,7 @@ namespace ScEngineNet
         //_SC_EXTERN sc_iterator3* sc_iterator3_f_a_f_new(const sc_memory_context *ctx, sc_addr el_beg, sc_type arc_type, sc_addr el_end);
         [DllImport(ScEngineNet.ScMemoryDllName, CallingConvention = ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
         internal static extern IntPtr sc_iterator3_f_a_f_new(IntPtr context, WScAddress beginElementAddress, ElementType arcType, WScAddress endElementAddress);
-
+       
         ///*! Create new sc-iterator-3
         // * @param type Iterator type (search template)
         // * @param p1 First iterator parameter
@@ -48,7 +47,7 @@ namespace ScEngineNet
         //_SC_EXTERN sc_iterator3* sc_iterator3_new(const sc_memory_context *ctx, sc_iterator3_type type, sc_iterator_param p1, sc_iterator_param p2, sc_iterator_param p3);
         [DllImport(ScEngineNet.ScMemoryDllName, CallingConvention = ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
         internal static extern IntPtr sc_iterator3_new(IntPtr context, ScIterator3Type iteratorType, ScIteratorParam p1, ScIteratorParam p2, ScIteratorParam p3);
-
+        
         ///*! Destroy iterator and free allocated memory
         // * @param it Pointer to sc-iterator that need to be destroyed
         // */

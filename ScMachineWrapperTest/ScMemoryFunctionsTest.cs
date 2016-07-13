@@ -53,14 +53,14 @@ namespace ScEngineNetTest
             Assert.AreNotEqual(0, linkAddr.Offset);
 
             //sc_memory_set_link_content
-            var linkContent = new ScLinkContent("Test Content 1234567890 Тест Контент");
+            var linkContent = new ScString("Test Content 1234567890 Тест Контент");
             var resultSetLinkContent = NativeMethods.sc_memory_set_link_content( scMemoryContext, linkAddr, linkContent.ScStream);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultSetLinkContent);
 
             //sc_memory_get_link_content
             IntPtr streamPtr = IntPtr.Zero;
             NativeMethods.sc_memory_get_link_content( scMemoryContext, linkAddr, out streamPtr);
-            ScLinkContent gettingContent = new ScLinkContent(streamPtr);
+            ScLinkContent gettingContent = new ScBinary(streamPtr);
             Assert.AreEqual(linkContent, gettingContent);
 
             //sc_memory_find_links_with_content

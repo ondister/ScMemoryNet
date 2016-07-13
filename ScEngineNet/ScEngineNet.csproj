@@ -30,6 +30,7 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>..\..\sc-machine-iot\bin\ScEngineNet.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -41,6 +42,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NetHelpers\DataTypes.cs" />
+    <Compile Include="NetHelpers\NLanguages.cs" />
+    <Compile Include="SafeElements\ScObject.cs" />
+    <Compile Include="SafeElements\ScBinary.cs" />
+    <Compile Include="SafeElements\ScByte.cs" />
+    <Compile Include="SafeElements\ScBool.cs" />
+    <Compile Include="SafeElements\ScLong.cs" />
+    <Compile Include="SafeElements\ScDouble.cs" />
+    <Compile Include="SafeElements\ScInt32.cs" />
+    <Compile Include="SafeElements\ScString.cs" />
+    <Compile Include="SafeElements\MainIdentifiers.cs" />
     <Compile Include="SafeElements\ScAccessLevels.cs" />
     <Compile Include="SafeElements\ScResultExtensionMethods.cs" />
     <Compile Include="ExtensionsNet\IScExtensionNet.cs" />
@@ -53,7 +65,7 @@
     <Compile Include="SafeElements\ScElement.cs" />
     <Compile Include="SafeElements\ScEvent.cs" />
     <Compile Include="SafeElements\Construction.cs" />
-    <Compile Include="SafeElements\ScContainer.cs" />
+    <Compile Include="SafeElements\ScIterator.cs" />
     <Compile Include="ScEventNativeMethods.cs" />
     <Compile Include="ScHelperNativeMethods.cs" />
     <Compile Include="ScIterator5NativeMethods.cs" />

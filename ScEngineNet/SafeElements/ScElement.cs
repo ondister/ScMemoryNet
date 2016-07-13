@@ -2,11 +2,20 @@
 
 namespace ScEngineNet.SafeElements
 {
+    /// <summary>
+    /// Базовый класс для всех sc-элементов памяти: sc-узла, sc-ссылки и sc-дуги. Напрямую создать его нельзя
+    /// </summary>
     public class ScElement : IEquatable<ScElement>
     {
         internal IntPtr scContext;
         private ScAddress scAddress;
 
+        /// <summary>
+        /// Вовращает тип элемента
+        /// </summary>
+        /// <value>
+        /// Тип элемента
+        /// </value>
         public ElementType ElementType
         {
             get
@@ -15,29 +24,115 @@ namespace ScEngineNet.SafeElements
             }
         }
 
+        /// <summary>
+        /// Возвращает адрес элемента
+        /// </summary>
+        /// <value>
+        /// Sc-адрес
+        /// </value>
         public ScAddress ScAddress
         {
             get { return scAddress; }
         }
 
-        public bool DeleteFromMemory()
+        /// <summary>
+        /// Удаляет элемент из памяти
+        /// </summary>
+        /// <returns>Возвращает ScResult.SC_RESULT_OK, если элемент удален</returns>
+        public ScResult DeleteFromMemory()
         {
-            bool isDeleted = false;
+            ScResult isDeleted = ScResult.SC_RESULT_ERROR;
             isDeleted = ScMemorySafeMethods.DeleteElement(this.scContext, this);
             this.scAddress = ScAddress.Invalid;
             return isDeleted;
         }
 
-        internal ScElement(ScAddress scAddress,IntPtr scContext)
+        internal ScElement(ScAddress scAddress, IntPtr scContext)
         {
             this.scContext = scContext;
             this.scAddress = scAddress;
         }
 
-        public bool ChangeSubType(ElementType subType)
+        /// <summary>
+        /// Изменяет подтип элемента. 
+        /// </summary>
+        /// <param name="subType">Подтип элемента</param>
+        /// <returns>Возвращает ScResult.SC_RESULT_OK, если подтип изменен</returns>
+        public ScResult ChangeSubType(ElementType subType)
         {
-            return NativeMethods.sc_memory_change_element_subtype(this.scContext, this.ScAddress.WScAddress, subType).ToBool();
+            return NativeMethods.sc_memory_change_element_subtype(this.scContext, this.ScAddress.WScAddress, subType);
         }
+
+        /// <summary>
+        /// Добавляет входящую дугу
+        /// </summary>
+        /// <param name="beginElement">Начальный элемент</param>
+        /// <param name="arcType">Тип дуги</param>
+        /// <returns></returns>
+        public ScArc AddInputArc(ScElement beginElement, ElementType arcType)
+        {
+            return ScMemorySafeMethods.CreateArc(this.scContext, arcType, beginElement, this);
+        }
+
+        /// <summary>
+        /// Добавляет исходящую дугу
+        /// </summary>
+        /// <param name="endElement">Конечный элемент</param>
+        /// <param name="arcType">Тип дуги</param>
+        /// <returns></returns>
+        public ScArc AddOutputArc(ScElement endElement, ElementType arcType)
+        {
+            return ScMemorySafeMethods.CreateArc(this.scContext, arcType, this, endElement);
+        }
+
+        /// <summary>
+        /// Создает событие для элемента
+        /// </summary>
+        /// <param name="element">Sc-элемент</param>
+        /// <param name="eventType">Тип события</param>
+        /// <returns>Возвращает событие <see cref="ScEvent"/> </returns>
+        public ScEvent CreateEvent(ScElement element, ScEventType eventType)
+        {
+            var scEvent = new ScEvent(element.ScAddress, eventType);
+            if (ScMemoryContext.IsMemoryInitialized() == true)
+            {
+
+                scEvent.Subscribe(this.scContext);
+            }
+            return scEvent;
+        }
+
+
+
+
+
+        /// <summary>
+        /// Находит элемент по узлу неролевого отношения и узлу класса.
+        /// </summary>
+        /// <param name="nrelNode">Узел неролевого отношения</param>
+        /// <param name="classNode">Узел класса</param>
+        /// <param name="findElementType">Тип искомого элемента</param>
+        /// <returns></returns>
+        public ScElement GetElementByNrelClass(ScNode nrelNode, ScNode classNode, ElementType findElementType)
+        {
+            ScElement element = null;
+            var tmpContext = new ScMemoryContext(this.scContext);
+
+            var container5 = tmpContext.CreateIterator(this, ElementType.ConstantCommonArc_c, findElementType, ElementType.PositiveConstantPermanentAccessArc_c, nrelNode);
+            foreach (var construction in container5)
+            {
+                var container3 = tmpContext.CreateIterator(classNode, ElementType.PositiveConstantPermanentAccessArc_c, construction.Elements[2]);
+                if (container3.GetAllConstructions().Count != 0)
+                {
+                    element = construction.Elements[2];
+                    break;
+                }
+            }
+
+            return element;
+        }
+
+
 
         #region Реализация сравнения
 
@@ -78,8 +173,8 @@ namespace ScEngineNet.SafeElements
         /// <summary>
         /// Оператор сравнения элементов
         /// </summary>
-        /// <param name="scElement">Первый элемент</param>
-        /// <param name="scElement">Второй элемент</param>
+        /// <param name="scElement1">Первый элемент</param>
+        /// <param name="scElement2">Второй элемент</param>
         /// <returns>Возвращает True, если элементы равны</returns>
         public static bool operator ==(ScElement scElement1, ScElement scElement2)
         {

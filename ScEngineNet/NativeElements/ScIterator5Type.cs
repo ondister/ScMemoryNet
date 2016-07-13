@@ -1,5 +1,8 @@
 ﻿namespace ScEngineNet.NativeElements
 {
+    /// <summary>
+    /// Типы ScIterator5 из нативной библиотеки
+    /// </summary>
     internal enum ScIterator5Type
     {
         sc_iterator5_unknown = -1,

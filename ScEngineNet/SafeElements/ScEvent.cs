@@ -1,24 +1,45 @@
-using System;
-
 using ScEngineNet.NativeElements;
+using System;
 
 namespace ScEngineNet.SafeElements
 {
+    /// <summary>
+    /// Делегат события
+    /// </summary>
+    /// <param name="sender">The sender.</param>
+    /// <param name="e">The <see cref="ScEventArgs"/> instance containing the event data.</param>
     public delegate void ElementEventHandler(object sender, ScEventArgs e);
+    /// <summary>
+    /// Делегат удаления элемента, подписанного на событие
+    /// </summary>
+    /// <param name="sender">The sender.</param>
+    /// <param name="e">The <see cref="ScEventArgs"/> instance containing the event data.</param>
     public delegate void ElementDeleteHandler(object sender, ScEventArgs e);
+    
+    /// <summary>
+    /// Событие для элемента. Создается посредством вызова метода CreateEvent класса <see cref="ScMemoryContext" />
+    /// </summary>
     public class ScEvent : IDisposable
     {
         private IntPtr wScEvent;
         private ScAddress elementAddress;
         private IntPtr context;
+        private readonly ScEventType eventType;
+
+        /// <summary>
+        /// Событие элемента
+        /// </summary>
         public event ElementEventHandler ElementEvent;
+        /// <summary>
+        /// Событие удаления элемента
+        /// </summary>
         public event ElementDeleteHandler ElementDelete;
 
         internal void OnElementEvent(ScEventType eventType, ScAddress elementAddress, ScAddress arcAddress)
         {
             if (ElementEvent != null)
             {
-                ScEventArgs args = new ScEventArgs(eventType, new ScElement(elementAddress,this.context), new ScArc(arcAddress, this.context));
+                ScEventArgs args = new ScEventArgs(eventType, ScMemorySafeMethods.GetElement(elementAddress.WScAddress, this.context), new ScArc(arcAddress, this.context));
                 ElementEvent(this, args);
             }
         }
@@ -27,18 +48,30 @@ namespace ScEngineNet.SafeElements
         {
             if (ElementDelete != null)
             {
-                ScEventArgs args = new ScEventArgs(ScEventType.SC_EVENT_REMOVE_ELEMENT, new ScElement(elementAddress, this.context), new ScArc(ScAddress.Invalid, context));
+                ScEventArgs args = new ScEventArgs(ScEventType.SC_EVENT_REMOVE_ELEMENT, ScMemorySafeMethods.GetElement(elementAddress.WScAddress, this.context), new ScArc(ScAddress.Invalid, context));
                 ElementDelete(this, args);
             }
         }
 
+        /// <summary>
+        /// Возвращает адрес элемента, подписанного на событие.
+        /// </summary>
+        /// <value>
+        /// The element address.
+        /// </value>
         public ScAddress ElementAddress
         {
             get { return elementAddress; }
         }
 
-        private readonly ScEventType eventType;
 
+
+        /// <summary>
+        /// Возвращает тип события.
+        /// </summary>
+        /// <value>
+        /// Тип события <see cref="ScEventType"/>
+        /// </value>
         public ScEventType EventType
         {
             get { return eventType; }
@@ -74,6 +107,10 @@ namespace ScEngineNet.SafeElements
             return this.wScEvent != IntPtr.Zero ? true : false;
         }
 
+        /// <summary>
+        /// Удаляет событие
+        /// </summary>
+        /// <returns></returns>
         public bool Delete()
         {
             bool isDelete = false;
@@ -102,6 +139,10 @@ namespace ScEngineNet.SafeElements
 
         private bool disposed = false;
 
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposed)
@@ -116,11 +157,17 @@ namespace ScEngineNet.SafeElements
             }
         }
 
+        /// <summary>
+        /// Finalizes an instance of the <see cref="ScEvent"/> class.
+        /// </summary>
         ~ScEvent()
         {
             Dispose(false);
         }
 
+        /// <summary>
+        /// Выполняет определяемые приложением задачи, связанные с удалением, высвобождением или сбросом неуправляемых ресурсов.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);

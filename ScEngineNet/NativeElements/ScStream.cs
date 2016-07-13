@@ -5,6 +5,23 @@ using ScEngineNet.SafeElements;
 
 namespace ScEngineNet.NativeElements
 {
+    /// <summary>
+    /// Поток для чтения и записи в память. Эта структура не используется, вместо нее используется указатель.
+    /// Так же не используются и делегаты, имплементирующие указаели на функции.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential, CharSet = ScEngineNet.DefaultCharset)]
+    internal struct ScStream
+    {
+        internal IntPtr Handler;
+        internal ScStreamFlag Flags;
+        internal fStreamRead ReadFunction;
+        internal fStreamWrite WriteFunction;
+        internal fStreamSeek SeekFunction;
+        internal fStreamTell TellFunction;
+        internal fStreamFreeHandler FreeFunction;
+        internal fStreamEof EofFunction;
+    }
+    
     //  typedef sc_result (*fStreamRead)(const sc_stream *stream, sc_char *data, sc_uint32 length, sc_uint32 *bytes_read);
     [UnmanagedFunctionPointer(ScEngineNet.DefaultCallingConvention,CharSet=ScEngineNet.DefaultCharset)]
     internal delegate ScResult fStreamRead(IntPtr stream, byte[] data, uint lenth, out uint bytesRead);
@@ -29,16 +46,5 @@ namespace ScEngineNet.NativeElements
     //typedef sc_bool (*fStreamEof)(const sc_stream *stream);
     internal delegate bool fStreamEof(IntPtr stream);
 
-    [StructLayout(LayoutKind.Sequential, CharSet=ScEngineNet.DefaultCharset)]
-    internal struct ScStream
-    {
-        internal IntPtr Handler;
-        internal ScStreamFlag Flags;
-        internal fStreamRead ReadFunction;
-        internal fStreamWrite WriteFunction;
-        internal fStreamSeek SeekFunction;
-        internal fStreamTell TellFunction;
-        internal fStreamFreeHandler FreeFunction;
-        internal fStreamEof EofFunction;
-    }
+  
 }

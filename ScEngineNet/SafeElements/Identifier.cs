@@ -3,12 +3,8 @@
 namespace ScEngineNet.SafeElements
 {
     /// <summary>
-    /// Идентификатор SC-элемента.
+    /// Идентификатор SC-элемента. Он может быть только текстовым. 
     /// </summary>
-    /// <example>
-    /// Следующий пример демонстрирует использование класса: <see cref="Identifier"/>
-    /// <code source="..\Ostis.Tests\SafeElementsTest.cs" region="Identifier" lang="C#" />
-    /// </example>
     public class Identifier : IEquatable<Identifier>
     {
         /// <summary>
@@ -33,22 +29,35 @@ namespace ScEngineNet.SafeElements
         /// </summary>
         public static readonly Identifier Invalid = String.Empty;
 
-        internal static Identifier GetUnique(IntPtr scExtContext,  ScNode node)
+        /// <summary>
+        /// Возвращает уникльный идентификатор
+        /// </summary>
+        /// <param name="scExtContext">Указатель на контекст</param>
+        /// <param name="node">Узел для которого создается идентификатор</param>
+        /// <returns>Уникальный идентификатор</returns>
+        internal static Identifier GetUnique(IntPtr scExtContext, ScNode node)
         {
             Identifier identifier = Identifier.Invalid;
-            identifier = "idtf_"+node.ScAddress.GetHashCode();
+            identifier = "idtf_" + node.ScAddress.GetHashCode();
             while (ScMemorySafeMethods.IsElementExist(scExtContext, (ScMemorySafeMethods.FindNode(scExtContext, identifier)).ScAddress) != false)
             {
                 Random rand = new Random();
-                identifier =  identifier + "_" + rand.Next();
+                identifier = identifier + "_" + rand.Next();
             }
 
             return identifier;
         }
 
+        /// <summary>
+        /// Возвращает уникльный идентификатор
+        /// </summary>
+        /// <param name="scExtContext">Указатель на контекст</param>
+        /// <param name="prefix">Преффикс</param>
+        /// <param name="node">Узел для которого создается идентификатор</param>
+        /// <returns>Уникальный идентификатор</returns>
         internal static Identifier GetUnique(IntPtr scExtContext, string prefix, ScNode node)
         {
-            Identifier initialIdentifier = Identifier.GetUnique( scExtContext,node);
+            Identifier initialIdentifier = Identifier.GetUnique(scExtContext, node);
             return prefix + "_" + initialIdentifier;
         }
 

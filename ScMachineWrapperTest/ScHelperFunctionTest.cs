@@ -29,14 +29,14 @@ namespace ScEngineNetTest
             Assert.IsTrue(isInitialized);
                         
             //sc_helper_set_system_identifier
-            var identifier=new ScLinkContent("sc_helper_test_idtf");
+            var identifier=new ScString("sc_helper_test_idtf");
             var nodeAddr = NativeMethods.sc_memory_node_new(scMemoryContext, ElementType.ClassNode_a);
-            var resultSetIdtf = NativeMethods.sc_helper_set_system_identifier(scMemoryContext, nodeAddr, identifier.Content, (uint)identifier.Content.Length);
+            var resultSetIdtf = NativeMethods.sc_helper_set_system_identifier(scMemoryContext, nodeAddr, identifier.Bytes, (uint)identifier.Value.Length);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultSetIdtf);
 
             //sc_helper_resolve_system_identifier
             WScAddress resolvedAddr;
-            bool isResolve = NativeMethods.sc_helper_resolve_system_identifier(  scMemoryContext, identifier.Content, out resolvedAddr);
+            bool isResolve = NativeMethods.sc_helper_resolve_system_identifier(scMemoryContext, identifier.Bytes, out resolvedAddr);
             Assert.IsTrue(isResolve);
             Assert.AreEqual(nodeAddr.Offset, resolvedAddr.Offset);
 
@@ -50,11 +50,11 @@ namespace ScEngineNetTest
             IntPtr stream;
             ScResult resultgetlinkContent = NativeMethods.sc_memory_get_link_content(  scMemoryContext, linkAddress, out stream);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultgetlinkContent);
-            Assert.AreEqual(identifier, new ScLinkContent(stream));
+            Assert.AreEqual(identifier, new ScBinary(stream));
 
             //sc_helper_find_element_by_system_identifier
             WScAddress findedAddress;
-            ScResult resultFindElement = NativeMethods.sc_helper_find_element_by_system_identifier(  scMemoryContext, identifier.Content, (uint)identifier.Content.Length, out findedAddress);
+            ScResult resultFindElement = NativeMethods.sc_helper_find_element_by_system_identifier(scMemoryContext, identifier.Bytes, (uint)identifier.Bytes.Length, out findedAddress);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultFindElement);
             Assert.AreEqual(nodeAddr.Offset, findedAddress.Offset);
 
