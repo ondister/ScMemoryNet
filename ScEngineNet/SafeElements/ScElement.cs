@@ -23,6 +23,19 @@ namespace ScEngineNet.SafeElements
                 return ScMemorySafeMethods.GetElementType(this.scContext, this);
             }
         }
+        /// <summary>
+        /// Returns true if ScElement is valid.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is valid; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsValid
+        {
+            get
+            {
+                return this.isValid() ;
+            }
+        }
 
         /// <summary>
         /// Возвращает адрес элемента
@@ -91,9 +104,9 @@ namespace ScEngineNet.SafeElements
         /// <param name="element">Sc-элемент</param>
         /// <param name="eventType">Тип события</param>
         /// <returns>Возвращает событие <see cref="ScEvent"/> </returns>
-        public ScEvent CreateEvent(ScElement element, ScEventType eventType)
+        public ScEvent CreateEvent(ScEventType eventType)
         {
-            var scEvent = new ScEvent(element.ScAddress, eventType);
+            var scEvent = new ScEvent(this.ScAddress, eventType);
             if (ScMemoryContext.IsMemoryInitialized() == true)
             {
 
@@ -132,6 +145,13 @@ namespace ScEngineNet.SafeElements
             return element;
         }
 
+        private  bool isValid()
+        {
+            bool isValid = false;
+            if (this!=null && this.scAddress.IsValid )
+            { isValid = true; }
+            return isValid;
+        }
 
 
         #region Реализация сравнения

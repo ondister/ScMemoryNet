@@ -79,9 +79,9 @@ namespace ScMemoryNet
 
             if (ScMemoryContext.IsMemoryInitialized() == false)
             {
-           
-                NativeMethods.sc_memory_initialize(parameters.scParams);
-
+               
+                    NativeMethods.sc_memory_initialize(parameters.scParams);
+               
                 ScMemory.LoadExtensionsNets(parameters.NetExtensionsPath);
 
                 NLanguages.CreateKeyNodes();

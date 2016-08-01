@@ -21,91 +21,47 @@ namespace Demo
            const string extensionPath = @"d:\OSTIS\sc-machine-iot\bin\extensions";
            const string netExtensionPath = @"d:\OSTIS\sc-machine-iot\bin\netextensions";
            ScMemory.Initialize(true, configFile, repoPath, extensionPath, netExtensionPath);
-         var context = new ScMemoryContext(ScAccessLevels.MinLevel);
-           
+           using (var context = new ScMemoryContext(ScAccessLevels.MinLevel))
+           { 
+               //создаем узел с идентификаторами
+             
+                   var node = context.CreateNode(ElementType.ConstantNode_c, "sys_identificator");
+                   node.MainIdentifiers[NLanguages.Lang_en] = "engl_idtf";
+                   node.MainIdentifiers[NLanguages.Lang_ru] = "ru_idtf";
 
-               XmlDocument xdoc = new XmlDocument();
-               xdoc.Load(@"f:\1\text_entry.xml");
-               // xdoc.Load(@"f:\1\1.xml");
-               foreach (XmlNode node in xdoc.ChildNodes[0])
-               {
-                   string id = "";
-                   string name = "";
-                   string lemma = "";
-                   id = node.Attributes[0].Value;
-
-                   Console.WriteLine(id);
-
-                   foreach (XmlNode cnode in node.ChildNodes)
+               //итерируем их
+                   ScNode main_idtf = context.FindNode("nrel_main_idtf");
+                   if (main_idtf.IsValid)
                    {
-
-                       if (cnode.InnerText.Length != 0)
+                       var iterator = context.CreateIterator(node, ElementType.ConstantCommonArc_c, ElementType.Link_a, ElementType.PositiveConstantPermanentAccessArc_c, main_idtf);
+                       foreach (var construction in iterator)
                        {
-                           if (cnode.Name == "name")
-                           {
-                               name = cnode.InnerText;
-                           }
-                           if (cnode.Name == "lemma")
-                           {
-                               lemma = cnode.InnerText;
-                           }
+                           var linkContent = ((ScLink)construction.Elements[2]).LinkContent;
+                           Console.WriteLine(((ScString)linkContent).Value);
                        }
                    }
-                   createConceptNode(context, id, name, lemma);
 
-               }
-
-
-
-               Console.WriteLine("write done");
-               ScStat stat = context.GetStatistics();
-               Console.WriteLine("nodes: " + stat.NodeCount);
-               Console.WriteLine("arcs: " + stat.ArcCount);
-               Console.WriteLine("links: " + stat.LinkCount);
-               Console.WriteLine("segs: " + stat.SegmentsCount);
-               Stopwatch watch = new Stopwatch();
-               watch.Start();
-
-               var links = context.FindLinks("АБОНЕНТ");
-
-               watch.Stop();
-               Console.WriteLine("LinksCount: " + links.Count);
-               foreach (var link in links)
-               {
-                   Console.WriteLine("Finded: " + ((ScString)link.LinkContent).Value);
-               }
-               Console.WriteLine("Elapsed:" + watch.Elapsed.TotalMilliseconds);
+               //подпитываем элемент на событие добавления исходящей дуги
+                 var nodeEvent=  node.CreateEvent(ScEventType.SC_EVENT_ADD_OUTPUT_ARC);
+                 nodeEvent.ElementEvent += nodeEvent_ElementEvent;
+               //добаляем исходящую дугу
+                 var link = context.CreateLink("linka");
+                 node.AddOutputArc(link, ElementType.PositiveConstantPermanentAccessArc_c);
+             
 
 
-               watch.Start();
-               var links1 = context.FindLinks("ИСКАТЬ ИНФОРМАЦИЮ");
 
-               watch.Stop();
-               Console.WriteLine("Elapsed:" + watch.Elapsed.TotalMilliseconds);
-               Console.WriteLine("LinksCount: " + links1.Count);
-               foreach (var link in links1)
-               {
-                   Console.WriteLine("Finded: " + ((ScString)link.LinkContent).Value);
-               }
-
+           }
            
-
            Console.ReadKey();
-           context.Delete();
            Console.WriteLine(ScMemory.ShutDown(false));
+           Console.ReadKey();
        }
 
-
-       private  void createConceptNode(ScMemoryContext context, string id, string name, string lemma)
+       void nodeEvent_ElementEvent(object sender, ScEventArgs e)
        {
-           var node = context.CreateNode(ElementType.ConstantNode_c, id);
-           node.MainIdentifiers[NLanguages.Lang_ru] = name;
-           var nrel_lemma = context.CreateNode(ElementType.NonRoleNode_a, "nrel_rutez_lemma");
-           var lemmaLink = context.CreateLink(lemma);
-           var arc = node.AddOutputArc(lemmaLink, ElementType.ConstantCommonArc_c);
-           nrel_lemma.AddOutputArc(arc, ElementType.PositiveConstantPermanentAccessArc_c);
+           Console.WriteLine("arc added");
        }
-
 
 
     }
