@@ -121,10 +121,6 @@ namespace ScEngineNetTest
             ScResult resultFree = NativeMethods.sc_memory_element_free( scMemoryContext, nodeAddr);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultFree);
 
-#warning Непонятно, как и зачем работает функция очистки. Здесь она не работает. У разработчика памяти она просто очищает поля структуры.
-            //sc_memory_params_clear
-            NativeMethods.sc_memory_params_clear(scParams);
-
 
             //sc_memory_shutdown
             bool isShutDown = NativeMethods.sc_memory_shutdown(false);

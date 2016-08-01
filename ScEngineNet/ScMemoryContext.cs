@@ -4,6 +4,7 @@ using ScEngineNet.SafeElements;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Security;
 
 namespace ScEngineNet
 {
@@ -12,9 +13,14 @@ namespace ScEngineNet
     /// Это виртуальный интерфейс для доступа к памяти, которому устанавливается уровень доступа.
     /// Контекст с меньшим уровнем доступа не имеет доступ к элементам, созданным в контекс.
     /// </summary>
-    public class ScMemoryContext : IDisposable
+    public class ScMemoryContext:SafeHandle
     {
-        private IntPtr scMemoryContext;
+        private IntPtr ptrScMemoryContext;
+
+        internal IntPtr PtrScMemoryContext
+        {
+            get { return ptrScMemoryContext; }
+        }
 
         /// <summary>
         /// Возвращает установленный для контекста уровень доступа
@@ -26,7 +32,7 @@ namespace ScEngineNet
         {
             get
             {
-                var context = (WScMemoryContext)Marshal.PtrToStructure(scMemoryContext, typeof(WScMemoryContext));
+                var context = (WScMemoryContext)Marshal.PtrToStructure(PtrScMemoryContext, typeof(WScMemoryContext));
                 return (ScAccessLevels)context.AccessLevels;
             }
         }
@@ -35,15 +41,6 @@ namespace ScEngineNet
 
         #region initialize
 
-        /// <summary>
-        /// Возвращает true если контекст инициализирован правильно.
-        /// </summary>
-        /// <returns></returns>
-        public bool IsValid()
-        {
-            bool isValid = scMemoryContext != IntPtr.Zero;
-            return isValid;
-        }
 
         /// <summary>
         /// Определяет, инициализирована ли память
@@ -54,33 +51,32 @@ namespace ScEngineNet
             return NativeMethods.sc_memory_is_initialized();
         }
 
-        internal ScMemoryContext(IntPtr context)
-        {
-            this.scMemoryContext = context;
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ScMemoryContext"/> class.
         /// Для создания экземпляра контекста, необходимо инициализировать память <see cref="ScMemory"/>
         /// </summary>
         /// <param name="accessLevels"> Уровень доступа</param>
         public ScMemoryContext(ScAccessLevels accessLevels)
+            : base(IntPtr.Zero, true)
         {
+            GC.KeepAlive(this);
             if (ScMemoryContext.IsMemoryInitialized())
             {
-                this.scMemoryContext = NativeMethods.sc_memory_context_new((byte)accessLevels);
+                this.ptrScMemoryContext = NativeMethods.sc_memory_context_new((byte)accessLevels);
+                
             }
+
         }
 
         /// <summary>
         /// Удаляет контекст
+        /// Этот метод не обязательно вызывать, так как он вызывается сборщиком мусора
         /// </summary>
         public void Delete()
         {
             if (ScMemoryContext.IsMemoryInitialized())
             {
-                NativeMethods.sc_memory_context_free(this.scMemoryContext);
-                this.scMemoryContext = IntPtr.Zero;
+               NativeMethods.sc_memory_context_free(this.PtrScMemoryContext);
             }
         }
 
@@ -93,7 +89,7 @@ namespace ScEngineNet
             var stat = new ScStat();
             if (ScMemoryContext.IsMemoryInitialized())
             {
-                NativeMethods.sc_memory_stat(this.scMemoryContext, out stat);
+                NativeMethods.sc_memory_stat(this.PtrScMemoryContext, out stat);
             }
             return stat;
         }
@@ -107,7 +103,7 @@ namespace ScEngineNet
             var result = ScResult.SC_RESULT_ERROR;
             if (ScMemoryContext.IsMemoryInitialized())
             {
-                result = NativeMethods.sc_memory_save(this.scMemoryContext);
+                result = NativeMethods.sc_memory_save(this.PtrScMemoryContext);
             }
             return result;
         }
@@ -125,7 +121,7 @@ namespace ScEngineNet
         /// <returns>Уникальный идентификатр узла</returns>
         public Identifier CreateUniqueIdentifier(ScNode node)
         {
-            return Identifier.GetUnique(this.scMemoryContext, node);
+            return Identifier.GetUnique(this, node);
         }
 
         /// <summary>
@@ -136,7 +132,7 @@ namespace ScEngineNet
         /// <returns>Уникальный идентификатр узла</returns>
         public Identifier CreateUniqueIdentifier(string prefix, ScNode node)
         {
-            return Identifier.GetUnique(this.scMemoryContext, prefix, node);
+            return Identifier.GetUnique(this, prefix, node);
         }
 
         /// <summary>
@@ -146,7 +142,7 @@ namespace ScEngineNet
         /// <returns></returns>
         public bool IsElementExist(ScAddress elementAddress)
         {
-            return ScMemorySafeMethods.IsElementExist(this.scMemoryContext, elementAddress);
+            return ScMemorySafeMethods.IsElementExist(this, elementAddress);
         }
 
 
@@ -164,10 +160,10 @@ namespace ScEngineNet
         /// <returns>Созданную дугу</returns>
         public ScArc CreateArc(ScElement beginElement, ScElement endElement, ElementType arcType)
         {
-            var createdArc = new ScArc(ScAddress.Invalid, this.scMemoryContext);
+            ScArc createdArc = null;
             if (ScMemoryContext.IsMemoryInitialized() == true)
             {
-                createdArc = ScMemorySafeMethods.CreateArc(this.scMemoryContext, arcType, beginElement, endElement);
+                createdArc = ScMemorySafeMethods.CreateArc(this, arcType, beginElement, endElement);
             }
             return createdArc;
         }
@@ -179,8 +175,8 @@ namespace ScEngineNet
         /// <returns>sc-дуга</returns>
         public ScArc FindArc(ScAddress arcAddress)
         {
-            var createdArc = new ScArc(ScAddress.Invalid, this.scMemoryContext);
-            var scElement = ScMemorySafeMethods.GetElement(arcAddress.WScAddress, this.scMemoryContext);
+            ScArc createdArc = null;
+            var scElement = ScMemorySafeMethods.GetElement(arcAddress.WScAddress, this);
             if (scElement.ElementType.HasAnyType(ElementType.ArcMask_c))
             {
                 createdArc = (ScArc)scElement;
@@ -201,7 +197,7 @@ namespace ScEngineNet
             bool result = false;
             if (ScMemoryContext.IsMemoryInitialized() == true)
             {
-                result = NativeMethods.sc_helper_check_arc(this.scMemoryContext, beginElement.ScAddress.WScAddress, endElement.ScAddress.WScAddress, arcType);
+                result = NativeMethods.sc_helper_check_arc(this.PtrScMemoryContext, beginElement.ScAddress.WScAddress, endElement.ScAddress.WScAddress, arcType);
             }
             return result;
 
@@ -218,10 +214,10 @@ namespace ScEngineNet
         /// <returns>Созданный узел</returns>
         public ScNode CreateNode(ElementType nodeType)
         {
-            var createdNode = new ScNode(ScAddress.Invalid, this.scMemoryContext);
+            ScNode createdNode = null;
             if (ScMemoryContext.IsMemoryInitialized() == true)
             {
-                createdNode = new ScNode(new ScAddress(NativeMethods.sc_memory_node_new(this.scMemoryContext, nodeType)), this.scMemoryContext);
+                createdNode = new ScNode(new ScAddress(NativeMethods.sc_memory_node_new(this.PtrScMemoryContext, nodeType)), this);
             }
             return createdNode;
         }
@@ -282,7 +278,7 @@ namespace ScEngineNet
         /// <returns>Найденный узел</returns>
         public ScNode FindNode(Identifier identifier)
         {
-            return ScMemorySafeMethods.FindNode(this.scMemoryContext, identifier);
+            return ScMemorySafeMethods.FindNode(this, identifier);
         }
 
         /// <summary>
@@ -292,8 +288,8 @@ namespace ScEngineNet
         /// <returns>Найденный узел</returns>
         public ScNode FindNode(ScAddress nodeAddress)
         {
-            var createdNode = new ScNode(ScAddress.Invalid, this.scMemoryContext);
-            var scElement = ScMemorySafeMethods.GetElement(nodeAddress.WScAddress, this.scMemoryContext);
+            ScNode createdNode = null;
+            var scElement = ScMemorySafeMethods.GetElement(nodeAddress.WScAddress, this);
             if (scElement.ElementType.HasAnyType(ElementType.NodeOrStructureMask_c))
             {
                 createdNode = (ScNode)scElement;
@@ -311,10 +307,10 @@ namespace ScEngineNet
         /// <returns>Созданная sc-ссылка</returns>
         public ScLink CreateLink()
         {
-            var createdLink = new ScLink(ScAddress.Invalid, this.scMemoryContext);
+            var createdLink = new ScLink(ScAddress.Invalid, this);
             if (ScMemoryContext.IsMemoryInitialized() == true)
             {
-                createdLink = new ScLink(new ScAddress(NativeMethods.sc_memory_link_new(this.scMemoryContext)), this.scMemoryContext);
+                createdLink = new ScLink(new ScAddress(NativeMethods.sc_memory_link_new(this.PtrScMemoryContext)), this);
             }
             return createdLink;
         }
@@ -347,8 +343,8 @@ namespace ScEngineNet
         /// <returns>Найденная ссылка</returns>
         public ScLink FindLink(ScAddress linkAddress)
         {
-            var createdLink = new ScLink(ScAddress.Invalid, this.scMemoryContext);
-            var scElement = ScMemorySafeMethods.GetElement(linkAddress.WScAddress, this.scMemoryContext);
+            var createdLink = new ScLink(ScAddress.Invalid, this);
+            var scElement = ScMemorySafeMethods.GetElement(linkAddress.WScAddress, this);
             if (scElement.ElementType==ElementType.Link_a)
             {
                 createdLink = (ScLink)scElement;
@@ -369,12 +365,12 @@ namespace ScEngineNet
             uint resulCount = 0;
             if (ScMemoryContext.IsMemoryInitialized() == true)
             {
-                NativeMethods.sc_memory_find_links_with_content(this.scMemoryContext, content.ScStream, out adressesPtr, out resulCount);
+                NativeMethods.sc_memory_find_links_with_content(this.PtrScMemoryContext, content.ScStream, out adressesPtr, out resulCount);
             }
             Array addressesArray = NativeMethods.PtrToArray(typeof(WScAddress), adressesPtr, resulCount);
             for (uint index = 0; index < resulCount; index++)
             {
-                links.Add(new ScLink(new ScAddress((WScAddress)addressesArray.GetValue(index)), this.scMemoryContext));
+                links.Add(new ScLink(new ScAddress((WScAddress)addressesArray.GetValue(index)), this));
             }
             NativeMethods.sc_memory_free_buff(adressesPtr);
             return links;
@@ -396,7 +392,7 @@ namespace ScEngineNet
         /// <returns></returns>
         public ScIterator CreateIterator(ScElement e1, ElementType t1, ElementType t2)
         {
-            return new ScIterator(this.scMemoryContext, e1, t1, t2);
+            return new ScIterator(this, e1, t1, t2);
         }
 
         /// <summary>
@@ -408,7 +404,7 @@ namespace ScEngineNet
         /// <returns></returns>
         public ScIterator CreateIterator(ElementType t1, ElementType t2, ScElement e1)
         {
-            return new ScIterator(this.scMemoryContext, t1, t2, e1);
+            return new ScIterator(this, t1, t2, e1);
         }
 
         /// <summary>
@@ -420,7 +416,7 @@ namespace ScEngineNet
         /// <returns></returns>
         public ScIterator CreateIterator(ScElement e1, ElementType t1, ScElement e2)
         {
-            return new ScIterator(this.scMemoryContext, e1, t1, e2);
+            return new ScIterator(this, e1, t1, e2);
         }
 
         /// <summary>
@@ -434,7 +430,7 @@ namespace ScEngineNet
         /// <returns></returns>
         public ScIterator CreateIterator(ElementType t1, ElementType t2, ScElement e1, ElementType t3, ElementType t4)
         {
-            return new ScIterator(this.scMemoryContext, t1, t2, e1, t3, t4);
+            return new ScIterator(this, t1, t2, e1, t3, t4);
         }
 
         /// <summary>
@@ -448,7 +444,7 @@ namespace ScEngineNet
         /// <returns></returns>
         public ScIterator CreateIterator(ElementType t1, ElementType t2, ScElement e1, ElementType t3, ScElement e2)
         {
-            return new ScIterator(this.scMemoryContext, t1, t2, e1, t3, e2);
+            return new ScIterator(this, t1, t2, e1, t3, e2);
         }
 
         /// <summary>
@@ -462,7 +458,7 @@ namespace ScEngineNet
         /// <returns></returns>
         public ScIterator CreateIterator(ScElement e1, ElementType t1, ElementType t2, ElementType t3, ElementType t4)
         {
-            return new ScIterator(this.scMemoryContext, e1, t1, t2, t3, t4);
+            return new ScIterator(this, e1, t1, t2, t3, t4);
         }
 
         /// <summary>
@@ -476,7 +472,7 @@ namespace ScEngineNet
         /// <returns></returns>
         public ScIterator CreateIterator(ScElement e1, ElementType t1, ElementType t2, ElementType t3, ScElement e2)
         {
-            return new ScIterator(this.scMemoryContext, e1, t1, t2, t3, e2);
+            return new ScIterator(this, e1, t1, t2, t3, e2);
         }
 
         /// <summary>
@@ -490,7 +486,7 @@ namespace ScEngineNet
         /// <returns></returns>
         public ScIterator CreateIterator(ScElement e1, ElementType t1, ScElement e2, ElementType t2, ElementType t3)
         {
-            return new ScIterator(this.scMemoryContext, e1, t1, e2, t2, t3);
+            return new ScIterator(this, e1, t1, e2, t2, t3);
         }
 
         /// <summary>
@@ -504,50 +500,36 @@ namespace ScEngineNet
         /// <returns></returns>
         public ScIterator CreateIterator(ScElement e1, ElementType t1, ScElement e2, ElementType t2, ScElement e3)
         {
-            return new ScIterator(this.scMemoryContext, e1, t1, e2, t2, e3);
+            return new ScIterator(this, e1, t1, e2, t2, e3);
         }
 
         #endregion
 
-        #region Члены IDisposable
-
-        private bool disposed = false;
-
+        #region Члены SafeHandle        
         /// <summary>
-        /// Releases unmanaged and - optionally - managed resources.
+        /// При переопределении в производном классе получает значение, показывающее, допустимо ли значение дескриптора.
         /// </summary>
-        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected virtual void Dispose(bool disposing)
+        /// <PermissionSet>
+        ///   <IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="UnmanagedCode" />
+        /// </PermissionSet>
+        public override bool IsInvalid
         {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-
-                }
-                //unmanaged
-                this.Delete();
-                this.scMemoryContext = IntPtr.Zero;
-            }
+            get { return this.PtrScMemoryContext == IntPtr.Zero; }
         }
-
         /// <summary>
-        /// Finalizes an instance of the <see cref="ScMemoryContext"/> class.
+        /// При переопределении в производном классе выполняет код, необходимый для освобождения дескриптора.
         /// </summary>
-        ~ScMemoryContext()
+        /// <returns>
+        /// Значение true, если дескриптор освобождается успешно, в противном случае, в случае катастрофической ошибки — значение  false.В таком случае создается управляющий помощник по отладке releaseHandleFailed MDA.
+        /// </returns>
+        protected override bool ReleaseHandle()
         {
-            Dispose(false);
+            this.Delete();
+            return !IsInvalid;
         }
-
-        /// <summary>
-        /// Выполняет определяемые приложением задачи, связанные с удалением, высвобождением или сбросом неуправляемых ресурсов.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
+     
         #endregion
+
+     
     }
 }

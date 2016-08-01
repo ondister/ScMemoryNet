@@ -14,7 +14,7 @@ namespace ScMemoryNet
     /// </summary>
     public sealed class ScMemory
     {
-        private static ScMemoryContext baseContext;
+      //  private static ScMemoryContext baseContext;
         /// <summary>
         /// Определяет, инициализирована ли память
         /// </summary>
@@ -26,17 +26,6 @@ namespace ScMemoryNet
             get { return ScMemoryContext.IsMemoryInitialized(); }
         }
 
-        /// <summary>
-        /// Возвращает базовый контекст памяти.
-        /// Используйте его только для чтения элементов, так как он инициализируется с максимальными правами доступа, и элементы, созданные в нем могут быть невидимы для других контекстов.
-        /// </summary>
-        /// <value>
-        /// Базовый контекст.
-        /// </value>
-        public static ScMemoryContext BaseContext
-        {
-            get { return baseContext; }
-        }
 
         private static List<IScExtensionNet> listExtensionsNet;
 
@@ -90,8 +79,8 @@ namespace ScMemoryNet
 
             if (ScMemoryContext.IsMemoryInitialized() == false)
             {
-                IntPtr wcontext = NativeMethods.sc_memory_initialize(parameters.scParams);
-                baseContext = new ScMemoryContext(wcontext);
+           
+                NativeMethods.sc_memory_initialize(parameters.scParams);
 
                 ScMemory.LoadExtensionsNets(parameters.NetExtensionsPath);
 

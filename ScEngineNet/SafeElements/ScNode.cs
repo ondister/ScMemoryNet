@@ -5,7 +5,7 @@ namespace ScEngineNet.SafeElements
     /// <summary>
     /// Элемент sc-узел. Создается в классе <see cref="ScMemoryContext" />
     /// </summary>
-    public class ScNode : ScElement, IDisposable
+    public class ScNode : ScElement
     {
         private MainIdentifiers mainIdentifiers;
 
@@ -32,50 +32,12 @@ namespace ScEngineNet.SafeElements
         }
 
 
-        internal ScNode(ScAddress nodeAddress, IntPtr scContext)
+        internal ScNode(ScAddress nodeAddress, ScMemoryContext scContext)
             : base(nodeAddress, scContext)
         {
             mainIdentifiers = new MainIdentifiers(this);
         }
 
-        #region Члены IDisposable
-
-        private bool disposed = false;
-
-        /// <summary>
-        /// Releases unmanaged and - optionally - managed resources.
-        /// </summary>
-        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-
-                }
-                //unmanaged
-                this.mainIdentifiers.Dispose();
-            }
-        }
-
-        /// <summary>
-        /// Finalizes an instance of the <see cref="ScNode"/> class.
-        /// </summary>
-        ~ScNode()
-        {
-            Dispose(false);
-        }
-
-        /// <summary>
-        /// Выполняет определяемые приложением задачи, связанные с удалением, высвобождением или сбросом неуправляемых ресурсов.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        #endregion
+    
     }
 }

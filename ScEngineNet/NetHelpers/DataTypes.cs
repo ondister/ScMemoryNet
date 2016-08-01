@@ -123,17 +123,18 @@ namespace ScEngineNet.NetHelpers
         internal static void CreateKeyNodes()
         {
 
-            ScMemoryContext context = new ScMemoryContext(ScAccessLevels.MinLevel);
-            numeric_int = DataTypes.CreateKeyNode(context, ElementType.ClassNode_a, "numeric_int");
-            numeric_double = DataTypes.CreateKeyNode(context, ElementType.ClassNode_a, "numeric_double");
-            numeric_long = DataTypes.CreateKeyNode(context, ElementType.ClassNode_a, "numeric_long");
-            numeric_byte = DataTypes.CreateKeyNode(context, ElementType.ClassNode_a, "numeric_byte");
-            type_binary = DataTypes.CreateKeyNode(context, ElementType.ClassNode_a, "type_binary");
-            type_bool = DataTypes.CreateKeyNode(context, ElementType.ClassNode_a, "type_bool");
-            type_string = DataTypes.CreateKeyNode(context, ElementType.ClassNode_a, "type_string");
-            keyNodes = new List<ScNode>() { numeric_int, numeric_double, numeric_long, numeric_byte, type_binary, type_bool, type_string };
-
-            context.Delete();
+            using (var context = new ScMemoryContext(ScAccessLevels.MinLevel))
+            {
+                numeric_int = DataTypes.CreateKeyNode(context, ElementType.ClassNode_a, "numeric_int");
+                numeric_double = DataTypes.CreateKeyNode(context, ElementType.ClassNode_a, "numeric_double");
+                numeric_long = DataTypes.CreateKeyNode(context, ElementType.ClassNode_a, "numeric_long");
+                numeric_byte = DataTypes.CreateKeyNode(context, ElementType.ClassNode_a, "numeric_byte");
+                type_binary = DataTypes.CreateKeyNode(context, ElementType.ClassNode_a, "type_binary");
+                type_bool = DataTypes.CreateKeyNode(context, ElementType.ClassNode_a, "type_bool");
+                type_string = DataTypes.CreateKeyNode(context, ElementType.ClassNode_a, "type_string");
+                keyNodes = new List<ScNode>() { numeric_int, numeric_double, numeric_long, numeric_byte, type_binary, type_bool, type_string };
+            }
+          
         }
 
 

@@ -7,7 +7,7 @@ namespace ScEngineNet.SafeElements
     /// Основных идентификаторов узла. 
     /// </summary>
     /// <seealso cref="System.IDisposable" />
-    public class MainIdentifiers : IDisposable
+    public class MainIdentifiers
     {
         private ScNode node;
         private ScMemoryContext scContext;
@@ -15,7 +15,7 @@ namespace ScEngineNet.SafeElements
         internal MainIdentifiers(ScNode node)
         {
             this.node = node;
-            this.scContext = new ScMemoryContext(node.scContext);
+            this.scContext = node.scContext;
         }
 
         /// <summary>
@@ -79,47 +79,5 @@ namespace ScEngineNet.SafeElements
 
             }
         }
-
-
-
-        #region Члены IDisposable
-
-        private bool disposed = false;
-
-        /// <summary>
-        /// Releases unmanaged and - optionally - managed resources.
-        /// </summary>
-        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-
-                }
-                //unmanaged
-                this.scContext.Dispose();
-            }
-        }
-
-        /// <summary>
-        /// Finalizes an instance of the <see cref="MainIdentifiers"/> class.
-        /// </summary>
-        ~MainIdentifiers()
-        {
-            Dispose(false);
-        }
-
-        /// <summary>
-        /// Выполняет определяемые приложением задачи, связанные с удалением, высвобождением или сбросом неуправляемых ресурсов.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        #endregion
     }
 }

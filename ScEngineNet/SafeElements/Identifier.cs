@@ -35,7 +35,7 @@ namespace ScEngineNet.SafeElements
         /// <param name="scExtContext">Указатель на контекст</param>
         /// <param name="node">Узел для которого создается идентификатор</param>
         /// <returns>Уникальный идентификатор</returns>
-        internal static Identifier GetUnique(IntPtr scExtContext, ScNode node)
+        internal static Identifier GetUnique(ScMemoryContext scExtContext, ScNode node)
         {
             Identifier identifier = Identifier.Invalid;
             identifier = "idtf_" + node.ScAddress.GetHashCode();
@@ -55,7 +55,7 @@ namespace ScEngineNet.SafeElements
         /// <param name="prefix">Преффикс</param>
         /// <param name="node">Узел для которого создается идентификатор</param>
         /// <returns>Уникальный идентификатор</returns>
-        internal static Identifier GetUnique(IntPtr scExtContext, string prefix, ScNode node)
+        internal static Identifier GetUnique(ScMemoryContext scExtContext, string prefix, ScNode node)
         {
             Identifier initialIdentifier = Identifier.GetUnique(scExtContext, node);
             return prefix + "_" + initialIdentifier;

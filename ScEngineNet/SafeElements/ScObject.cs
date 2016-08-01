@@ -51,7 +51,7 @@ namespace ScEngineNet.SafeElements
         }
 
         /// <summary>
-        /// Performs an implicit conversion from <see cref="ScObject"/> to <see cref="System.Byte[]"/>.
+        /// Performs an implicit conversion from <see cref="ScObject"/> to <see cref="System.Byte"/>.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns>

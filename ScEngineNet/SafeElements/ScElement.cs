@@ -7,7 +7,7 @@ namespace ScEngineNet.SafeElements
     /// </summary>
     public class ScElement : IEquatable<ScElement>
     {
-        internal IntPtr scContext;
+        internal ScMemoryContext scContext;
         private ScAddress scAddress;
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace ScEngineNet.SafeElements
             return isDeleted;
         }
 
-        internal ScElement(ScAddress scAddress, IntPtr scContext)
+        internal ScElement(ScAddress scAddress, ScMemoryContext scContext)
         {
             this.scContext = scContext;
             this.scAddress = scAddress;
@@ -60,7 +60,7 @@ namespace ScEngineNet.SafeElements
         /// <returns>Возвращает ScResult.SC_RESULT_OK, если подтип изменен</returns>
         public ScResult ChangeSubType(ElementType subType)
         {
-            return NativeMethods.sc_memory_change_element_subtype(this.scContext, this.ScAddress.WScAddress, subType);
+            return NativeMethods.sc_memory_change_element_subtype(this.scContext.PtrScMemoryContext, this.ScAddress.WScAddress, subType);
         }
 
         /// <summary>
@@ -116,12 +116,12 @@ namespace ScEngineNet.SafeElements
         public ScElement GetElementByNrelClass(ScNode nrelNode, ScNode classNode, ElementType findElementType)
         {
             ScElement element = null;
-            var tmpContext = new ScMemoryContext(this.scContext);
+           
 
-            var container5 = tmpContext.CreateIterator(this, ElementType.ConstantCommonArc_c, findElementType, ElementType.PositiveConstantPermanentAccessArc_c, nrelNode);
+            var container5 = this.scContext.CreateIterator(this, ElementType.ConstantCommonArc_c, findElementType, ElementType.PositiveConstantPermanentAccessArc_c, nrelNode);
             foreach (var construction in container5)
             {
-                var container3 = tmpContext.CreateIterator(classNode, ElementType.PositiveConstantPermanentAccessArc_c, construction.Elements[2]);
+                var container3 = this.scContext.CreateIterator(classNode, ElementType.PositiveConstantPermanentAccessArc_c, construction.Elements[2]);
                 if (container3.GetAllConstructions().Count != 0)
                 {
                     element = construction.Elements[2];

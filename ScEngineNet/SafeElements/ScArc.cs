@@ -42,7 +42,7 @@ namespace ScEngineNet.SafeElements
             }
         }
 
-        internal ScArc(ScAddress arcAddress, IntPtr scExtContent)
+        internal ScArc(ScAddress arcAddress, ScMemoryContext scExtContent)
             : base(arcAddress, scExtContent)
         { }
     }

@@ -1,5 +1,6 @@
 using ScEngineNet.NativeElements;
 using System;
+using System.Runtime.InteropServices;
 
 namespace ScEngineNet.SafeElements
 {
@@ -19,11 +20,11 @@ namespace ScEngineNet.SafeElements
     /// <summary>
     /// Событие для элемента. Создается посредством вызова метода CreateEvent класса <see cref="ScMemoryContext" />
     /// </summary>
-    public class ScEvent : IDisposable
+    public class ScEvent:SafeHandle
     {
         private IntPtr wScEvent;
         private ScAddress elementAddress;
-        private IntPtr context;
+        private ScMemoryContext context;
         private readonly ScEventType eventType;
 
         /// <summary>
@@ -82,28 +83,20 @@ namespace ScEngineNet.SafeElements
             get { return wScEvent; }
         }
 
-        internal ScEvent(IntPtr wScEvent)
-        {
-            this.wScEvent = wScEvent;
-            if (wScEvent != IntPtr.Zero)
-            {
-                this.elementAddress = new ScAddress(NativeMethods.sc_event_get_element(this.wScEvent));
-                this.eventType = NativeMethods.sc_event_get_type(this.wScEvent);
-            }
-        }
 
         internal ScEvent(ScAddress elementAddress, ScEventType eventType)
+            :base(IntPtr.Zero,true)
         {
             this.elementAddress = elementAddress;
             this.eventType = eventType;
         }
 
-        internal bool Subscribe(IntPtr context)
+        internal bool Subscribe(ScMemoryContext context)
         {
             fEventCallback cb = new fEventCallback(ECallback);
             fDeleteCallback db = new fDeleteCallback(DCallback);
             this.context = context;
-            this.wScEvent = NativeMethods.sc_event_new(this.context, this.elementAddress.WScAddress, this.eventType, IntPtr.Zero, cb, db);
+            this.wScEvent = NativeMethods.sc_event_new(this.context.PtrScMemoryContext, this.elementAddress.WScAddress, this.eventType, IntPtr.Zero, cb, db);
             return this.wScEvent != IntPtr.Zero ? true : false;
         }
 
@@ -137,41 +130,27 @@ namespace ScEngineNet.SafeElements
             return ScResult.SC_RESULT_OK;
         }
 
-        private bool disposed = false;
 
         /// <summary>
-        /// Releases unmanaged and - optionally - managed resources.
+        /// При переопределении в производном классе получает значение, показывающее, допустимо ли значение дескриптора.
         /// </summary>
-        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected virtual void Dispose(bool disposing)
+        /// <PermissionSet>
+        ///   <IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="UnmanagedCode" />
+        /// </PermissionSet>
+        public override bool IsInvalid
         {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    this.elementAddress = null;
-                }
-                //unmanaged
-                this.Delete();
-                wScEvent = IntPtr.Zero;
-            }
+            get { return this.wScEvent==IntPtr.Zero; }
         }
-
         /// <summary>
-        /// Finalizes an instance of the <see cref="ScEvent"/> class.
+        /// При переопределении в производном классе выполняет код, необходимый для освобождения дескриптора.
         /// </summary>
-        ~ScEvent()
+        /// <returns>
+        /// Значение true, если дескриптор освобождается успешно, в противном случае, в случае катастрофической ошибки — значение  false.В таком случае создается управляющий помощник по отладке releaseHandleFailed MDA.
+        /// </returns>
+        protected override bool ReleaseHandle()
         {
-            Dispose(false);
-        }
-
-        /// <summary>
-        /// Выполняет определяемые приложением задачи, связанные с удалением, высвобождением или сбросом неуправляемых ресурсов.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            this.Delete();
+            return !IsInvalid;
         }
     }
 }

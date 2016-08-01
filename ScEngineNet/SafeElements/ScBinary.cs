@@ -45,7 +45,7 @@ namespace ScEngineNet.SafeElements
         { }
 
         /// <summary>
-        /// Performs an implicit conversion from <see cref="System.Byte[]"/> to <see cref="ScBinary"/>.
+        /// Performs an implicit conversion from <see cref="System.Byte"/> to <see cref="ScBinary"/>.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns>
@@ -57,7 +57,7 @@ namespace ScEngineNet.SafeElements
         }
 
         /// <summary>
-        /// Performs an implicit conversion from <see cref="ScBinary"/> to <see cref="System.Byte[]"/>.
+        /// Performs an implicit conversion from <see cref="ScBinary"/> to <see cref="System.Byte"/>.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns>

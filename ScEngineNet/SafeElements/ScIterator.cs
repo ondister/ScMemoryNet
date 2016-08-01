@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using ScEngineNet.NativeElements;
+using System.Runtime.InteropServices;
 
 namespace ScEngineNet.SafeElements
 {
@@ -10,9 +11,9 @@ namespace ScEngineNet.SafeElements
     /// Итератор для поиска конструкций по шаблону.
     /// Создается в методе CreateIterator класса <see cref="ScMemoryContext" />
     /// </summary>
-    public sealed class ScIterator : IEnumerable<Construction>, IEnumerator<Construction>, IDisposable
+    public sealed class ScIterator :SafeHandle, IEnumerable<Construction>, IEnumerator<Construction>
     {
-        private readonly IntPtr scContext;
+        private readonly ScMemoryContext scContext;
         private readonly ScIterator3Type iterator3type;
         private ScIterator5Type iterator5type;
         private Construction construction;
@@ -33,14 +34,15 @@ namespace ScEngineNet.SafeElements
 
         #region Конструкторы
 
-        private ScIterator(IntPtr scContext)
+        private ScIterator(ScMemoryContext scContext)
+            :base(IntPtr.Zero,true)
         {
             this.scContext = scContext;
             this.construction = new Construction();
             this.constructions = new List<Construction>();
         }
 
-        internal ScIterator(IntPtr scContext,ScElement e1, ElementType t1, ElementType t2)
+        internal ScIterator(ScMemoryContext scContext, ScElement e1, ElementType t1, ElementType t2)
             : this( scContext)
         {
             this.construction = new Construction();
@@ -53,7 +55,7 @@ namespace ScEngineNet.SafeElements
             this.iterator = ScMemorySafeMethods.CreateIterator3(this.scContext, this.iterator3type, p1, p2, p3);
         }
 
-        internal ScIterator(IntPtr scContext, ElementType t1, ElementType t2, ScElement e1)
+        internal ScIterator(ScMemoryContext scContext, ElementType t1, ElementType t2, ScElement e1)
             : this(scContext)
         {
             this.iterator3type = ScIterator3Type.sc_iterator3_a_a_f;
@@ -66,7 +68,7 @@ namespace ScEngineNet.SafeElements
             this.iterator = ScMemorySafeMethods.CreateIterator3(this.scContext, this.iterator3type, p1, p2, p3);
         }
 
-        internal ScIterator(IntPtr scContext, ScElement e1, ElementType t1, ScElement e2)
+        internal ScIterator(ScMemoryContext scContext, ScElement e1, ElementType t1, ScElement e2)
             : this( scContext)
         {
             this.iterator3type = ScIterator3Type.sc_iterator3_f_a_f;
@@ -79,7 +81,7 @@ namespace ScEngineNet.SafeElements
             this.iterator = ScMemorySafeMethods.CreateIterator3(this.scContext, this.iterator3type, p1, p2, p3);
         }
 
-        internal ScIterator(IntPtr scContext, ElementType t1, ElementType t2, ScElement e1, ElementType t3, ElementType t4)
+        internal ScIterator(ScMemoryContext scContext, ElementType t1, ElementType t2, ScElement e1, ElementType t3, ElementType t4)
             : this( scContext)
         {
             this.iterator3type = ScIterator3Type.sc_iterator3_unknown;
@@ -94,7 +96,7 @@ namespace ScEngineNet.SafeElements
             this.iterator = ScMemorySafeMethods.CreateIterator5(this.scContext, this.iterator5type, p1, p2, p3, p4, p5);
         }
 
-        internal ScIterator(IntPtr scContext, ElementType t1, ElementType t2, ScElement e1, ElementType t3, ScElement e2)
+        internal ScIterator(ScMemoryContext scContext, ElementType t1, ElementType t2, ScElement e1, ElementType t3, ScElement e2)
             : this(scContext)
         {
             this.iterator3type = ScIterator3Type.sc_iterator3_unknown;
@@ -109,7 +111,7 @@ namespace ScEngineNet.SafeElements
             this.iterator = ScMemorySafeMethods.CreateIterator5(this.scContext, this.iterator5type, p1, p2, p3, p4, p5);
         }
 
-        internal ScIterator(IntPtr scContext, ScElement e1, ElementType t1, ElementType t2, ElementType t3, ElementType t4)
+        internal ScIterator(ScMemoryContext scContext, ScElement e1, ElementType t1, ElementType t2, ElementType t3, ElementType t4)
             : this( scContext)
         {
             this.iterator3type = ScIterator3Type.sc_iterator3_unknown;
@@ -124,7 +126,7 @@ namespace ScEngineNet.SafeElements
             this.iterator = ScMemorySafeMethods.CreateIterator5(this.scContext, this.iterator5type, p1, p2, p3, p4, p5);
         }
 
-        internal ScIterator(IntPtr scContext, ScElement e1, ElementType t1, ElementType t2, ElementType t3, ScElement e2)
+        internal ScIterator(ScMemoryContext scContext, ScElement e1, ElementType t1, ElementType t2, ElementType t3, ScElement e2)
             : this( scContext)
         {
             this.iterator3type = ScIterator3Type.sc_iterator3_unknown;
@@ -139,7 +141,7 @@ namespace ScEngineNet.SafeElements
             this.iterator = ScMemorySafeMethods.CreateIterator5(this.scContext, this.iterator5type, p1, p2, p3, p4, p5);
         }
 
-        internal ScIterator(IntPtr scContext, ScElement e1, ElementType t1, ScElement e2, ElementType t2, ElementType t3)
+        internal ScIterator(ScMemoryContext scContext, ScElement e1, ElementType t1, ScElement e2, ElementType t2, ElementType t3)
             : this( scContext)
         {
             this.iterator3type = ScIterator3Type.sc_iterator3_unknown;
@@ -154,7 +156,7 @@ namespace ScEngineNet.SafeElements
             this.iterator = ScMemorySafeMethods.CreateIterator5(this.scContext, this.iterator5type, p1, p2, p3, p4, p5);
         }
 
-        internal ScIterator(IntPtr scContext, ScElement e1, ElementType t1, ScElement e2, ElementType t2, ScElement e3)
+        internal ScIterator(ScMemoryContext scContext, ScElement e1, ElementType t1, ScElement e2, ElementType t2, ScElement e3)
             : this(scContext)
         {
             this.iterator3type = ScIterator3Type.sc_iterator3_unknown;
@@ -265,28 +267,6 @@ namespace ScEngineNet.SafeElements
 
         #endregion
 
-        #region IDisposable
-
-        private bool disposed = false;
-
-        /// <summary>
-        /// Releases unmanaged and - optionally - managed resources.
-        /// </summary>
-        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        public void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    construction = null;
-                }
-                //unmanaged
-                this.Delete();
-                this.iterator = IntPtr.Zero;
-            }
-        }
-
         private bool Delete()
         {
             bool isDeleted = false;
@@ -301,23 +281,29 @@ namespace ScEngineNet.SafeElements
             return isDeleted;
         }
 
-        /// <summary>
-        /// Finalizes an instance of the <see cref="ScIterator"/> class.
-        /// </summary>
-        ~ScIterator()
-        {
-            Dispose(false);
-        }
 
+        #region SafeHandle        
         /// <summary>
-        /// Выполняет определяемые приложением задачи, связанные с удалением, высвобождением или сбросом неуправляемых ресурсов.
+        /// При переопределении в производном классе получает значение, показывающее, допустимо ли значение дескриптора.
         /// </summary>
-        public void Dispose()
+        /// <PermissionSet>
+        ///   <IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="UnmanagedCode" />
+        /// </PermissionSet>
+        public override bool IsInvalid
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            get { return this.iterator==IntPtr.Zero; }
         }
-
+        /// <summary>
+        /// При переопределении в производном классе выполняет код, необходимый для освобождения дескриптора.
+        /// </summary>
+        /// <returns>
+        /// Значение true, если дескриптор освобождается успешно, в противном случае, в случае катастрофической ошибки — значение  false.В таком случае создается управляющий помощник по отладке releaseHandleFailed MDA.
+        /// </returns>
+        protected override bool ReleaseHandle()
+        {
+            this.Delete();
+            return !IsInvalid;
+        }
         #endregion
     }
 }

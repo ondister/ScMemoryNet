@@ -3,6 +3,7 @@ using ScEngineNet.NetHelpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace ScEngineNet.SafeElements
 {
@@ -10,7 +11,7 @@ namespace ScEngineNet.SafeElements
     /// Базовый класс для содержимого sc-ссылки
     /// </summary>
 
-    public abstract class ScLinkContent : IEquatable<ScLinkContent>, IDisposable
+    public abstract class ScLinkContent : SafeHandle, IEquatable<ScLinkContent>
     {
 
         private IntPtr scStream;
@@ -38,20 +39,26 @@ namespace ScEngineNet.SafeElements
             get { return bytes; }
         }
 
-        #region Конструкторы
         internal IntPtr ScStream
         {
             get { return scStream; }
             set { this.SetStream(value); }
         }
 
+        #region Конструкторы
+      
+
         internal ScLinkContent(byte[] bytes)
+            :base(IntPtr.Zero,true)
         {
             this.bytes = bytes;
             scStream = NativeMethods.sc_stream_memory_new(this.bytes, (uint)bytes.Length, ScStreamFlag.SC_STREAM_FLAG_READ, false);
         }
-
-        internal ScLinkContent(IntPtr Stream) :
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ScLinkContent"/> class.
+        /// </summary>
+        /// <param name="Stream">The stream.</param>
+      protected ScLinkContent(IntPtr Stream) :
             this(new byte[0])
         {
             this.SetStream(Stream);
@@ -138,7 +145,7 @@ namespace ScEngineNet.SafeElements
 
 
         /// <summary>
-        /// Performs an implicit conversion from <see cref="System.Byte[]"/> to <see cref="ScLinkContent"/>.
+        /// Оператор присваивания для массива байт
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns>
@@ -389,49 +396,35 @@ namespace ScEngineNet.SafeElements
 
         #endregion
 
-        #region Dispose
+        #region SafeHandle
         private void StreamFree()
         {
             NativeMethods.sc_stream_free(this.scStream);
         }
 
-        private bool disposed = false;
 
         /// <summary>
-        /// Releases unmanaged and - optionally - managed resources.
+        /// При переопределении в производном классе получает значение, показывающее, допустимо ли значение дескриптора.
         /// </summary>
-        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected virtual void Dispose(bool disposing)
+        /// <PermissionSet>
+        ///   <IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="UnmanagedCode" />
+        /// </PermissionSet>
+        public override bool IsInvalid
         {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    this.bytes = null;
-                }
-                //unmanaged
-                this.StreamFree();
-                this.scStream = IntPtr.Zero;
-            }
+            get {return this.scStream==IntPtr.Zero; }
+        }
+        /// <summary>
+        /// При переопределении в производном классе выполняет код, необходимый для освобождения дескриптора.
+        /// </summary>
+        /// <returns>
+        /// Значение true, если дескриптор освобождается успешно, в противном случае, в случае катастрофической ошибки — значение  false.В таком случае создается управляющий помощник по отладке releaseHandleFailed MDA.
+        /// </returns>
+        protected override bool ReleaseHandle()
+        {
+            StreamFree();
+            return !IsInvalid;
         }
 
-        /// <summary>
-        /// Finalizes an instance of the <see cref="ScLinkContent"/> class.
-        /// </summary>
-        ~ScLinkContent()
-        {
-            Dispose(false);
-        }
-
-        /// <summary>
-        /// Выполняет определяемые приложением задачи, связанные с удалением, высвобождением или сбросом неуправляемых ресурсов.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
         #endregion
-
     }
 }

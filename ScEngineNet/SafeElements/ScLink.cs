@@ -26,9 +26,9 @@ namespace ScEngineNet.SafeElements
             }
         }
 
-       
 
-        internal ScLink(ScAddress linkAddress, IntPtr scContext)
+
+        internal ScLink(ScAddress linkAddress, ScMemoryContext scContext)
             : base(linkAddress,scContext)
         { }
     }

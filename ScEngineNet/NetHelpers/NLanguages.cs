@@ -38,10 +38,11 @@ namespace ScEngineNet.NetHelpers
 
         internal static void CreateKeyNodes()
         {
-            ScMemoryContext context = new ScMemoryContext(ScAccessLevels.MinLevel);
-            lang_ru = NLanguages.CreateKeyNode(context, ElementType.ClassNode_a, "lang_ru");
-            lang_en = NLanguages.CreateKeyNode(context, ElementType.ClassNode_a, "lang_en");
-            context.Delete();
+            using (var context = new ScMemoryContext(ScAccessLevels.MinLevel))
+            {
+                lang_ru = NLanguages.CreateKeyNode(context, ElementType.ClassNode_a, "lang_ru");
+                lang_en = NLanguages.CreateKeyNode(context, ElementType.ClassNode_a, "lang_en");
+            }
         }
 
         private static ScNode CreateKeyNode(ScMemoryContext context, ElementType elementType, Identifier identifier)
