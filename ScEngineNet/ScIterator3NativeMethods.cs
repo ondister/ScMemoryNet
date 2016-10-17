@@ -53,7 +53,7 @@ namespace ScEngineNet
         // */
         //_SC_EXTERN void sc_iterator3_free(sc_iterator3 *it);
         [DllImport(ScEngineNet.ScMemoryDllName, CallingConvention = ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
-        internal static extern IntPtr sc_iterator3_free(IntPtr iterator3);
+        internal static extern void sc_iterator3_free(IntPtr iterator3);
 
         ///*! Go to next iterator result
         // * @param it Pointer to iterator that we need to go next result

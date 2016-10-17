@@ -4,6 +4,7 @@ using ScEngineNet.NativeElements;
 using ScEngineNet.SafeElements;
 using System.Collections.Generic;
 using ScEngineNet.NetHelpers;
+using System.Linq;
 
 namespace ScEngineNet
 {
@@ -56,8 +57,7 @@ namespace ScEngineNet
                 {
 
                     var container = scExtContext.CreateIterator(beginElement, arcType, endElement);
-                    var constructions = container.GetAllConstructions();
-                    arc = (ScArc)constructions[0].Elements[1];
+                    arc = (ScArc)container.ElementAt(0).Elements[1];
                 }
             }
 
@@ -161,20 +161,20 @@ namespace ScEngineNet
 
             }
             //определяем тип ссылки
-            ScNode classNode = DataTypes.Binary;
-           
+            Identifier classNodeidentifier = ScDataTypes.Instance.TypeBinary;
             var container = scExtContext.CreateIterator(ElementType.ClassNode_a, ElementType.PositiveConstantPermanentAccessArc_c, link);
             foreach (var construction in container)
             {
-                if (DataTypes.KeyNodes.Contains((ScNode)construction.Elements[0]))
+                if (ScDataTypes.Instance.KeyLinkTypes.Contains(((ScNode)construction.Elements[0]).SystemIdentifier))
                 {
-                    classNode = (ScNode)construction.Elements[0];
+                   var classNode = (ScNode)construction.Elements[0];
+                   classNodeidentifier = classNode.SystemIdentifier;
                     break;
                 }
             }
 
 
-            return ScLinkContent.GetScContent(streamPtr, classNode);
+            return ScLinkContent.GetScContent(streamPtr, classNodeidentifier);
         }
 
         internal static ScResult SetLinkContent(ScMemoryContext scExtContext, ScLinkContent content, ScLink link)
@@ -188,7 +188,7 @@ namespace ScEngineNet
                 var container = scExtContext.CreateIterator(ElementType.ClassNode_a, ElementType.PositiveConstantPermanentAccessArc_c, link);
                 foreach (var construction in container)
                 {
-                    if (DataTypes.KeyNodes.Contains((ScNode)construction.Elements[0]))
+                    if (ScDataTypes.Instance.KeyLinkTypes.Contains(((ScNode)construction.Elements[0]).SystemIdentifier))
                     {
                         construction.Elements[1].DeleteFromMemory();//delete arc
                         break;
@@ -196,7 +196,7 @@ namespace ScEngineNet
                 }
                 // create classNode
 
-                ScMemorySafeMethods.CreateArc(scExtContext, ElementType.PositiveConstantPermanentAccessArc_c, content.ClassNode, link);
+                ScMemorySafeMethods.CreateArc(scExtContext, ElementType.PositiveConstantPermanentAccessArc_c, scExtContext.FindNode(content.ClassNodeIdentifier), link);
             }
             return result;
         }

@@ -17,9 +17,9 @@ namespace ScEngineNet.SafeElements
         /// <value>
         /// Ключевой узел.
         /// </value>
-       public override ScNode ClassNode
+       public override Identifier ClassNodeIdentifier
        {
-           get { return DataTypes.Type_string; }
+           get { return ScDataTypes.Instance.TypeString; }
        }
        /// <summary>
        /// Возвращает значение ссылки. В данном случае string

@@ -38,6 +38,6 @@ namespace ScEngineNet.SafeElements
             mainIdentifiers = new MainIdentifiers(this);
         }
 
-    
+        public static readonly String InstancePreffix = "inst_";
     }
 }

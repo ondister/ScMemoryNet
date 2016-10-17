@@ -30,6 +30,46 @@ namespace ScEngineNet.SafeElements
 
         internal ScLink(ScAddress linkAddress, ScMemoryContext scContext)
             : base(linkAddress,scContext)
-        { }
+        {
+            this.contentChangeEvent = new ScEvent(this.ScAddress, ScEventType.SC_EVENT_CONTENT_CHANGED);
+        }
+
+     
+
+
+        #region ContentChangedEvent
+        private ScEvent contentChangeEvent;//не забываем добавить в конструктор начальную инициализацию
+        internal static readonly EventKey contentChangeEventKey = new EventKey();
+        public event ElementEventHandler ContentChanged
+        {
+            add
+            {
+                //subscribe           
+                this.contentChangeEvent = this.CreateEvent(ScEventType.SC_EVENT_CONTENT_CHANGED);
+                contentChangeEvent.ElementEvent += contentChangeEvent_ElementEvent;
+                base.EventSet.Add(contentChangeEventKey, value);
+            }
+            remove
+            {
+                //delete
+                base.EventSet.Remove(contentChangeEventKey, value);
+                this.contentChangeEvent.Dispose();
+            }
+        }
+
+        void contentChangeEvent_ElementEvent(object sender, ScEventArgs e)
+        {
+            OnContentChangeEvent(e);
+        }
+
+      
+        protected virtual void OnContentChangeEvent(ScEventArgs args)
+        {
+            base.EventSet.Raise(contentChangeEventKey, this, args);
+        }
+
+        #endregion
+
+
     }
 }

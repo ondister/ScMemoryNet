@@ -15,9 +15,9 @@ namespace ScEngineNet.SafeElements
         /// <value>
         /// Ключевой узел.
         /// </value>
-        public override ScNode ClassNode
+        public override Identifier ClassNodeIdentifier
         {
-            get { return DataTypes.Type_bool; }
+            get { return ScDataTypes.Instance.TypeBool; }
         }
 
         /// <summary>

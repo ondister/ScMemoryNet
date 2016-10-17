@@ -18,10 +18,6 @@ namespace ScEngineNet
         /// </summary>
         internal static readonly Encoding TextEncoding = new UTF8Encoding();
 
-        /// <summary>
-        /// Внутреннее имя библиотеки
-        /// </summary>
-        public static readonly string LibraryName = "Оболочка .Net для sc-memory";
 
         /// <summary>
         /// Соглашение о вызове по умолчанию.
@@ -32,5 +28,12 @@ namespace ScEngineNet
         /// Кодировка по умолчанию.
         /// </summary>
         internal const CharSet DefaultCharset = CharSet.Unicode;
+
+
+        /// <summary>
+        /// Внутреннее имя библиотеки
+        /// </summary>
+        public static readonly string LibraryName = "Оболочка .Net для sc-memory";
+
     }
 }

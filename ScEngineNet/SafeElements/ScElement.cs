@@ -1,14 +1,18 @@
 ﻿using System;
-
+using System.Linq;
 namespace ScEngineNet.SafeElements
 {
     /// <summary>
     /// Базовый класс для всех sc-элементов памяти: sc-узла, sc-ссылки и sc-дуги. Напрямую создать его нельзя
     /// </summary>
-    public class ScElement : IEquatable<ScElement>
+    public class ScElement : IEquatable<ScElement>, IDisposable
     {
         internal ScMemoryContext scContext;
         private ScAddress scAddress;
+
+        private const string disposalException_msg = "Был вызван метод Dispose и cсылка на объект в памяти уже удалена";
+        private const string memoryNotInitializedException_msg = "Библиотека ScMemory.Net не инициализирована";
+        private const string contextInvalidException_msg = "Указанная ссылка на ScContext не действительна";
 
         /// <summary>
         /// Вовращает тип элемента
@@ -33,7 +37,7 @@ namespace ScEngineNet.SafeElements
         {
             get
             {
-                return this.isValid() ;
+                return this.isValid();
             }
         }
 
@@ -54,16 +58,31 @@ namespace ScEngineNet.SafeElements
         /// <returns>Возвращает ScResult.SC_RESULT_OK, если элемент удален</returns>
         public ScResult DeleteFromMemory()
         {
+            if (this.Disposed == true) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+            if (this.scContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
+
             ScResult isDeleted = ScResult.SC_RESULT_ERROR;
             isDeleted = ScMemorySafeMethods.DeleteElement(this.scContext, this);
             this.scAddress = ScAddress.Invalid;
+
             return isDeleted;
         }
 
         internal ScElement(ScAddress scAddress, ScMemoryContext scContext)
         {
+            
             this.scContext = scContext;
             this.scAddress = scAddress;
+
+
+            this.scOutputArcAddedEvent = new ScEvent(this.scAddress, ScEventType.SC_EVENT_ADD_OUTPUT_ARC);
+            this.scOutputArcRemovedEvent = new ScEvent(this.scAddress, ScEventType.SC_EVENT_REMOVE_OUTPUT_ARC);
+
+            this.scInputArcAddedEvent = new ScEvent(this.scAddress, ScEventType.SC_EVENT_ADD_INPUT_ARC);
+            this.scInputArcRemovedEvent = new ScEvent(this.scAddress, ScEventType.SC_EVENT_REMOVE_INPUT_ARC);
+
+            this.scElementRemovedEvent = new ScEvent(this.scAddress, ScEventType.SC_EVENT_REMOVE_ELEMENT);
         }
 
         /// <summary>
@@ -84,6 +103,10 @@ namespace ScEngineNet.SafeElements
         /// <returns></returns>
         public ScArc AddInputArc(ScElement beginElement, ElementType arcType)
         {
+            if (this.Disposed == true) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+            if (this.scContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
+
             return ScMemorySafeMethods.CreateArc(this.scContext, arcType, beginElement, this);
         }
 
@@ -95,6 +118,10 @@ namespace ScEngineNet.SafeElements
         /// <returns></returns>
         public ScArc AddOutputArc(ScElement endElement, ElementType arcType)
         {
+            if (this.Disposed == true) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+            if (this.scContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
+
             return ScMemorySafeMethods.CreateArc(this.scContext, arcType, this, endElement);
         }
 
@@ -104,18 +131,16 @@ namespace ScEngineNet.SafeElements
         /// <param name="element">Sc-элемент</param>
         /// <param name="eventType">Тип события</param>
         /// <returns>Возвращает событие <see cref="ScEvent"/> </returns>
-        public ScEvent CreateEvent(ScEventType eventType)
+        internal ScEvent CreateEvent(ScEventType eventType)
         {
-            var scEvent = new ScEvent(this.ScAddress, eventType);
-            if (ScMemoryContext.IsMemoryInitialized() == true)
-            {
+            if (this.Disposed == true) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+            if (this.scContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
 
+            var scEvent = new ScEvent(this.ScAddress, eventType);
                 scEvent.Subscribe(this.scContext);
-            }
             return scEvent;
         }
-
-
 
 
 
@@ -128,14 +153,20 @@ namespace ScEngineNet.SafeElements
         /// <returns></returns>
         public ScElement GetElementByNrelClass(ScNode nrelNode, ScNode classNode, ElementType findElementType)
         {
+
+            if (this.Disposed == true) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+            if (this.scContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
+
             ScElement element = null;
-           
+
+
 
             var container5 = this.scContext.CreateIterator(this, ElementType.ConstantCommonArc_c, findElementType, ElementType.PositiveConstantPermanentAccessArc_c, nrelNode);
             foreach (var construction in container5)
             {
                 var container3 = this.scContext.CreateIterator(classNode, ElementType.PositiveConstantPermanentAccessArc_c, construction.Elements[2]);
-                if (container3.GetAllConstructions().Count != 0)
+                if (container3.Count() != 0)
                 {
                     element = construction.Elements[2];
                     break;
@@ -145,10 +176,10 @@ namespace ScEngineNet.SafeElements
             return element;
         }
 
-        private  bool isValid()
+        private bool isValid()
         {
             bool isValid = false;
-            if (this!=null && this.scAddress.IsValid )
+            if (this != null && this.scAddress.IsValid)
             { isValid = true; }
             return isValid;
         }
@@ -165,7 +196,17 @@ namespace ScEngineNet.SafeElements
             if (obj == null)
                 return false;
 
-            return obj.ScAddress == this.scAddress;
+            if (object.ReferenceEquals(this, obj))
+                return true;
+
+            if (this.GetType() != obj.GetType())
+                return false;
+
+            if (this.ScAddress.Offset == obj.ScAddress.Offset && this.ScAddress.Segment == obj.ScAddress.Segment)
+            { return true; }
+            else
+            { return false; }
+
         }
 
         /// <summary>
@@ -174,12 +215,17 @@ namespace ScEngineNet.SafeElements
         /// <param name="obj">объект <see cref="T:System.Object"/></param>
         public override bool Equals(object obj)
         {
+
             if (obj == null)
                 return false;
-            ScElement scElement = obj as ScElement;
-            if (scElement as ScElement == null)
+
+            if (object.ReferenceEquals(this, obj))
+                return true;
+
+            if (this.GetType() != obj.GetType())
                 return false;
-            return scElement.ScAddress == this.scAddress;
+
+            return this.Equals(obj as ScElement);
         }
 
         /// <summary>
@@ -219,5 +265,231 @@ namespace ScEngineNet.SafeElements
         }
 
         #endregion
+
+
+        #region Events
+        private readonly EventSet elementEventSet = new EventSet();
+        internal EventSet EventSet { get { return elementEventSet; } }
+
+
+        #region OutputArcAdded
+        private ScEvent scOutputArcAddedEvent;//не забываем добавить в конструктор начальную инициализацию
+        internal static readonly EventKey outputArcAddedEventKey = new EventKey();
+        public event ElementEventHandler OutputArcAdded
+        {
+            add
+            {
+                //subscribe           
+                this.scOutputArcAddedEvent = this.CreateEvent(ScEventType.SC_EVENT_ADD_OUTPUT_ARC);
+                scOutputArcAddedEvent.ElementEvent += scOutputArcAddedEvent_ElementEvent;
+                elementEventSet.Add(outputArcAddedEventKey, value);
+            }
+            remove
+            {
+                //delete
+                elementEventSet.Remove(outputArcAddedEventKey, value);
+                this.scOutputArcAddedEvent.Dispose();
+            }
+        }
+
+        void scOutputArcAddedEvent_ElementEvent(object sender, ScEventArgs e)
+        {
+            OnOutputArcAdded(e);
+        }
+
+        protected virtual void OnOutputArcAdded(ScEventArgs args)
+        {
+            elementEventSet.Raise(outputArcAddedEventKey, this, args);
+        }
+
+        #endregion
+
+        #region OutputArcRemoved
+        private ScEvent scOutputArcRemovedEvent;//не забываем добавить в конструктор начальную инициализацию
+        internal static readonly EventKey outputArcRemovedEventKey = new EventKey();
+        public event ElementEventHandler OutputArcRemoved
+        {
+            add
+            {
+                //subscribe           
+                this.scOutputArcRemovedEvent = this.CreateEvent(ScEventType.SC_EVENT_REMOVE_OUTPUT_ARC);
+                scOutputArcRemovedEvent.ElementEvent += scOutputArcRemovedEvent_ElementEvent;
+                elementEventSet.Add(outputArcRemovedEventKey, value);
+            }
+            remove
+            {
+                //delete
+                elementEventSet.Remove(outputArcRemovedEventKey, value);
+                this.scOutputArcRemovedEvent.Dispose();
+            }
+        }
+
+        void scOutputArcRemovedEvent_ElementEvent(object sender, ScEventArgs e)
+        {
+            OnOutputArcRemoved(e);
+        }
+
+
+        protected virtual void OnOutputArcRemoved(ScEventArgs args)
+        {
+            elementEventSet.Raise(outputArcRemovedEventKey, this, args);
+        }
+
+        #endregion
+
+        #region InputArcRemoved
+        private ScEvent scInputArcRemovedEvent;//не забываем добавить в конструктор начальную инициализацию
+        internal static readonly EventKey inputArcRemovedEventKey = new EventKey();
+        public event ElementEventHandler InputArcRemoved
+        {
+            add
+            {
+                //subscribe           
+                this.scInputArcRemovedEvent = this.CreateEvent(ScEventType.SC_EVENT_REMOVE_INPUT_ARC);
+                scInputArcRemovedEvent.ElementEvent += scInputArcRemovedEvent_ElementEvent;
+                elementEventSet.Add(inputArcRemovedEventKey, value);
+            }
+            remove
+            {
+                //delete
+                elementEventSet.Remove(inputArcRemovedEventKey, value);
+                this.scInputArcRemovedEvent.Dispose();
+            }
+        }
+
+        void scInputArcRemovedEvent_ElementEvent(object sender, ScEventArgs e)
+        {
+            OnInputArcRemoved(e);
+        }
+
+        protected virtual void OnInputArcRemoved(ScEventArgs args)
+        {
+            elementEventSet.Raise(inputArcRemovedEventKey, this, args);
+        }
+
+        #endregion
+
+        #region InputArcAdded
+        private ScEvent scInputArcAddedEvent;//не забываем добавить в конструктор начальную инициализацию
+        internal static readonly EventKey inputArcAddedEventKey = new EventKey();
+        public event ElementEventHandler InputArcAdded
+        {
+            add
+            {
+                //subscribe           
+                this.scInputArcAddedEvent = this.CreateEvent(ScEventType.SC_EVENT_ADD_INPUT_ARC);
+                scInputArcAddedEvent.ElementEvent += scInputArcAddedEvent_ElementEvent;
+                elementEventSet.Add(inputArcAddedEventKey, value);
+            }
+            remove
+            {
+                //delete
+                elementEventSet.Remove(inputArcAddedEventKey, value);
+                this.scInputArcAddedEvent.Dispose();
+            }
+        }
+
+        void scInputArcAddedEvent_ElementEvent(object sender, ScEventArgs e)
+        {
+            OnInputArcAdded(e);
+        }
+
+        protected virtual void OnInputArcAdded(ScEventArgs args)
+        {
+            elementEventSet.Raise(inputArcAddedEventKey, this, args);
+        }
+
+        #endregion
+
+        #region ElementRemoved
+        private ScEvent scElementRemovedEvent;//не забываем добавить в конструктор начальную инициализацию
+        internal static readonly EventKey elementRemovedEventKey = new EventKey();
+        public event ElementEventHandler ElementRemoved
+        {
+            add
+            {
+                //subscribe           
+                this.scElementRemovedEvent = this.CreateEvent(ScEventType.SC_EVENT_REMOVE_ELEMENT);
+                scElementRemovedEvent.ElementEvent += scElementRemovedEvent_ElementEvent;
+                elementEventSet.Add(elementRemovedEventKey, value);
+            }
+            remove
+            {
+                //delete
+                elementEventSet.Remove(elementRemovedEventKey, value);
+                this.scElementRemovedEvent.Dispose();
+            }
+        }
+
+
+
+        void scElementRemovedEvent_ElementEvent(object sender, ScEventArgs e)
+        {
+            OnElementRemoved(e);
+
+            this.scElementRemovedEvent.Dispose();
+        }
+
+
+        protected virtual void OnElementRemoved(ScEventArgs args)
+        {
+            elementEventSet.Raise(elementRemovedEventKey, this, args);
+        }
+
+        #endregion
+
+
+
+        #endregion
+
+        #region IDisposal
+        private bool disposed;
+
+        public bool Disposed
+        {
+            get { return disposed; }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            Console.WriteLine("call Dispose({0}) ScElement with {1}", disposing, this.ScAddress);
+
+
+            if (!disposed && ScMemoryContext.IsMemoryInitialized())
+            {
+                // Dispose of resources held by this instance.
+
+
+
+                // Suppress finalization of this disposed instance.
+                if (disposing)
+                {
+                    this.scOutputArcAddedEvent.Dispose();
+                    this.scOutputArcRemovedEvent.Dispose();
+
+                    this.scInputArcAddedEvent.Dispose();
+                    this.scInputArcRemovedEvent.Dispose();
+
+                    this.scElementRemovedEvent.Dispose();
+                    GC.SuppressFinalize(this);
+                }
+                disposed = true;
+            }
+
+
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+
+        }
+
+        ~ScElement()
+        {
+            Dispose(false);
+        }
+        #endregion
+
     }
 }

@@ -16,9 +16,9 @@ namespace ScEngineNet.SafeElements
         /// <value>
         /// Ключевой узел.
         /// </value>
-        public override ScNode ClassNode
+        public override Identifier ClassNodeIdentifier
         {
-            get { return DataTypes.Binary; }
+            get { return ScDataTypes.Instance.TypeBinary; }
         }
 
         /// <summary>

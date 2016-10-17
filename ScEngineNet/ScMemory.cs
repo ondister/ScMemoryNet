@@ -6,6 +6,8 @@ using System.Reflection;
 using ScEngineNet;
 using ScEngineNet.ExtensionsNet;
 using ScEngineNet.NetHelpers;
+using ScEngineNet.SafeElements;
+using System.Threading;
 
 namespace ScMemoryNet
 {
@@ -84,8 +86,7 @@ namespace ScMemoryNet
                
                 ScMemory.LoadExtensionsNets(parameters.NetExtensionsPath);
 
-                NLanguages.CreateKeyNodes();
-                DataTypes.CreateKeyNodes();
+                ScDataTypes.Instance.CreateKeyNodes();
             }
             else
             {
@@ -106,12 +107,16 @@ namespace ScMemoryNet
                 Assembly assembly = Assembly.LoadFrom(fName);
                 foreach (Type t in assembly.GetExportedTypes())
                 {
-                    if (typeof(IScExtensionNet).IsAssignableFrom(t))
+                    if (typeof(IScExtensionNet).GetTypeInfo().IsAssignableFrom(t.GetTypeInfo()))
                     {
-                        var exNet = (IScExtensionNet) assembly.CreateInstance(t.FullName);
-                        Console.WriteLine("** Message: Initialize .net module: " + fName);
-                        exNet.Initialize();
-                        listExtensionsNet.Add(exNet);
+                        //var exNet = (IScExtensionNet)assembly.CreateInstance(t.FullName);
+
+                        //if (exNet.Initialize() == ScResult.SC_RESULT_OK)
+                        //{
+                        //    listExtensionsNet.Add(exNet);
+                        //    Console.WriteLine("** Message: .net module: {0} initialized ", fName);
+                        //}
+
                     }
                 }
             }
@@ -121,8 +126,11 @@ namespace ScMemoryNet
         {
             foreach (var exNet in listExtensionsNet)
             {
-                Console.WriteLine("** Message: Shutdown .net module: " + exNet.NetExtensionName);
-                exNet.ShutDown();
+                
+                if (exNet.ShutDown() == ScResult.SC_RESULT_OK)
+                {
+                    Console.WriteLine("** Message: .net module: {0} unloaded", exNet.NetExtensionName);
+                }
             }
             return true;
         }
@@ -135,6 +143,13 @@ namespace ScMemoryNet
         public static bool ShutDown(bool SaveMemoryState)
         {
             bool IsShutDown = false;
+
+
+          
+            //уничтожение объектов с указателями в памяти перед закрытием памяти
+           
+
+            //закрытие расширений и закрытие библиотеки
             if (ScMemoryContext.IsMemoryInitialized())
             {
                 if (ScMemory.UnLoadExtensionsNet())
@@ -142,8 +157,16 @@ namespace ScMemoryNet
                     IsShutDown = NativeMethods.sc_memory_shutdown(SaveMemoryState);
                 }
             }
+           
 
             return IsShutDown;
         }
+
+
+
+      
+
+        
+
     }
 }

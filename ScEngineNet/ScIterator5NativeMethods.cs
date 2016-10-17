@@ -113,6 +113,6 @@ namespace ScEngineNet
         // */
         //_SC_EXTERN void sc_iterator5_free(sc_iterator5 *it);
         [DllImport(ScEngineNet.ScMemoryDllName, CallingConvention = ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
-        internal static extern IntPtr sc_iterator5_free(IntPtr iterator5);
+        internal static extern void sc_iterator5_free(IntPtr iterator5);
     }
 }

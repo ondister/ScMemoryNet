@@ -14,9 +14,9 @@ namespace ScEngineNet.SafeElements
         /// <value>
         /// Ключевой узел.
         /// </value>
-        public override ScNode ClassNode
+        public override Identifier ClassNodeIdentifier
         {
-            get { return DataTypes.Numeric_long; }
+            get { return ScDataTypes.Instance.NumericLong; }
         }
         /// <summary>
         /// Возвращает значение ссылки. В данном случае long

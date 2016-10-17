@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ScEngineNet</RootNamespace>
     <AssemblyName>ScEngineNet</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,17 +21,20 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\OSTIS\sc-machine-iot\bin\</OutputPath>
+    <OutputPath>..\..\..\..\OSTIS\sc-machine-master\bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>..\..\sc-machine-iot\bin\ScEngineNet.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -42,8 +46,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NetHelpers\DataTypes.cs" />
-    <Compile Include="NetHelpers\NLanguages.cs" />
+    <Compile Include="NetHelpers\ScDataTypes.cs" />
+    <Compile Include="SafeElements\EventSet.cs" />
+    <Compile Include="SafeElements\ScIterator.cs" />
+    <Compile Include="ScContextInvalidException.cs" />
     <Compile Include="SafeElements\ScObject.cs" />
     <Compile Include="SafeElements\ScBinary.cs" />
     <Compile Include="SafeElements\ScByte.cs" />
@@ -64,8 +70,8 @@
     <Compile Include="SafeElements\ScArc.cs" />
     <Compile Include="SafeElements\ScElement.cs" />
     <Compile Include="SafeElements\ScEvent.cs" />
-    <Compile Include="SafeElements\Construction.cs" />
-    <Compile Include="SafeElements\ScIterator.cs" />
+    <Compile Include="SafeElements\ScConstruction.cs" />
+    <Compile Include="SafeElements\ScEnumerator.cs" />
     <Compile Include="ScEventNativeMethods.cs" />
     <Compile Include="ScHelperNativeMethods.cs" />
     <Compile Include="ScIterator5NativeMethods.cs" />
@@ -74,6 +80,7 @@
     <Compile Include="ScMemoryNativeMethods.cs" />
     <Compile Include="ScIterator3NativeMethods.cs" />
     <Compile Include="ScEngineNet.cs" />
+    <Compile Include="ScMemoryNotInitializeException.cs" />
     <Compile Include="ScMemoryParams.cs" />
     <Compile Include="ScMemorySafeMethods.cs" />
     <Compile Include="ScStreamNativeMethods.cs" />
@@ -91,7 +98,7 @@
     <Compile Include="NativeElements\ScIterator3Type.cs" />
     <Compile Include="NativeElements\ScIteratorParam.cs" />
     <Compile Include="NativeElements\WScMemoryContext.cs" />
-    <Compile Include="NetHelpers\WScMemoryParams.cs" />
+    <Compile Include="NativeElements\WScMemoryParams.cs" />
     <Compile Include="SafeElements\ScResult.cs" />
     <Compile Include="SafeElements\ScStat.cs" />
     <Compile Include="NativeElements\ScStream.cs" />

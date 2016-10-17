@@ -23,7 +23,7 @@ namespace ScEngineNet.SafeElements
         /// <value>
         /// Ключевой узел.
         /// </value>
-        public abstract ScNode ClassNode
+        public abstract Identifier ClassNodeIdentifier
         {
             get;
         }
@@ -69,43 +69,43 @@ namespace ScEngineNet.SafeElements
         { }
         #endregion
 
-        internal static ScLinkContent GetScContent(byte[] bytes, ScNode classNode)
+        internal static ScLinkContent GetScContent(byte[] bytes, Identifier classNodeIdentifier)
         {
             Func<byte[], ScLinkContent> constructor;
-            return ScLinkContentConstructors.TryGetValue(classNode, out constructor)
+            return ScLinkContentConstructors.TryGetValue(classNodeIdentifier, out constructor)
                 ? constructor(bytes)
                 : new ScObject(bytes);
         }
-        internal static ScLinkContent GetScContent(IntPtr streamIntPtr, ScNode classNode)
+        internal static ScLinkContent GetScContent(IntPtr streamIntPtr, Identifier classNodeIdentifier)
         {
             Func<IntPtr, ScLinkContent> constructor;
-            return ScLinkIntPtrConstructors.TryGetValue(classNode, out constructor)
+            return ScLinkIntPtrConstructors.TryGetValue(classNodeIdentifier, out constructor)
                 ? constructor(streamIntPtr)
                 : new ScObject(streamIntPtr);
         }
 
-        private static readonly Dictionary<ScNode, Func<byte[], ScLinkContent>> ScLinkContentConstructors = new Dictionary<ScNode, Func<byte[], ScLinkContent>>
+        private static readonly Dictionary<Identifier, Func<byte[], ScLinkContent>> ScLinkContentConstructors = new Dictionary<Identifier, Func<byte[], ScLinkContent>>
         {
-            { DataTypes.Type_string, bytes => new ScString(bytes) }, 
-            { DataTypes.Binary, bytes => new ScBinary(bytes) },
-            { DataTypes.Numeric_int, bytes => new ScInt32(bytes) },
-            { DataTypes.Numeric_double, bytes => new ScDouble(bytes) },
-            { DataTypes.Numeric_long, bytes => new ScLong(bytes) },
-            { DataTypes.Type_bool, bytes => new ScBool(bytes) },
-            { DataTypes.Numeric_byte, bytes => new ScByte(bytes) }
+            { ScDataTypes.Instance.TypeString, bytes => new ScString(bytes) }, 
+            { ScDataTypes.Instance.TypeBinary, bytes => new ScBinary(bytes) },
+            { ScDataTypes.Instance.NumericInt, bytes => new ScInt32(bytes) },
+            {  ScDataTypes.Instance.NumericDouble, bytes => new ScDouble(bytes) },
+            {  ScDataTypes.Instance.NumericLong, bytes => new ScLong(bytes) },
+            {  ScDataTypes.Instance.TypeBool, bytes => new ScBool(bytes) },
+            {  ScDataTypes.Instance.NumericByte, bytes => new ScByte(bytes) }
         };
 
 
 
-        private static readonly Dictionary<ScNode, Func<IntPtr, ScLinkContent>> ScLinkIntPtrConstructors = new Dictionary<ScNode, Func<IntPtr, ScLinkContent>>
+        private static readonly Dictionary<Identifier, Func<IntPtr, ScLinkContent>> ScLinkIntPtrConstructors = new Dictionary<Identifier, Func<IntPtr, ScLinkContent>>
         {
-            { DataTypes.Type_string, streamIntPtr  => new ScString(streamIntPtr) }, 
-            { DataTypes.Binary, streamIntPtr => new ScBinary(streamIntPtr) },
-            { DataTypes.Numeric_int, streamIntPtr => new ScInt32(streamIntPtr) },
-            { DataTypes.Numeric_double, streamIntPtr => new ScDouble(streamIntPtr) },
-            { DataTypes.Numeric_long, streamIntPtr => new ScLong(streamIntPtr) },
-            { DataTypes.Type_bool, streamIntPtr => new ScBool(streamIntPtr) },
-            { DataTypes.Numeric_byte, streamIntPtr => new ScByte(streamIntPtr) },
+            { ScDataTypes.Instance.TypeString, streamIntPtr  => new ScString(streamIntPtr) }, 
+            { ScDataTypes.Instance.TypeBinary, streamIntPtr => new ScBinary(streamIntPtr) },
+            { ScDataTypes.Instance.NumericInt, streamIntPtr => new ScInt32(streamIntPtr) },
+            { ScDataTypes.Instance.NumericDouble, streamIntPtr => new ScDouble(streamIntPtr) },
+            { ScDataTypes.Instance.NumericLong, streamIntPtr => new ScLong(streamIntPtr) },
+            { ScDataTypes.Instance.TypeBool, streamIntPtr => new ScBool(streamIntPtr) },
+            { ScDataTypes.Instance.NumericByte, streamIntPtr => new ScByte(streamIntPtr) },
         };
 
 

@@ -8,18 +8,27 @@ using System.Security;
 
 namespace ScEngineNet
 {
+
     /// <summary>
     /// Контекст памяти.
     /// Это виртуальный интерфейс для доступа к памяти, которому устанавливается уровень доступа.
     /// Контекст с меньшим уровнем доступа не имеет доступ к элементам, созданным в контекс.
     /// </summary>
-    public class ScMemoryContext:SafeHandle
+    public class ScMemoryContext : IDisposable
     {
         private IntPtr ptrScMemoryContext;
 
+        private const string disposalException_msg = "Был вызван метод Dispose и Ссылка на объект в памяти уже удалена";
+        private const string memoryNotInitializedException_msg = "Библиотека ScMemory.Net не инициализирована";
+
+
+
         internal IntPtr PtrScMemoryContext
         {
-            get { return ptrScMemoryContext; }
+            get
+            {
+                return ptrScMemoryContext;
+            }
         }
 
         /// <summary>
@@ -32,6 +41,8 @@ namespace ScEngineNet
         {
             get
             {
+                if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+
                 var context = (WScMemoryContext)Marshal.PtrToStructure(PtrScMemoryContext, typeof(WScMemoryContext));
                 return (ScAccessLevels)context.AccessLevels;
             }
@@ -39,7 +50,7 @@ namespace ScEngineNet
 
 
 
-        #region initialize
+        #region initialize & service
 
 
         /// <summary>
@@ -57,28 +68,19 @@ namespace ScEngineNet
         /// </summary>
         /// <param name="accessLevels"> Уровень доступа</param>
         public ScMemoryContext(ScAccessLevels accessLevels)
-            : base(IntPtr.Zero, true)
+        //  : base(IntPtr.Zero, true)
         {
-            GC.KeepAlive(this);
+
+            //GC.KeepAlive(this);
             if (ScMemoryContext.IsMemoryInitialized())
             {
                 this.ptrScMemoryContext = NativeMethods.sc_memory_context_new((byte)accessLevels);
-                
+                //  base.SetHandle(this.ptrScMemoryContext);
             }
 
         }
 
-        /// <summary>
-        /// Удаляет контекст
-        /// Этот метод не обязательно вызывать, так как он вызывается сборщиком мусора
-        /// </summary>
-        public void Delete()
-        {
-            if (ScMemoryContext.IsMemoryInitialized())
-            {
-               NativeMethods.sc_memory_context_free(this.PtrScMemoryContext);
-            }
-        }
+
 
         /// <summary>
         /// Получение статистики
@@ -86,11 +88,12 @@ namespace ScEngineNet
         /// <returns>Структуру <see cref="ScStat"/>, содержащую статистику хранилища</returns>
         public ScStat GetStatistics()
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
             var stat = new ScStat();
-            if (ScMemoryContext.IsMemoryInitialized())
-            {
-                NativeMethods.sc_memory_stat(this.PtrScMemoryContext, out stat);
-            }
+            NativeMethods.sc_memory_stat(this.PtrScMemoryContext, out stat);
+
             return stat;
         }
 
@@ -100,11 +103,11 @@ namespace ScEngineNet
         /// <returns>ScResult.SC_RESULT_OK, если состояние сохранить удалось</returns>
         public ScResult SaveState()
         {
-            var result = ScResult.SC_RESULT_ERROR;
-            if (ScMemoryContext.IsMemoryInitialized())
-            {
-                result = NativeMethods.sc_memory_save(this.PtrScMemoryContext);
-            }
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
+            var result = NativeMethods.sc_memory_save(this.PtrScMemoryContext);
+
             return result;
         }
 
@@ -142,6 +145,9 @@ namespace ScEngineNet
         /// <returns></returns>
         public bool IsElementExist(ScAddress elementAddress)
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
             return ScMemorySafeMethods.IsElementExist(this, elementAddress);
         }
 
@@ -160,11 +166,11 @@ namespace ScEngineNet
         /// <returns>Созданную дугу</returns>
         public ScArc CreateArc(ScElement beginElement, ScElement endElement, ElementType arcType)
         {
-            ScArc createdArc = null;
-            if (ScMemoryContext.IsMemoryInitialized() == true)
-            {
-                createdArc = ScMemorySafeMethods.CreateArc(this, arcType, beginElement, endElement);
-            }
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
+            ScArc createdArc = ScMemorySafeMethods.CreateArc(this, arcType, beginElement, endElement);
+
             return createdArc;
         }
 
@@ -175,6 +181,9 @@ namespace ScEngineNet
         /// <returns>sc-дуга</returns>
         public ScArc FindArc(ScAddress arcAddress)
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
             ScArc createdArc = null;
             var scElement = ScMemorySafeMethods.GetElement(arcAddress.WScAddress, this);
             if (scElement.ElementType.HasAnyType(ElementType.ArcMask_c))
@@ -194,11 +203,11 @@ namespace ScEngineNet
         /// <returns>True, если дуга существует</returns>
         public bool ArcIsExist(ScElement beginElement, ScElement endElement, ElementType arcType)
         {
-            bool result = false;
-            if (ScMemoryContext.IsMemoryInitialized() == true)
-            {
-                result = NativeMethods.sc_helper_check_arc(this.PtrScMemoryContext, beginElement.ScAddress.WScAddress, endElement.ScAddress.WScAddress, arcType);
-            }
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
+            bool result = NativeMethods.sc_helper_check_arc(this.PtrScMemoryContext, beginElement.ScAddress.WScAddress, endElement.ScAddress.WScAddress, arcType);
+
             return result;
 
         }
@@ -214,11 +223,11 @@ namespace ScEngineNet
         /// <returns>Созданный узел</returns>
         public ScNode CreateNode(ElementType nodeType)
         {
-            ScNode createdNode = null;
-            if (ScMemoryContext.IsMemoryInitialized() == true)
-            {
-                createdNode = new ScNode(new ScAddress(NativeMethods.sc_memory_node_new(this.PtrScMemoryContext, nodeType)), this);
-            }
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
+            ScNode createdNode = new ScNode(new ScAddress(NativeMethods.sc_memory_node_new(this.PtrScMemoryContext, nodeType)), this);
+
             return createdNode;
         }
 
@@ -230,6 +239,10 @@ namespace ScEngineNet
         /// <returns>Созданный узел</returns>
         public ScNode CreateNode(ElementType nodeType, Identifier sysIdentifier)
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
+
             ScNode createdNode = this.FindNode(sysIdentifier);
             if (createdNode.ScAddress == ScAddress.Invalid)
             {
@@ -248,8 +261,12 @@ namespace ScEngineNet
         /// <returns>Созданный узел</returns>
         public ScNode CreateNode(ElementType nodeType, Identifier sysIdentifier, Identifier ruIdentifier)
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
+
             ScNode createdNode = this.CreateNode(nodeType, sysIdentifier);
-            createdNode.MainIdentifiers[NLanguages.Lang_ru] = new ScString(ruIdentifier.Value);
+            createdNode.MainIdentifiers[ScDataTypes.Instance.LanguageRu] = new ScString(ruIdentifier.Value);
             return createdNode;
         }
 
@@ -265,8 +282,12 @@ namespace ScEngineNet
         /// </returns>
         public ScNode CreateNode(ElementType nodeType, Identifier sysIdentifier, Identifier ruIdentifier, Identifier enIdentifier)
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
+
             ScNode createdNode = this.CreateNode(nodeType, sysIdentifier, ruIdentifier);
-            createdNode.MainIdentifiers[NLanguages.Lang_en] = new ScString(enIdentifier.Value);
+            createdNode.MainIdentifiers[ScDataTypes.Instance.LanguageEn] = new ScString(enIdentifier.Value);
             return createdNode;
         }
 
@@ -278,6 +299,9 @@ namespace ScEngineNet
         /// <returns>Найденный узел</returns>
         public ScNode FindNode(Identifier identifier)
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
             return ScMemorySafeMethods.FindNode(this, identifier);
         }
 
@@ -288,6 +312,10 @@ namespace ScEngineNet
         /// <returns>Найденный узел</returns>
         public ScNode FindNode(ScAddress nodeAddress)
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
+
             ScNode createdNode = null;
             var scElement = ScMemorySafeMethods.GetElement(nodeAddress.WScAddress, this);
             if (scElement.ElementType.HasAnyType(ElementType.NodeOrStructureMask_c))
@@ -307,11 +335,10 @@ namespace ScEngineNet
         /// <returns>Созданная sc-ссылка</returns>
         public ScLink CreateLink()
         {
-            var createdLink = new ScLink(ScAddress.Invalid, this);
-            if (ScMemoryContext.IsMemoryInitialized() == true)
-            {
-                createdLink = new ScLink(new ScAddress(NativeMethods.sc_memory_link_new(this.PtrScMemoryContext)), this);
-            }
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
+            ScLink createdLink = new ScLink(new ScAddress(NativeMethods.sc_memory_link_new(this.PtrScMemoryContext)), this);
             return createdLink;
         }
 
@@ -322,6 +349,9 @@ namespace ScEngineNet
         /// <returns>Созданная sc-ссылка</returns>
         public ScLink CreateLink(ScLinkContent content)
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
             List<ScLink> findLinks = this.FindLinks(content);
             if (findLinks.Count > 0)
             {
@@ -343,9 +373,12 @@ namespace ScEngineNet
         /// <returns>Найденная ссылка</returns>
         public ScLink FindLink(ScAddress linkAddress)
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
             var createdLink = new ScLink(ScAddress.Invalid, this);
             var scElement = ScMemorySafeMethods.GetElement(linkAddress.WScAddress, this);
-            if (scElement.ElementType==ElementType.Link_a)
+            if (scElement.ElementType == ElementType.Link_a)
             {
                 createdLink = (ScLink)scElement;
             }
@@ -360,26 +393,31 @@ namespace ScEngineNet
         /// <returns>Коллекция ссылок</returns>
         public List<ScLink> FindLinks(ScLinkContent content)
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
             List<ScLink> links = new List<ScLink>();
             IntPtr adressesPtr = IntPtr.Zero;
             uint resulCount = 0;
-            if (ScMemoryContext.IsMemoryInitialized() == true)
-            {
-                NativeMethods.sc_memory_find_links_with_content(this.PtrScMemoryContext, content.ScStream, out adressesPtr, out resulCount);
-            }
+
+            NativeMethods.sc_memory_find_links_with_content(this.PtrScMemoryContext, content.ScStream, out adressesPtr, out resulCount);
+
             Array addressesArray = NativeMethods.PtrToArray(typeof(WScAddress), adressesPtr, resulCount);
             for (uint index = 0; index < resulCount; index++)
             {
                 links.Add(new ScLink(new ScAddress((WScAddress)addressesArray.GetValue(index)), this));
             }
-            NativeMethods.sc_memory_free_buff(adressesPtr);
+#warning Здесь иногда происходит вылет библиотеки, нужно разобраться почему
+            if (links.Count != 0)
+            {
+                NativeMethods.sc_memory_free_buff(adressesPtr);
+            }
             return links;
         }
 
         #endregion
 
         #endregion
-
 
         #region Iterators
 
@@ -392,6 +430,9 @@ namespace ScEngineNet
         /// <returns></returns>
         public ScIterator CreateIterator(ScElement e1, ElementType t1, ElementType t2)
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
             return new ScIterator(this, e1, t1, t2);
         }
 
@@ -404,6 +445,9 @@ namespace ScEngineNet
         /// <returns></returns>
         public ScIterator CreateIterator(ElementType t1, ElementType t2, ScElement e1)
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
             return new ScIterator(this, t1, t2, e1);
         }
 
@@ -416,6 +460,9 @@ namespace ScEngineNet
         /// <returns></returns>
         public ScIterator CreateIterator(ScElement e1, ElementType t1, ScElement e2)
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
             return new ScIterator(this, e1, t1, e2);
         }
 
@@ -430,6 +477,9 @@ namespace ScEngineNet
         /// <returns></returns>
         public ScIterator CreateIterator(ElementType t1, ElementType t2, ScElement e1, ElementType t3, ElementType t4)
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
             return new ScIterator(this, t1, t2, e1, t3, t4);
         }
 
@@ -444,6 +494,9 @@ namespace ScEngineNet
         /// <returns></returns>
         public ScIterator CreateIterator(ElementType t1, ElementType t2, ScElement e1, ElementType t3, ScElement e2)
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
             return new ScIterator(this, t1, t2, e1, t3, e2);
         }
 
@@ -458,6 +511,9 @@ namespace ScEngineNet
         /// <returns></returns>
         public ScIterator CreateIterator(ScElement e1, ElementType t1, ElementType t2, ElementType t3, ElementType t4)
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
             return new ScIterator(this, e1, t1, t2, t3, t4);
         }
 
@@ -472,6 +528,9 @@ namespace ScEngineNet
         /// <returns></returns>
         public ScIterator CreateIterator(ScElement e1, ElementType t1, ElementType t2, ElementType t3, ScElement e2)
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
             return new ScIterator(this, e1, t1, t2, t3, e2);
         }
 
@@ -486,6 +545,9 @@ namespace ScEngineNet
         /// <returns></returns>
         public ScIterator CreateIterator(ScElement e1, ElementType t1, ScElement e2, ElementType t2, ElementType t3)
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
             return new ScIterator(this, e1, t1, e2, t2, t3);
         }
 
@@ -500,36 +562,60 @@ namespace ScEngineNet
         /// <returns></returns>
         public ScIterator CreateIterator(ScElement e1, ElementType t1, ScElement e2, ElementType t2, ScElement e3)
         {
+            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+
             return new ScIterator(this, e1, t1, e2, t2, e3);
         }
 
         #endregion
 
-        #region Члены SafeHandle        
-        /// <summary>
-        /// При переопределении в производном классе получает значение, показывающее, допустимо ли значение дескриптора.
-        /// </summary>
-        /// <PermissionSet>
-        ///   <IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="UnmanagedCode" />
-        /// </PermissionSet>
-        public override bool IsInvalid
+
+
+        #region IDisposal
+        private bool disposed;
+
+        public bool Disposed
         {
-            get { return this.PtrScMemoryContext == IntPtr.Zero; }
+            get { return disposed; }
         }
-        /// <summary>
-        /// При переопределении в производном классе выполняет код, необходимый для освобождения дескриптора.
-        /// </summary>
-        /// <returns>
-        /// Значение true, если дескриптор освобождается успешно, в противном случае, в случае катастрофической ошибки — значение  false.В таком случае создается управляющий помощник по отладке releaseHandleFailed MDA.
-        /// </returns>
-        protected override bool ReleaseHandle()
+
+        protected virtual void Dispose(bool disposing)
         {
-            this.Delete();
-            return !IsInvalid;
+            Console.WriteLine("call Dispose({0}) ScContext with {1}",disposing, this.ptrScMemoryContext);
+
+
+            if (!disposed && ScMemoryContext.IsMemoryInitialized())
+            {
+                // Dispose of resources held by this instance.
+                NativeMethods.sc_memory_context_free(this.ptrScMemoryContext);
+                this.ptrScMemoryContext = IntPtr.Zero;
+
+
+                // Suppress finalization of this disposed instance.
+                if (disposing)
+                {
+                    GC.SuppressFinalize(this);
+                }
+                disposed = true;
+            }
+
+
         }
-     
+
+        public void Dispose()
+        {
+            Dispose(true);
+
+        }
+
+        ~ScMemoryContext()
+        {
+            Dispose(false);
+        }
         #endregion
 
-     
+
+
     }
 }

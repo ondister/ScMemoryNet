@@ -5,7 +5,7 @@ namespace ScEngineNet.SafeElements
     /// <summary>
     /// Конструкция из 3-х или 5-ти элементов
     /// </summary>
-   public  class Construction
+   public  class ScConstruction
     {
         private readonly List<ScElement> elements;
 
@@ -20,7 +20,7 @@ namespace ScEngineNet.SafeElements
             get { return elements; }
         }
 
-        internal Construction()
+        internal ScConstruction()
         {
             elements = new List<ScElement>();
         }

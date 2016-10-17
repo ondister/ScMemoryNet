@@ -20,8 +20,12 @@ namespace ScEngineNet.SafeElements
     /// <summary>
     /// Событие для элемента. Создается посредством вызова метода CreateEvent класса <see cref="ScMemoryContext" />
     /// </summary>
-    public class ScEvent:SafeHandle
+    internal class ScEvent:IDisposable
     {
+        private const string disposalException_msg = "Был вызван метод Dispose и cсылка на объект в памяти уже удалена";
+        private const string memoryNotInitializedException_msg = "Библиотека ScMemory.Net не инициализирована";
+        private const string contextInvalidException_msg = "Указанная ссылка на ScContext не действительна";
+
         private IntPtr wScEvent;
         private ScAddress elementAddress;
         private ScMemoryContext context;
@@ -38,6 +42,8 @@ namespace ScEngineNet.SafeElements
 
         internal void OnElementEvent(ScEventType eventType, ScAddress elementAddress, ScAddress arcAddress)
         {
+           
+
             if (ElementEvent != null)
             {
                 ScEventArgs args = new ScEventArgs(eventType, ScMemorySafeMethods.GetElement(elementAddress.WScAddress, this.context), new ScArc(arcAddress, this.context));
@@ -47,6 +53,8 @@ namespace ScEngineNet.SafeElements
 
         internal void OnElementDelete(ScAddress elementAddress)
         {
+         
+
             if (ElementDelete != null)
             {
                 ScEventArgs args = new ScEventArgs(ScEventType.SC_EVENT_REMOVE_ELEMENT, ScMemorySafeMethods.GetElement(elementAddress.WScAddress, this.context), new ScArc(ScAddress.Invalid, context));
@@ -85,7 +93,6 @@ namespace ScEngineNet.SafeElements
 
 
         internal ScEvent(ScAddress elementAddress, ScEventType eventType)
-            :base(IntPtr.Zero,true)
         {
             this.elementAddress = elementAddress;
             this.eventType = eventType;
@@ -93,30 +100,21 @@ namespace ScEngineNet.SafeElements
 
         internal bool Subscribe(ScMemoryContext context)
         {
+           
+
+          
+            this.context = context;
             fEventCallback cb = new fEventCallback(ECallback);
             fDeleteCallback db = new fDeleteCallback(DCallback);
-            this.context = context;
+
+            if (this.Disposed == true) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+            if (this.context.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
+
             this.wScEvent = NativeMethods.sc_event_new(this.context.PtrScMemoryContext, this.elementAddress.WScAddress, this.eventType, IntPtr.Zero, cb, db);
             return this.wScEvent != IntPtr.Zero ? true : false;
         }
 
-        /// <summary>
-        /// Удаляет событие
-        /// </summary>
-        /// <returns></returns>
-        public bool Delete()
-        {
-            bool isDelete = false;
-            if (ScMemoryContext.IsMemoryInitialized() == true)
-            {
-                isDelete = NativeMethods.sc_event_destroy(this.wScEvent) == ScResult.SC_RESULT_OK ? true : false;
-            }
-            else
-            {
-                isDelete = true;
-            }
-            return isDelete;
-        }
 
         private ScResult ECallback(ref WScEvent scEvent, WScAddress arg)
         {
@@ -131,26 +129,70 @@ namespace ScEngineNet.SafeElements
         }
 
 
+           #region IDisposal
+
         /// <summary>
-        /// При переопределении в производном классе получает значение, показывающее, допустимо ли значение дескриптора.
+        /// Удаляет событие
         /// </summary>
-        /// <PermissionSet>
-        ///   <IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="UnmanagedCode" />
-        /// </PermissionSet>
-        public override bool IsInvalid
+        /// <returns></returns>
+        private bool Delete()
         {
-            get { return this.wScEvent==IntPtr.Zero; }
+            bool isDelete = false;
+            if (ScMemoryContext.IsMemoryInitialized() == true && this.wScEvent != IntPtr.Zero)
+            {
+                isDelete = NativeMethods.sc_event_destroy(this.wScEvent) == ScResult.SC_RESULT_OK ? true : false;
+                this.wScEvent = IntPtr.Zero;
+            }
+            else
+            {
+                isDelete = true;
+            }
+            return isDelete;
         }
-        /// <summary>
-        /// При переопределении в производном классе выполняет код, необходимый для освобождения дескриптора.
-        /// </summary>
-        /// <returns>
-        /// Значение true, если дескриптор освобождается успешно, в противном случае, в случае катастрофической ошибки — значение  false.В таком случае создается управляющий помощник по отладке releaseHandleFailed MDA.
-        /// </returns>
-        protected override bool ReleaseHandle()
+
+
+        private bool disposed;
+
+        public bool Disposed
         {
-            this.Delete();
-            return !IsInvalid;
+            get { return disposed; }
         }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            Console.WriteLine("call Dispose({0}) ScEvent with {1}", disposing, this.ToString());
+
+
+            if (!disposed && ScMemoryContext.IsMemoryInitialized())
+            {
+                // Dispose of resources held by this instance.
+                this.Delete();
+                // Suppress finalization of this disposed instance.
+                if (disposing)
+                {
+                   
+                    GC.SuppressFinalize(this);
+                }
+                disposed = true;
+            }
+
+
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+
+        }
+
+        ~ScEvent()
+        {
+            Dispose(false);
+        }
+        #endregion
+       
+
+
+
     }
 }

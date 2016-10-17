@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ScEngineNet.SafeElements
 {
@@ -25,11 +26,11 @@ namespace ScEngineNet.SafeElements
         /// <value>
         /// Содержимое ссылки идентификатора <see cref="ScLinkContent"/>. Его необходимо привести к нужному типу.
         /// </value>
-        /// <param name="ClassNode">Это ключевые узлы из коллекций <see cref="DataTypes"/> или <see cref="NLanguages"/></param>
-        public ScLinkContent this[ScNode ClassNode]
+        /// <param name="ClassNodeIdentifier">Это ключевые узлы из коллекций <see cref="DataTypes"/> или <see cref="NLanguages"/></param>
+        public ScLinkContent this[Identifier ClassNodeIdentifier]
         {
-            set { this.setIdentifier(ClassNode, value); }
-            get { return this.getIdentifier(ClassNode); }
+            set { this.setIdentifier(ClassNodeIdentifier, value); }
+            get { return this.getIdentifier(ClassNodeIdentifier); }
         }
 
         private List<ScLink> getLinks()
@@ -45,19 +46,17 @@ namespace ScEngineNet.SafeElements
             return links;
         }
 
-        private ScLinkContent getIdentifier(ScNode ClassNode)
+        private ScLinkContent getIdentifier(Identifier ClassNodeIdentifier)
         {
             ScLinkContent identifier = "";
             List<ScLink> links = this.getLinks();
 
             foreach (var link in links)
             {
-                ScIterator container = scContext.CreateIterator(ClassNode, ElementType.PositiveConstantPermanentAccessArc_c, link);
-
-                var constructions = container.GetAllConstructions();
-                if (constructions.Count != 0)
-                {
-                    ScLinkContent content = (constructions[0].Elements[2] as ScLink).LinkContent;
+                var container = scContext.CreateIterator(scContext.FindNode(ClassNodeIdentifier), ElementType.PositiveConstantPermanentAccessArc_c, link);
+                if ( container.Count() != 0)
+                {    
+                    ScLinkContent content = (container.ElementAt(0).Elements[2] as ScLink).LinkContent;
                     identifier = content;
                 }
 
@@ -66,17 +65,16 @@ namespace ScEngineNet.SafeElements
             return identifier;
         }
 
-        private void setIdentifier(ScNode ClassNode, ScLinkContent identifier)
+        private void setIdentifier(Identifier ClassNodeIdentifier, ScLinkContent identifier)
         {
-            if (this.getIdentifier(ClassNode) == "")
+            if (this.getIdentifier(ClassNodeIdentifier) == "")
             {
                 ScNode main_idtf = scContext.FindNode("nrel_main_idtf");
                 ScLink idtfLink = scContext.CreateLink(identifier);
                 var commonArc = scContext.CreateArc(node, idtfLink, ElementType.ConstantCommonArc_c);
                 //another arcs
                 var arc1 = scContext.CreateArc(main_idtf, commonArc, ElementType.PositiveConstantPermanentAccessArc_c);
-                var arc2 = scContext.CreateArc(ClassNode, idtfLink, ElementType.PositiveConstantPermanentAccessArc_c);
-
+                var arc2 = scContext.CreateArc(scContext.FindNode(ClassNodeIdentifier), idtfLink, ElementType.PositiveConstantPermanentAccessArc_c);
             }
         }
     }

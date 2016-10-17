@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // Управление общими сведениями о сборке осуществляется с помощью 
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
-[assembly: AssemblyTitle("ScEngineNet")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("ScFullTextSearch")]
+[assembly: AssemblyDescription("Набор ScNet агентов для полнотекстогово поиска на основе PullEnti")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("ScEngineNet")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2016")]
+[assembly: AssemblyCompany("OSTIS")]
+[assembly: AssemblyProduct("ScFullTextSearch")]
+[assembly: AssemblyCopyright("Copyright © OSTIS 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // Следующий GUID служит для идентификации библиотеки типов, если этот проект будет видимым для COM
-[assembly: Guid("31f29c71-e93c-4402-bff5-ee5f7bd65200")]
+[assembly: Guid("8f3e608d-aaa6-4145-bb18-aa0b56f0e205")]
 
 // Сведения о версии сборки состоят из следующих четырех значений:
 //
@@ -34,5 +34,3 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: InternalsVisibleTo("ScMachineWrapperTest")]
-[assembly: InternalsVisibleTo("Demo")]
