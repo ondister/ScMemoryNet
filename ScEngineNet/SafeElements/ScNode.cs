@@ -27,8 +27,22 @@ namespace ScEngineNet.SafeElements
         /// </value>
         public Identifier SystemIdentifier
         {
-            get { return ScMemorySafeMethods.GetSystemIdentifier(base.scContext, this); }
-            set { ScMemorySafeMethods.SetSystemIdentifier(base.scContext, this, value); }
+            get 
+            {
+                if (this.Disposed == true) { throw new ObjectDisposedException("ScNode", disposalException_msg); }
+                if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+                if (this.ScContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
+                
+                return ScMemorySafeMethods.GetSystemIdentifier(base.ScContext, this);
+            }
+            set 
+            {
+                if (this.Disposed == true) { throw new ObjectDisposedException("ScNode", disposalException_msg); }
+                if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+                if (this.ScContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
+               
+                ScMemorySafeMethods.SetSystemIdentifier(base.ScContext, this, value);
+            }
         }
 
 
@@ -38,6 +52,9 @@ namespace ScEngineNet.SafeElements
             mainIdentifiers = new MainIdentifiers(this);
         }
 
+        /// <summary>
+        /// Текстовая константа для узла. Используется при создании идентификаторов
+        /// </summary>
         public static readonly String InstancePreffix = "inst_";
     }
 }

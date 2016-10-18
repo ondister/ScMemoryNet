@@ -19,7 +19,11 @@ namespace ScEngineNet.SafeElements
         {
             get
             {
-                this.beginElement = ScMemorySafeMethods.GetArcBeginElement(base.scContext, this);
+                if (this.Disposed == true) { throw new ObjectDisposedException("ScArc", disposalException_msg); }
+                if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+                if (this.ScContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
+               
+                this.beginElement = ScMemorySafeMethods.GetArcBeginElement(base.ScContext, this);
                 return beginElement;
             }
         }
@@ -37,7 +41,11 @@ namespace ScEngineNet.SafeElements
         {
             get
             {
-                this.endElement = ScMemorySafeMethods.GetArcEndElement(base.scContext, this);
+                if (this.Disposed == true) { throw new ObjectDisposedException("ScArc", disposalException_msg); }
+                if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+                if (this.ScContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
+               
+                this.endElement = ScMemorySafeMethods.GetArcEndElement(base.ScContext, this);
                 return this.endElement;
             }
         }

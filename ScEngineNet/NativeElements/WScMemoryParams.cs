@@ -11,14 +11,17 @@ namespace ScEngineNet.NativeElements
         /// <summary>
         /// Путь к репозиторию
         /// </summary>
+      
         internal string RepoPath;
         /// <summary>
         /// Путь к файлу конфигурации
         /// </summary>
+      
         internal string ConfigFile;
         /// <summary>
         /// Путь к расширениям
         /// </summary>
+       
         internal string ExtensionsPath;
         /// <summary>
         /// Очищать ли память перед инициализацией (стирает все содержимое памяти)

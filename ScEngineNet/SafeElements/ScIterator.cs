@@ -1,17 +1,17 @@
 ﻿using ScEngineNet.NativeElements;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ScEngineNet.SafeElements
 {
-   public class ScIterator:IEnumerable<ScConstruction>
+    /// <summary>
+    /// Итератор для поиска конструкций по шаблону.
+    /// Создается в методе CreateIterator класса <see cref="ScMemoryContext" />
+    /// </summary>
+    public class ScIterator : IEnumerable<ScConstruction>
     {
-     
-       private readonly ScMemoryContext scContext;
+
+        private readonly ScMemoryContext scContext;
         private readonly ScIterator3Type iterator3type;
         private readonly ScIterator5Type iterator5type;
 
@@ -48,7 +48,7 @@ namespace ScEngineNet.SafeElements
             p2 = new ScIteratorParam() { IsType = true, Type = t1 };
             p3 = new ScIteratorParam() { IsType = false, Address = e1.ScAddress.WScAddress };
 
-         
+
         }
 
         internal ScIterator(ScMemoryContext scContext, ScElement e1, ElementType t1, ScElement e2)
@@ -61,7 +61,7 @@ namespace ScEngineNet.SafeElements
             p2 = new ScIteratorParam() { IsType = true, Type = t1 };
             p3 = new ScIteratorParam() { IsType = false, Address = e2.ScAddress.WScAddress };
 
-          
+
         }
 
         internal ScIterator(ScMemoryContext scContext, ElementType t1, ElementType t2, ScElement e1, ElementType t3, ElementType t4)
@@ -76,7 +76,7 @@ namespace ScEngineNet.SafeElements
             p4 = new ScIteratorParam() { IsType = true, Type = t3 };
             p5 = new ScIteratorParam() { IsType = true, Type = t4 };
 
-           
+
         }
 
         internal ScIterator(ScMemoryContext scContext, ElementType t1, ElementType t2, ScElement e1, ElementType t3, ScElement e2)
@@ -91,7 +91,7 @@ namespace ScEngineNet.SafeElements
             p4 = new ScIteratorParam() { IsType = true, Type = t3 };
             p5 = new ScIteratorParam() { IsType = false, Address = e2.ScAddress.WScAddress };
 
-           
+
         }
 
         internal ScIterator(ScMemoryContext scContext, ScElement e1, ElementType t1, ElementType t2, ElementType t3, ElementType t4)
@@ -106,7 +106,7 @@ namespace ScEngineNet.SafeElements
             p4 = new ScIteratorParam() { IsType = true, Type = t3 };
             p5 = new ScIteratorParam() { IsType = true, Type = t4 };
 
-           
+
         }
 
         internal ScIterator(ScMemoryContext scContext, ScElement e1, ElementType t1, ElementType t2, ElementType t3, ScElement e2)
@@ -121,7 +121,7 @@ namespace ScEngineNet.SafeElements
             p4 = new ScIteratorParam() { IsType = true, Type = t3 };
             p5 = new ScIteratorParam() { IsType = false, Address = e2.ScAddress.WScAddress };
 
-           
+
         }
 
         internal ScIterator(ScMemoryContext scContext, ScElement e1, ElementType t1, ScElement e2, ElementType t2, ElementType t3)
@@ -136,7 +136,7 @@ namespace ScEngineNet.SafeElements
             p4 = new ScIteratorParam() { IsType = true, Type = t2 };
             p5 = new ScIteratorParam() { IsType = true, Type = t3 };
 
-            
+
         }
 
         internal ScIterator(ScMemoryContext scContext, ScElement e1, ElementType t1, ScElement e2, ElementType t2, ScElement e3)
@@ -151,12 +151,17 @@ namespace ScEngineNet.SafeElements
             p4 = new ScIteratorParam() { IsType = true, Type = t2 };
             p5 = new ScIteratorParam() { IsType = false, Address = e3.ScAddress.WScAddress };
 
-           
+
         }
 
         #endregion
 
-
+        /// <summary>
+        /// Возвращает перечислитель, выполняющий перебор элементов в коллекции.
+        /// </summary>
+        /// <returns>
+        /// Интерфейс <see cref="T:System.Collections.Generic.IEnumerator`1" />, который может использоваться для перебора элементов коллекции.
+        /// </returns>
         public IEnumerator<ScConstruction> GetEnumerator()
         {
 
@@ -164,9 +169,9 @@ namespace ScEngineNet.SafeElements
             {
                 return new ScEnumerator(this.scContext, this.iterator3type, this.p1, this.p2, this.p3);
             }
-            else 
+            else
             {
-                return new ScEnumerator(this.scContext, this.iterator5type, this.p1, this.p2, this.p3,this.p4,this.p5);
+                return new ScEnumerator(this.scContext, this.iterator5type, this.p1, this.p2, this.p3, this.p4, this.p5);
             }
         }
 
@@ -177,7 +182,7 @@ namespace ScEngineNet.SafeElements
         }
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-          return  this.GetEnumerator1();
+            return this.GetEnumerator1();
         }
     }
 }

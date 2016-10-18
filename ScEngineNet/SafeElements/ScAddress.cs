@@ -1,5 +1,4 @@
 ﻿using System;
-
 using ScEngineNet.NativeElements;
 
 namespace ScEngineNet.SafeElements

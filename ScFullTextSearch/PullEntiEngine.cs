@@ -31,7 +31,7 @@ namespace ScFullTextSearch
                 if (context.ArcIsExist(SearchKeyNodes.ClassLinkForTokenize, Link, ElementType.PositiveConstantPermanentAccessArc_c) == true)
                 {
                     var linkIterator = context.CreateIterator(SearchKeyNodes.ClassLinkForTokenize, ElementType.PositiveConstantPermanentAccessArc_c, Link);
-                    linkIterator.ElementAt(0).Elements[1].DeleteFromMemory();//убераем дугу от классас ClassForTokenizeString
+                    linkIterator.ElementAt(0)[1].DeleteFromMemory();//убераем дугу от классас ClassForTokenizeString
                     //и довляем дугу от класса  ClassTokenizedString, то есть ссылка токенизирована
                     SearchKeyNodes.ClassTokenizedLink.AddOutputArc(Link, ElementType.PositiveConstantPermanentAccessArc_c);
                 }
@@ -148,12 +148,12 @@ namespace ScFullTextSearch
                 foreach (var construction in lemmaIterator)
                 {
                     Console.WriteLine(((ScString)Lemma.LinkContent).Value);
-                    Console.WriteLine(((ScNode)construction.Elements[0]).SystemIdentifier);
+                    Console.WriteLine(((ScNode)construction[0]).SystemIdentifier);
 
-                    ScIterator wordIterator = context.CreateIterator(ElementType.ConstantNode_c, ElementType.ConstantCommonArc_c, construction.Elements[0], ElementType.PositiveConstantPermanentAccessArc_c, SearchKeyNodes.NrelWordLemma);
+                    ScIterator wordIterator = context.CreateIterator(ElementType.ConstantNode_c, ElementType.ConstantCommonArc_c, construction[0], ElementType.PositiveConstantPermanentAccessArc_c, SearchKeyNodes.NrelWordLemma);
                     if (wordIterator.Count() != 0)
                     {
-                        node = (ScNode)wordIterator.ElementAt(0).Elements[0];
+                        node = (ScNode)wordIterator.ElementAt(0)[0];
                         break;
                     }
                 }

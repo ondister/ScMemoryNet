@@ -16,11 +16,11 @@ namespace ScEngineNet.SafeElements
     /// <param name="sender">The sender.</param>
     /// <param name="e">The <see cref="ScEventArgs"/> instance containing the event data.</param>
     public delegate void ElementDeleteHandler(object sender, ScEventArgs e);
-    
+
     /// <summary>
     /// Событие для элемента. Создается посредством вызова метода CreateEvent класса <see cref="ScMemoryContext" />
     /// </summary>
-    internal class ScEvent:IDisposable
+    internal class ScEvent : IDisposable
     {
         private const string disposalException_msg = "Был вызван метод Dispose и cсылка на объект в памяти уже удалена";
         private const string memoryNotInitializedException_msg = "Библиотека ScMemory.Net не инициализирована";
@@ -42,7 +42,9 @@ namespace ScEngineNet.SafeElements
 
         internal void OnElementEvent(ScEventType eventType, ScAddress elementAddress, ScAddress arcAddress)
         {
-           
+            if (this.Disposed == true) { throw new ObjectDisposedException("ScEvent", disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+            if (this.context.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
 
             if (ElementEvent != null)
             {
@@ -53,7 +55,9 @@ namespace ScEngineNet.SafeElements
 
         internal void OnElementDelete(ScAddress elementAddress)
         {
-         
+            if (this.Disposed == true) { throw new ObjectDisposedException("ScEvent", disposalException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+            if (this.context.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
 
             if (ElementDelete != null)
             {
@@ -100,9 +104,9 @@ namespace ScEngineNet.SafeElements
 
         internal bool Subscribe(ScMemoryContext context)
         {
-           
 
-          
+
+
             this.context = context;
             fEventCallback cb = new fEventCallback(ECallback);
             fDeleteCallback db = new fDeleteCallback(DCallback);
@@ -129,7 +133,7 @@ namespace ScEngineNet.SafeElements
         }
 
 
-           #region IDisposal
+        #region IDisposal
 
         /// <summary>
         /// Удаляет событие
@@ -153,6 +157,12 @@ namespace ScEngineNet.SafeElements
 
         private bool disposed;
 
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="ScEvent"/> is disposed.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if disposed; otherwise, <c>false</c>.
+        /// </value>
         public bool Disposed
         {
             get { return disposed; }
@@ -170,7 +180,7 @@ namespace ScEngineNet.SafeElements
                 // Suppress finalization of this disposed instance.
                 if (disposing)
                 {
-                   
+
                     GC.SuppressFinalize(this);
                 }
                 disposed = true;
@@ -179,6 +189,9 @@ namespace ScEngineNet.SafeElements
 
         }
 
+        /// <summary>
+        /// Выполняет определяемые приложением задачи, связанные с высвобождением или сбросом неуправляемых ресурсов.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
@@ -190,7 +203,7 @@ namespace ScEngineNet.SafeElements
             Dispose(false);
         }
         #endregion
-       
+
 
 
 

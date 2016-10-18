@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+
 namespace ScEngineNet.SafeElements
 {
     /// <summary>
@@ -7,12 +8,17 @@ namespace ScEngineNet.SafeElements
     /// </summary>
     public class ScElement : IEquatable<ScElement>, IDisposable
     {
-        internal ScMemoryContext scContext;
+        private ScMemoryContext scContext;
+
+        internal ScMemoryContext ScContext
+        {
+            get { return scContext; }
+        }
         private ScAddress scAddress;
 
-        private const string disposalException_msg = "Был вызван метод Dispose и cсылка на объект в памяти уже удалена";
-        private const string memoryNotInitializedException_msg = "Библиотека ScMemory.Net не инициализирована";
-        private const string contextInvalidException_msg = "Указанная ссылка на ScContext не действительна";
+        protected const string disposalException_msg = "Был вызван метод Dispose и cсылка на объект в памяти уже удалена";
+        protected const string memoryNotInitializedException_msg = "Библиотека ScMemory.Net не инициализирована";
+        protected const string contextInvalidException_msg = "Указанная ссылка на ScContext не действительна";
 
         /// <summary>
         /// Вовращает тип элемента
@@ -52,6 +58,21 @@ namespace ScEngineNet.SafeElements
             get { return scAddress; }
         }
 
+
+        internal ScElement(ScAddress scAddress, ScMemoryContext scContext)
+        {
+            this.scContext = scContext;
+            this.scAddress = scAddress;
+
+            this.scOutputArcAddedEvent = new ScEvent(this.scAddress, ScEventType.SC_EVENT_ADD_OUTPUT_ARC);
+            this.scOutputArcRemovedEvent = new ScEvent(this.scAddress, ScEventType.SC_EVENT_REMOVE_OUTPUT_ARC);
+
+            this.scInputArcAddedEvent = new ScEvent(this.scAddress, ScEventType.SC_EVENT_ADD_INPUT_ARC);
+            this.scInputArcRemovedEvent = new ScEvent(this.scAddress, ScEventType.SC_EVENT_REMOVE_INPUT_ARC);
+
+            this.scElementRemovedEvent = new ScEvent(this.scAddress, ScEventType.SC_EVENT_REMOVE_ELEMENT);
+        }
+
         /// <summary>
         /// Удаляет элемент из памяти
         /// </summary>
@@ -67,22 +88,6 @@ namespace ScEngineNet.SafeElements
             this.scAddress = ScAddress.Invalid;
 
             return isDeleted;
-        }
-
-        internal ScElement(ScAddress scAddress, ScMemoryContext scContext)
-        {
-            
-            this.scContext = scContext;
-            this.scAddress = scAddress;
-
-
-            this.scOutputArcAddedEvent = new ScEvent(this.scAddress, ScEventType.SC_EVENT_ADD_OUTPUT_ARC);
-            this.scOutputArcRemovedEvent = new ScEvent(this.scAddress, ScEventType.SC_EVENT_REMOVE_OUTPUT_ARC);
-
-            this.scInputArcAddedEvent = new ScEvent(this.scAddress, ScEventType.SC_EVENT_ADD_INPUT_ARC);
-            this.scInputArcRemovedEvent = new ScEvent(this.scAddress, ScEventType.SC_EVENT_REMOVE_INPUT_ARC);
-
-            this.scElementRemovedEvent = new ScEvent(this.scAddress, ScEventType.SC_EVENT_REMOVE_ELEMENT);
         }
 
         /// <summary>
@@ -138,7 +143,7 @@ namespace ScEngineNet.SafeElements
             if (this.scContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
 
             var scEvent = new ScEvent(this.ScAddress, eventType);
-                scEvent.Subscribe(this.scContext);
+            scEvent.Subscribe(this.scContext);
             return scEvent;
         }
 
@@ -160,15 +165,13 @@ namespace ScEngineNet.SafeElements
 
             ScElement element = null;
 
-
-
             var container5 = this.scContext.CreateIterator(this, ElementType.ConstantCommonArc_c, findElementType, ElementType.PositiveConstantPermanentAccessArc_c, nrelNode);
             foreach (var construction in container5)
             {
-                var container3 = this.scContext.CreateIterator(classNode, ElementType.PositiveConstantPermanentAccessArc_c, construction.Elements[2]);
+                var container3 = this.scContext.CreateIterator(classNode, ElementType.PositiveConstantPermanentAccessArc_c, construction[2]);
                 if (container3.Count() != 0)
                 {
-                    element = construction.Elements[2];
+                    element = construction[2];
                     break;
                 }
             }
@@ -479,6 +482,9 @@ namespace ScEngineNet.SafeElements
 
         }
 
+        /// <summary>
+        /// Выполняет определяемые приложением задачи, связанные с высвобождением или сбросом неуправляемых ресурсов.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);

@@ -10,12 +10,13 @@ namespace ScEngineNet.SafeElements
     /// <summary>
     /// Базовый класс для содержимого sc-ссылки
     /// </summary>
-
-    public abstract class ScLinkContent : SafeHandle, IEquatable<ScLinkContent>
+    public abstract class ScLinkContent : IDisposable, IEquatable<ScLinkContent>
     {
 
         private IntPtr scStream;
         private byte[] bytes;
+
+       
 
         /// <summary>
         /// Ключевой узел, определяющий тип содержимого
@@ -46,10 +47,9 @@ namespace ScEngineNet.SafeElements
         }
 
         #region Конструкторы
-      
+
 
         internal ScLinkContent(byte[] bytes)
-            :base(IntPtr.Zero,true)
         {
             this.bytes = bytes;
             scStream = NativeMethods.sc_stream_memory_new(this.bytes, (uint)bytes.Length, ScStreamFlag.SC_STREAM_FLAG_READ, false);
@@ -58,7 +58,7 @@ namespace ScEngineNet.SafeElements
         /// Initializes a new instance of the <see cref="ScLinkContent"/> class.
         /// </summary>
         /// <param name="Stream">The stream.</param>
-      protected ScLinkContent(IntPtr Stream) :
+        protected ScLinkContent(IntPtr Stream) :
             this(new byte[0])
         {
             this.SetStream(Stream);
@@ -396,35 +396,65 @@ namespace ScEngineNet.SafeElements
 
         #endregion
 
-        #region SafeHandle
-        private void StreamFree()
+      
+      
+
+           #region IDisposal
+        private bool disposed;
+
+          private void StreamFree()
         {
             NativeMethods.sc_stream_free(this.scStream);
+            this.scStream = IntPtr.Zero;
         }
-
 
         /// <summary>
-        /// При переопределении в производном классе получает значение, показывающее, допустимо ли значение дескриптора.
+        /// Gets a value indicating whether this <see cref="ScEnumerator"/> is disposed.
         /// </summary>
-        /// <PermissionSet>
-        ///   <IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="UnmanagedCode" />
-        /// </PermissionSet>
-        public override bool IsInvalid
+        /// <value>
+        ///   <c>true</c> if disposed; otherwise, <c>false</c>.
+        /// </value>
+        public bool Disposed
         {
-            get {return this.scStream==IntPtr.Zero; }
-        }
-        /// <summary>
-        /// При переопределении в производном классе выполняет код, необходимый для освобождения дескриптора.
-        /// </summary>
-        /// <returns>
-        /// Значение true, если дескриптор освобождается успешно, в противном случае, в случае катастрофической ошибки — значение  false.В таком случае создается управляющий помощник по отладке releaseHandleFailed MDA.
-        /// </returns>
-        protected override bool ReleaseHandle()
-        {
-            StreamFree();
-            return !IsInvalid;
+            get { return disposed; }
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            Console.WriteLine("call Dispose({0}) ScLinkContent with {1}", disposing, this.scStream);
+
+
+            if (!disposed && ScMemoryContext.IsMemoryInitialized())
+            {
+                // Dispose of resources held by this instance.
+                this.StreamFree();
+                // Suppress finalization of this disposed instance.
+                if (disposing)
+                {
+
+                    GC.SuppressFinalize(this);
+                }
+                disposed = true;
+            }
+
+
+        }
+
+        /// <summary>
+        /// Выполняет определяемые приложением задачи, связанные с высвобождением или сбросом неуправляемых ресурсов.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+
+        }
+
+        ~ScLinkContent()
+        {
+            Dispose(false);
+        }
         #endregion
+
+
     }
 }

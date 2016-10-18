@@ -2,16 +2,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Threading;
 
 namespace ScEngineNet.SafeElements
 {
+
     /// <summary>
-    /// Итератор для поиска конструкций по шаблону.
-    /// Создается в методе CreateIterator класса <see cref="ScMemoryContext" />
+    /// Энумератор для итераторов библиотеки
     /// </summary>
-    public class ScEnumerator :  IEnumerator<ScConstruction>,IDisposable
+    /// <seealso cref="System.Collections.Generic.IEnumerator{ScEngineNet.SafeElements.ScConstruction}" />
+    /// <seealso cref="System.IDisposable" />
+    public class ScEnumerator : IEnumerator<ScConstruction>, IDisposable
     {
         private const string disposalException_msg = "Был вызван метод Dispose и cсылка на объект в памяти уже удалена";
         private const string memoryNotInitializedException_msg = "Библиотека ScMemory.Net не инициализирована";
@@ -28,9 +28,6 @@ namespace ScEngineNet.SafeElements
         private ScIteratorParam p4;
         private ScIteratorParam p5;
 
-
-
-
         #region Конструкторы
 
         private ScEnumerator(ScMemoryContext scContext)
@@ -39,16 +36,17 @@ namespace ScEngineNet.SafeElements
         }
 
 
-        internal ScEnumerator(ScMemoryContext scContext, ScIterator3Type iterator3Type,ScIteratorParam p1,ScIteratorParam p2,ScIteratorParam p3)
+        internal ScEnumerator(ScMemoryContext scContext, ScIterator3Type iterator3Type, ScIteratorParam p1, ScIteratorParam p2, ScIteratorParam p3)
             : this(scContext)
         {
             this.iterator3type = iterator3Type;
             this.iterator5type = ScIterator5Type.sc_iterator5_unknown;
 
-            if (this.Disposed == true) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
             if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
             if (this.scContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
-           
+            this.p1 = p1;
+            this.p2 = p2;
+            this.p3 = p3;
             this.iterator = ScMemorySafeMethods.CreateIterator3(this.scContext, this.iterator3type, p1, p2, p3);
         }
 
@@ -57,11 +55,14 @@ namespace ScEngineNet.SafeElements
         {
             this.iterator3type = ScIterator3Type.sc_iterator3_unknown;
             this.iterator5type = iterator5Type;
-           
-            if (this.Disposed == true) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+
             if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
             if (this.scContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
-           
+            this.p1 = p1;
+            this.p2 = p2;
+            this.p3 = p3;
+            this.p4 = p4;
+            this.p5 = p5;
             this.iterator = ScMemorySafeMethods.CreateIterator5(this.scContext, this.iterator5type, p1, p2, p3, p4, p5);
         }
 
@@ -69,8 +70,13 @@ namespace ScEngineNet.SafeElements
 
 
         #region IEnumerator<Construction>
+
         private ScConstruction currentConstruction;
 
+        /// <summary>
+        /// Получает элемент коллекции, соответствующий текущей позиции перечислителя.
+        /// </summary>
+        /// <exception cref="System.InvalidOperationException"></exception>
         public ScConstruction Current
         {
             get
@@ -95,6 +101,15 @@ namespace ScEngineNet.SafeElements
             get { return Current1; }
         }
 
+        /// <summary>
+        /// Перемещает перечислитель к следующему элементу коллекции.
+        /// </summary>
+        /// <returns>
+        /// Значение true, если перечислитель был успешно перемещен к следующему элементу; значение false, если перечислитель достиг конца коллекции.
+        /// </returns>
+        /// <exception cref="System.ObjectDisposedException"></exception>
+        /// <exception cref="ScMemoryNotInitializeException"></exception>
+        /// <exception cref="ScContextInvalidException"></exception>
         public bool MoveNext()
         {
             if (this.Disposed == true) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
@@ -110,7 +125,7 @@ namespace ScEngineNet.SafeElements
                 }
                 for (uint element = 0; element < 3; element++)
                 {
-                    this.currentConstruction.Elements.Add(ScMemorySafeMethods.GetElement(new ScAddress(NativeMethods.sc_iterator3_value(this.iterator, element)).WScAddress, this.scContext));
+                    this.currentConstruction.AddElement(ScMemorySafeMethods.GetElement(new ScAddress(NativeMethods.sc_iterator3_value(this.iterator, element)).WScAddress, this.scContext));
                 }
 
             }
@@ -122,7 +137,7 @@ namespace ScEngineNet.SafeElements
                 }
                 for (uint element = 0; element < 5; element++)
                 {
-                    this.currentConstruction.Elements.Add(ScMemorySafeMethods.GetElement(new ScAddress(NativeMethods.sc_iterator5_value(this.iterator, element)).WScAddress, this.scContext));
+                    this.currentConstruction.AddElement(ScMemorySafeMethods.GetElement(new ScAddress(NativeMethods.sc_iterator5_value(this.iterator, element)).WScAddress, this.scContext));
                 }
             }
             return true;
@@ -131,7 +146,12 @@ namespace ScEngineNet.SafeElements
 
 
 
-
+        /// <summary>
+        /// Устанавливает перечислитель в его начальное положение, т. е. перед первым элементом коллекции.
+        /// </summary>
+        /// <exception cref="System.ObjectDisposedException"></exception>
+        /// <exception cref="ScMemoryNotInitializeException"></exception>
+        /// <exception cref="ScContextInvalidException"></exception>
         public void Reset()
         {
             if (this.Disposed == true) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
@@ -157,15 +177,14 @@ namespace ScEngineNet.SafeElements
         #endregion
 
 
-       
-        
+
         private bool Delete()
         {
             bool isDeleted = false;
             if (this.iterator3type != ScIterator3Type.sc_iterator3_unknown)
             {
-             NativeMethods.sc_iterator3_free(this.iterator);
-             this.iterator = IntPtr.Zero;
+                NativeMethods.sc_iterator3_free(this.iterator);
+                this.iterator = IntPtr.Zero;
             }
             else
             {
@@ -176,9 +195,15 @@ namespace ScEngineNet.SafeElements
         }
 
 
-          #region IDisposal
+        #region IDisposal
         private bool disposed;
 
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="ScEnumerator"/> is disposed.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if disposed; otherwise, <c>false</c>.
+        /// </value>
         public bool Disposed
         {
             get { return disposed; }
@@ -196,7 +221,7 @@ namespace ScEngineNet.SafeElements
                 // Suppress finalization of this disposed instance.
                 if (disposing)
                 {
-                   
+
                     GC.SuppressFinalize(this);
                 }
                 disposed = true;
@@ -205,6 +230,9 @@ namespace ScEngineNet.SafeElements
 
         }
 
+        /// <summary>
+        /// Выполняет определяемые приложением задачи, связанные с высвобождением или сбросом неуправляемых ресурсов.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
@@ -216,7 +244,7 @@ namespace ScEngineNet.SafeElements
             Dispose(false);
         }
         #endregion
-       
+
 
 
 

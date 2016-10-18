@@ -18,11 +18,19 @@ namespace ScEngineNet.SafeElements
         {
             get
             {
-                return ScMemorySafeMethods.GetLinkContent(base.scContext, this);
+                if (this.Disposed == true) { throw new ObjectDisposedException("ScLink", disposalException_msg); }
+                if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+                if (this.ScContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
+               
+                return ScMemorySafeMethods.GetLinkContent(base.ScContext, this);
             }
             set
             {
-                ScMemorySafeMethods.SetLinkContent(base.scContext, value, this);
+                if (this.Disposed == true) { throw new ObjectDisposedException("ScLink", disposalException_msg); }
+                if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
+                if (this.ScContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
+                
+                ScMemorySafeMethods.SetLinkContent(base.ScContext, value, this);
             }
         }
 
@@ -70,6 +78,13 @@ namespace ScEngineNet.SafeElements
 
         #endregion
 
+        protected virtual new void Dispose(bool disposing)
+        {
+            this.contentChangeEvent.Dispose();
+            this.LinkContent.Dispose();
+            base.Dispose(disposing);
+
+        }
 
     }
 }

@@ -4,7 +4,6 @@ using ScEngineNet.SafeElements;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Security;
 
 namespace ScEngineNet
 {
@@ -582,7 +581,7 @@ namespace ScEngineNet
 
         protected virtual void Dispose(bool disposing)
         {
-            Console.WriteLine("call Dispose({0}) ScContext with {1}",disposing, this.ptrScMemoryContext);
+            Console.WriteLine("call Dispose({0}) ScContext with {1}", disposing, this.ptrScMemoryContext);
 
 
             if (!disposed && ScMemoryContext.IsMemoryInitialized())

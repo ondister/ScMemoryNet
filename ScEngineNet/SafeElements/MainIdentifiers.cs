@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace ScEngineNet.SafeElements
 {
     /// <summary>
-    /// Основных идентификаторов узла. 
+    /// Основные идентификаторы узла. 
     /// </summary>
-    /// <seealso cref="System.IDisposable" />
     public class MainIdentifiers
     {
         private ScNode node;
@@ -16,7 +14,7 @@ namespace ScEngineNet.SafeElements
         internal MainIdentifiers(ScNode node)
         {
             this.node = node;
-            this.scContext = node.scContext;
+            this.scContext = node.ScContext;
         }
 
         /// <summary>
@@ -40,7 +38,7 @@ namespace ScEngineNet.SafeElements
             ScIterator container = scContext.CreateIterator(node, ElementType.ConstantCommonArc_c, ElementType.Link_a, ElementType.PositiveConstantPermanentAccessArc_c, main_idtf);
             foreach (var construction in container)
             {
-                links.Add((construction.Elements[2] as ScLink));
+                links.Add((construction[2] as ScLink));
             }
 
             return links;
@@ -54,9 +52,9 @@ namespace ScEngineNet.SafeElements
             foreach (var link in links)
             {
                 var container = scContext.CreateIterator(scContext.FindNode(ClassNodeIdentifier), ElementType.PositiveConstantPermanentAccessArc_c, link);
-                if ( container.Count() != 0)
-                {    
-                    ScLinkContent content = (container.ElementAt(0).Elements[2] as ScLink).LinkContent;
+                if (container.Count() != 0)
+                {
+                    ScLinkContent content = (container.ElementAt(0)[2] as ScLink).LinkContent;
                     identifier = content;
                 }
 

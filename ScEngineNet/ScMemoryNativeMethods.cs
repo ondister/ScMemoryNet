@@ -10,10 +10,10 @@ namespace ScEngineNet
     /// </summary>
     internal static partial class NativeMethods
     {
-        [DllImport(ScEngineNet.ScMemoryDllName, CallingConvention = ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
+        [DllImport(ScEngineNet.ScMemoryDllName, CallingConvention = ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset, BestFitMapping = false, ThrowOnUnmappableChar = true)]
         internal static extern void sc_memory_params_clear(WScMemoryParams sc_memory_params);
 
-        [DllImport(ScEngineNet.ScMemoryDllName, CallingConvention = ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
+        [DllImport(ScEngineNet.ScMemoryDllName, CallingConvention = ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset, BestFitMapping = false, ThrowOnUnmappableChar = true)]
         internal static extern IntPtr sc_memory_initialize(WScMemoryParams sc_memory_params);
 
         [DllImport(ScEngineNet.ScMemoryDllName, CallingConvention = ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]

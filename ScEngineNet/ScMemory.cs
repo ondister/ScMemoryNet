@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-
-using ScEngineNet;
+﻿using ScEngineNet;
 using ScEngineNet.ExtensionsNet;
 using ScEngineNet.NetHelpers;
 using ScEngineNet.SafeElements;
-using System.Threading;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
 namespace ScMemoryNet
 {
@@ -16,7 +14,7 @@ namespace ScMemoryNet
     /// </summary>
     public sealed class ScMemory
     {
-      //  private static ScMemoryContext baseContext;
+        //  private static ScMemoryContext baseContext;
         /// <summary>
         /// Определяет, инициализирована ли память
         /// </summary>
@@ -50,9 +48,9 @@ namespace ScMemoryNet
         /// or
         /// Память уже инициализирована. Нельзя использовать одновременно несколько экземпляров памяти. Создайте новый ScMemoryContext
         /// </exception>
-        public static void Initialize(bool clearBeforeInit,string configFile, string repoPath, string extensionsPath, string netExtensionsPath)
+        public static void Initialize(bool clearBeforeInit, string configFile, string repoPath, string extensionsPath, string netExtensionsPath)
         {
-          
+
             var parameters = new ScMemoryParams(clearBeforeInit, configFile, repoPath, extensionsPath, netExtensionsPath);
             ScMemory.Initialize(parameters);
         }
@@ -81,9 +79,9 @@ namespace ScMemoryNet
 
             if (ScMemoryContext.IsMemoryInitialized() == false)
             {
-               
-                    NativeMethods.sc_memory_initialize(parameters.scParams);
-               
+
+                NativeMethods.sc_memory_initialize(parameters.scParams);
+
                 ScMemory.LoadExtensionsNets(parameters.NetExtensionsPath);
 
                 ScDataTypes.Instance.CreateKeyNodes();
@@ -126,7 +124,7 @@ namespace ScMemoryNet
         {
             foreach (var exNet in listExtensionsNet)
             {
-                
+
                 if (exNet.ShutDown() == ScResult.SC_RESULT_OK)
                 {
                     Console.WriteLine("** Message: .net module: {0} unloaded", exNet.NetExtensionName);
@@ -145,9 +143,9 @@ namespace ScMemoryNet
             bool IsShutDown = false;
 
 
-          
+
             //уничтожение объектов с указателями в памяти перед закрытием памяти
-           
+
 
             //закрытие расширений и закрытие библиотеки
             if (ScMemoryContext.IsMemoryInitialized())
@@ -157,16 +155,16 @@ namespace ScMemoryNet
                     IsShutDown = NativeMethods.sc_memory_shutdown(SaveMemoryState);
                 }
             }
-           
+
 
             return IsShutDown;
         }
 
 
 
-      
 
-        
+
+
 
     }
 }

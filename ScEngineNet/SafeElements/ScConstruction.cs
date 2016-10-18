@@ -5,24 +5,33 @@ namespace ScEngineNet.SafeElements
     /// <summary>
     /// Конструкция из 3-х или 5-ти элементов
     /// </summary>
-   public  class ScConstruction
+    public class ScConstruction
     {
         private readonly List<ScElement> elements;
 
+
         /// <summary>
-        /// Возвращает коллекцию элементов
+        /// Возвращает  <see cref="ScElement"/> по указанному индексу
         /// </summary>
-        /// <value>
-        /// Коллекция элементов
-        /// </value>
-        public List<ScElement> Elements
+        /// <param name="index">Индекс</param>
+        public ScElement this[int index]
         {
-            get { return elements; }
+            get { return this.elements[index]; }
+        }
+
+        internal void AddElement(ScElement element)
+        {
+            this.elements.Add(element);
+        }
+
+        internal void Clear()
+        {
+            this.elements.Clear();
         }
 
         internal ScConstruction()
         {
-            elements = new List<ScElement>();
+            this.elements = new List<ScElement>();
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Demo
         private Stopwatch clock;
         public void Start()
         {
-           
+
             //var scParams = new WScMemoryParams
             //{
             //    Clear = true,
@@ -68,7 +68,7 @@ namespace Demo
             const string extensionPath = @"d:\OSTIS\sc-machine-master\bin\extensions";
             const string netExtensionPath = @"d:\OSTIS\sc-machine-master\bin\netextensions";
             ScMemory.Initialize(true, configFile, repoPath, extensionPath, netExtensionPath);
-          
+
 
             //ScNode nd = context.CreateNode(ElementType.ConstantNode_c);
             //ScNode nd1 = context.CreateNode(ElementType.NonRoleNode_a);
@@ -106,51 +106,22 @@ namespace Demo
 
             context = new ScMemoryContext(ScAccessLevels.MinLevel);
 
-            ScNode node = context.CreateNode(ElementType.Node_a);
+            ScLink link = context.CreateLink("linkkkk");
+
+            Console.WriteLine(((ScString)link.LinkContent).Value);
+
+            link.Dispose();
+            Console.WriteLine(((ScString)link.LinkContent).Value);
+
+            context.Dispose();
+
+            Console.WriteLine("Memory shutDown whith {0}", ScMemory.ShutDown(false));
+
+            
           
-
-            ScNode node2= context.CreateNode(ElementType.ClassNode_a);
-            context.CreateArc(node, node2,ElementType.CommonArc_a);
-            var iter = context.CreateIterator(node, ElementType.CommonArc_a, node2);
-            Console.WriteLine(iter.Count());
-            Console.WriteLine(iter.Count());
-            foreach(var t in iter)
-            {
-                Console.WriteLine(t.Elements[0].ScAddress);
-            }
-
-            for (int i = 0; i < iter.Count(); i++)
-            {
-                Console.WriteLine(iter.ElementAt(i).Elements[0].ScAddress);
-            }
-            // node.Dispose();
-            
-
-                    context.Dispose();
-                    foreach (var t in iter)
-                    {
-                        Console.WriteLine(t.Elements[0].ScAddress);
-                    }
-                    Console.WriteLine("Memory shutDown whith {0}", ScMemory.ShutDown(false));
-            
-
             Console.ReadKey();
         }
 
-      
-
-        //void link_InputArcAdded(object sender, ScEventArgs e)
-        //{
-        //    using (var context = new ScMemoryContext(ScAccessLevels.MinLevel))
-        //    {
-        //        ScNode tokenizedNode = context.FindNode("class_tokenized_link");
-        //        if (context.ArcIsExist(tokenizedNode, e.Element, ElementType.PositiveConstantPermanentAccessArc_c) == true)
-        //        {
-        //            clock.Stop();
-        //            Console.WriteLine("Ссылка обработана за {0} мс.", clock.ElapsedMilliseconds);
-        //        }
-        //    }
-        //}
 
 
 
