@@ -9,7 +9,6 @@ namespace ScEngineNet.SafeElements
     /// <summary>
     /// Энумератор для итераторов библиотеки
     /// </summary>
-    /// <seealso cref="System.Collections.Generic.IEnumerator{ScEngineNet.SafeElements.ScConstruction}" />
     /// <seealso cref="System.IDisposable" />
     public class ScEnumerator : IEnumerator<ScConstruction>, IDisposable
     {
@@ -209,6 +208,10 @@ namespace ScEngineNet.SafeElements
             get { return disposed; }
         }
 
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
             Console.WriteLine("call Dispose({0}) ScEnumerator with {1}", disposing, this.iterator);
@@ -239,6 +242,9 @@ namespace ScEngineNet.SafeElements
 
         }
 
+        /// <summary>
+        /// Finalizes an instance of the <see cref="ScEnumerator"/> class.
+        /// </summary>
         ~ScEnumerator()
         {
             Dispose(false);

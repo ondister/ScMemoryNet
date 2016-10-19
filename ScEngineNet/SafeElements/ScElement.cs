@@ -16,8 +16,17 @@ namespace ScEngineNet.SafeElements
         }
         private ScAddress scAddress;
 
+        /// <summary>
+        /// The disposal exception_msg
+        /// </summary>
         protected const string disposalException_msg = "Был вызван метод Dispose и cсылка на объект в памяти уже удалена";
+        /// <summary>
+        /// The memory not initialized exception_msg
+        /// </summary>
         protected const string memoryNotInitializedException_msg = "Библиотека ScMemory.Net не инициализирована";
+        /// <summary>
+        /// The context invalid exception_msg
+        /// </summary>
         protected const string contextInvalidException_msg = "Указанная ссылка на ScContext не действительна";
 
         /// <summary>
@@ -131,11 +140,13 @@ namespace ScEngineNet.SafeElements
         }
 
         /// <summary>
-        /// Создает событие для элемента
+        /// Creates the event.
         /// </summary>
-        /// <param name="element">Sc-элемент</param>
-        /// <param name="eventType">Тип события</param>
-        /// <returns>Возвращает событие <see cref="ScEvent"/> </returns>
+        /// <param name="eventType">Type of the event.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ObjectDisposedException"></exception>
+        /// <exception cref="ScMemoryNotInitializeException"></exception>
+        /// <exception cref="ScContextInvalidException"></exception>
         internal ScEvent CreateEvent(ScEventType eventType)
         {
             if (this.Disposed == true) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
@@ -278,6 +289,9 @@ namespace ScEngineNet.SafeElements
         #region OutputArcAdded
         private ScEvent scOutputArcAddedEvent;//не забываем добавить в конструктор начальную инициализацию
         internal static readonly EventKey outputArcAddedEventKey = new EventKey();
+        /// <summary>
+        /// Occurs when [output arc added].
+        /// </summary>
         public event ElementEventHandler OutputArcAdded
         {
             add
@@ -300,6 +314,10 @@ namespace ScEngineNet.SafeElements
             OnOutputArcAdded(e);
         }
 
+        /// <summary>
+        /// Raises the <see cref="E:OutputArcAdded" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="ScEventArgs"/> instance containing the event data.</param>
         protected virtual void OnOutputArcAdded(ScEventArgs args)
         {
             elementEventSet.Raise(outputArcAddedEventKey, this, args);
@@ -310,6 +328,9 @@ namespace ScEngineNet.SafeElements
         #region OutputArcRemoved
         private ScEvent scOutputArcRemovedEvent;//не забываем добавить в конструктор начальную инициализацию
         internal static readonly EventKey outputArcRemovedEventKey = new EventKey();
+        /// <summary>
+        /// Occurs when [output arc removed].
+        /// </summary>
         public event ElementEventHandler OutputArcRemoved
         {
             add
@@ -333,6 +354,10 @@ namespace ScEngineNet.SafeElements
         }
 
 
+        /// <summary>
+        /// Raises the <see cref="E:OutputArcRemoved" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="ScEventArgs"/> instance containing the event data.</param>
         protected virtual void OnOutputArcRemoved(ScEventArgs args)
         {
             elementEventSet.Raise(outputArcRemovedEventKey, this, args);
@@ -343,6 +368,9 @@ namespace ScEngineNet.SafeElements
         #region InputArcRemoved
         private ScEvent scInputArcRemovedEvent;//не забываем добавить в конструктор начальную инициализацию
         internal static readonly EventKey inputArcRemovedEventKey = new EventKey();
+        /// <summary>
+        /// Occurs when [input arc removed].
+        /// </summary>
         public event ElementEventHandler InputArcRemoved
         {
             add
@@ -365,6 +393,10 @@ namespace ScEngineNet.SafeElements
             OnInputArcRemoved(e);
         }
 
+        /// <summary>
+        /// Raises the <see cref="E:InputArcRemoved" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="ScEventArgs"/> instance containing the event data.</param>
         protected virtual void OnInputArcRemoved(ScEventArgs args)
         {
             elementEventSet.Raise(inputArcRemovedEventKey, this, args);
@@ -375,6 +407,9 @@ namespace ScEngineNet.SafeElements
         #region InputArcAdded
         private ScEvent scInputArcAddedEvent;//не забываем добавить в конструктор начальную инициализацию
         internal static readonly EventKey inputArcAddedEventKey = new EventKey();
+        /// <summary>
+        /// Occurs when [input arc added].
+        /// </summary>
         public event ElementEventHandler InputArcAdded
         {
             add
@@ -397,6 +432,10 @@ namespace ScEngineNet.SafeElements
             OnInputArcAdded(e);
         }
 
+        /// <summary>
+        /// Raises the <see cref="E:InputArcAdded" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="ScEventArgs"/> instance containing the event data.</param>
         protected virtual void OnInputArcAdded(ScEventArgs args)
         {
             elementEventSet.Raise(inputArcAddedEventKey, this, args);
@@ -407,6 +446,9 @@ namespace ScEngineNet.SafeElements
         #region ElementRemoved
         private ScEvent scElementRemovedEvent;//не забываем добавить в конструктор начальную инициализацию
         internal static readonly EventKey elementRemovedEventKey = new EventKey();
+        /// <summary>
+        /// Occurs when [element removed].
+        /// </summary>
         public event ElementEventHandler ElementRemoved
         {
             add
@@ -434,6 +476,10 @@ namespace ScEngineNet.SafeElements
         }
 
 
+        /// <summary>
+        /// Raises the <see cref="E:ElementRemoved" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="ScEventArgs"/> instance containing the event data.</param>
         protected virtual void OnElementRemoved(ScEventArgs args)
         {
             elementEventSet.Raise(elementRemovedEventKey, this, args);
@@ -448,11 +494,21 @@ namespace ScEngineNet.SafeElements
         #region IDisposal
         private bool disposed;
 
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="ScElement"/> is disposed.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if disposed; otherwise, <c>false</c>.
+        /// </value>
         public bool Disposed
         {
             get { return disposed; }
         }
 
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
             Console.WriteLine("call Dispose({0}) ScElement with {1}", disposing, this.ScAddress);
@@ -491,6 +547,9 @@ namespace ScEngineNet.SafeElements
 
         }
 
+        /// <summary>
+        /// Finalizes an instance of the <see cref="ScElement"/> class.
+        /// </summary>
         ~ScElement()
         {
             Dispose(false);

@@ -19,12 +19,12 @@ namespace ScEngineNet.SafeElements
 
         /// <summary>
         /// Задает или получает основной идентификатор с указанным узлом класса данных.
-        /// Это ключевые узлы из коллекций <see cref="DataTypes"/> или <see cref="NLanguages"/>
+        /// Это ключевые узлы из коллекций <see cref="NetHelpers.ScDataTypes"/>
         /// </summary>
         /// <value>
         /// Содержимое ссылки идентификатора <see cref="ScLinkContent"/>. Его необходимо привести к нужному типу.
         /// </value>
-        /// <param name="ClassNodeIdentifier">Это ключевые узлы из коллекций <see cref="DataTypes"/> или <see cref="NLanguages"/></param>
+        /// <param name="ClassNodeIdentifier">Это ключевые узлы из коллекций <see cref="NetHelpers.ScDataTypes"/> </param>
         public ScLinkContent this[Identifier ClassNodeIdentifier]
         {
             set { this.setIdentifier(ClassNodeIdentifier, value); }

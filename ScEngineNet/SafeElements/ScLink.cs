@@ -48,6 +48,9 @@ namespace ScEngineNet.SafeElements
         #region ContentChangedEvent
         private ScEvent contentChangeEvent;//не забываем добавить в конструктор начальную инициализацию
         internal static readonly EventKey contentChangeEventKey = new EventKey();
+        /// <summary>
+        /// Occurs when [content changed].
+        /// </summary>
         public event ElementEventHandler ContentChanged
         {
             add
@@ -70,7 +73,11 @@ namespace ScEngineNet.SafeElements
             OnContentChangeEvent(e);
         }
 
-      
+
+        /// <summary>
+        /// Raises the <see cref="E:ContentChangeEvent" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="ScEventArgs"/> instance containing the event data.</param>
         protected virtual void OnContentChangeEvent(ScEventArgs args)
         {
             base.EventSet.Raise(contentChangeEventKey, this, args);
@@ -78,6 +85,10 @@ namespace ScEngineNet.SafeElements
 
         #endregion
 
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual new void Dispose(bool disposing)
         {
             this.contentChangeEvent.Dispose();

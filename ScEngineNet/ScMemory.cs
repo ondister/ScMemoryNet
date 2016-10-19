@@ -26,7 +26,6 @@ namespace ScMemoryNet
             get { return ScMemoryContext.IsMemoryInitialized(); }
         }
 
-
         private static List<IScExtensionNet> listExtensionsNet;
 
         /// <summary>

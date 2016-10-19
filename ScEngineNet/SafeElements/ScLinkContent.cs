@@ -419,6 +419,10 @@ namespace ScEngineNet.SafeElements
             get { return disposed; }
         }
 
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
             Console.WriteLine("call Dispose({0}) ScLinkContent with {1}", disposing, this.scStream);
@@ -449,6 +453,9 @@ namespace ScEngineNet.SafeElements
 
         }
 
+        /// <summary>
+        /// Finalizes an instance of the <see cref="ScLinkContent"/> class.
+        /// </summary>
         ~ScLinkContent()
         {
             Dispose(false);

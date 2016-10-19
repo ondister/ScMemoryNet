@@ -63,7 +63,7 @@ namespace ScEngineNet
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScMemoryContext"/> class.
-        /// Для создания экземпляра контекста, необходимо инициализировать память <see cref="ScMemory"/>
+        /// Для создания экземпляра контекста, необходимо инициализировать память <see cref="ScMemoryNet.ScMemory"/>
         /// </summary>
         /// <param name="accessLevels"> Уровень доступа</param>
         public ScMemoryContext(ScAccessLevels accessLevels)
@@ -574,11 +574,21 @@ namespace ScEngineNet
         #region IDisposal
         private bool disposed;
 
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="ScMemoryContext"/> is disposed.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if disposed; otherwise, <c>false</c>.
+        /// </value>
         public bool Disposed
         {
             get { return disposed; }
         }
 
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
             Console.WriteLine("call Dispose({0}) ScContext with {1}", disposing, this.ptrScMemoryContext);
@@ -602,12 +612,18 @@ namespace ScEngineNet
 
         }
 
+        /// <summary>
+        /// Выполняет определяемые приложением задачи, связанные с высвобождением или сбросом неуправляемых ресурсов.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
 
         }
 
+        /// <summary>
+        /// Finalizes an instance of the <see cref="ScMemoryContext"/> class.
+        /// </summary>
         ~ScMemoryContext()
         {
             Dispose(false);
