@@ -6,157 +6,115 @@ using System.Collections.Generic;
 namespace ScFullTextSearch
 {
     /// <summary>
-    /// Ключевые узлы набора агентов для полнотекстового поиска.
+    /// Класс, содержащий идентификаторы типов данных для ссылок
     /// </summary>
-    public static class SearchKeyNodes
+    public sealed class SearchKeyNodes
     {
+        private static volatile SearchKeyNodes instance;
+        private static object syncRoot = new Object();
 
-        private static List<ScNode> keyNodes;
 
-        private static ScNode classLinkForTokenize;
-        private static ScNode classTokenizedLink;
-        private static ScNode classSimpleToken;
-        private static ScNode classWord;
-        private static ScNode classWordLemma;
-        private static ScNode classWordVariant;
-        private static ScNode nrelTokenStartPosition;
-        private static ScNode nrelTokenEndPosition;
-        private static ScNode nrelWordLemma;
-        private static ScNode nrelWordVariant;
-        private static ScNode nrelToken;
-        private static ScNode nrelTokenWord;
+        private SearchKeyNodes()
+        {
+        }
+      
 
-     
+        #region keynodes
        
 
-        internal static void CreateKeyNodes()
-        {
+        public Identifier ClassLinkForTokenize
+        { get { return "class_link_for_tokenize"; } }
+        public Identifier ClassTokenizedLink
+        { get { return "class_tokenized_link"; } }
+        public Identifier ClassSimpleToken
+        { get { return "class_simple_token"; } }
+        public Identifier ClassWord
+        { get { return "class_word"; } }
+        public Identifier ClassWordLemma
+        { get { return "class_word_lemma"; } }
+        public Identifier ClassWordVariant
+        { get { return "class_word_variant"; } }
+        public Identifier NrelTokenStartPosition
+        { get { return "nrel_token_start_position"; } }
+        public Identifier NrelTokenEndPosition
+        { get { return "nrel_token_end_position"; } }
+        public Identifier NrelWordLemma
+        { get { return "nrel_word_lemma"; } }
+        public Identifier NrelWordVariant
+        { get { return "nrel_word_variant"; } }
+        public Identifier NrelToken
+        { get { return "nrel_token"; } }
+        public Identifier NrelTokenWord
+        { get { return "nrel_token_word"; } }
 
-           var context = new ScMemoryContext(ScAccessLevels.MinLevel);
-            
-                classLinkForTokenize = SearchKeyNodes.CreateKeyNode(context, ElementType.ClassNode_a, "class_link_for_tokenize");
-                classTokenizedLink = SearchKeyNodes.CreateKeyNode(context, ElementType.ClassNode_a, "class_tokenized_link");
-                classSimpleToken = SearchKeyNodes.CreateKeyNode(context, ElementType.ClassNode_a, "class_simple_token");
-                classWord = SearchKeyNodes.CreateKeyNode(context, ElementType.ClassNode_a, "class_word");
-                classWordLemma = SearchKeyNodes.CreateKeyNode(context, ElementType.ClassNode_a, "class_word_lemma");
-                classWordVariant = SearchKeyNodes.CreateKeyNode(context, ElementType.ClassNode_a, "class_word_variant");
-                nrelTokenStartPosition = SearchKeyNodes.CreateKeyNode(context, ElementType.NonRoleNode_a, "nrel_token_start_position");
-                nrelTokenEndPosition = SearchKeyNodes.CreateKeyNode(context, ElementType.NonRoleNode_a, "nrel_token_end_position");
-                nrelWordLemma = SearchKeyNodes.CreateKeyNode(context, ElementType.NonRoleNode_a, "nrel_word_lemma");
-                nrelWordVariant = SearchKeyNodes.CreateKeyNode(context, ElementType.NonRoleNode_a, "nrel_word_variant");
-                nrelToken = SearchKeyNodes.CreateKeyNode(context, ElementType.NonRoleNode_a, "nrel_token");
-                nrelTokenWord = SearchKeyNodes.CreateKeyNode(context, ElementType.NonRoleNode_a, "nrel_token_word");
+        public Identifier ClassQuerryString
+        { get { return "class_querry_string"; } }
 
-                keyNodes = new List<ScNode>() { 
-                    classLinkForTokenize, 
-                    classTokenizedLink,
-                    classSimpleToken,
-                    classWord,
-                    classWordLemma,
-                    classWordVariant,
-                    nrelTokenStartPosition,
-                    nrelTokenEndPosition,
-                    nrelWordLemma,
-                    nrelWordVariant,
-                    nrelToken,
-                    nrelTokenWord
-               
-            };
+        public Identifier ClassQuerryResponse
+        { get { return "class_querry_response"; } }
 
-        }
-
-        public static ScNode ClassWordVariant
-        {
-            get { return SearchKeyNodes.classWordVariant; }
-            set { SearchKeyNodes.classWordVariant = value; }
-        }
-
-        public static ScNode ClassWordLemma
-        {
-            get { return SearchKeyNodes.classWordLemma; }
-            set { SearchKeyNodes.classWordLemma = value; }
-        }
-        public static ScNode NrelTokenWord
-        {
-            get { return SearchKeyNodes.nrelTokenWord; }
-            set { SearchKeyNodes.nrelTokenWord = value; }
-        }
-        public static ScNode ClassWord
-        {
-            get { return SearchKeyNodes.classWord; }
-            set { SearchKeyNodes.classWord = value; }
-        }
-        public static ScNode NrelToken
-        {
-            get { return SearchKeyNodes.nrelToken; }
-            set { SearchKeyNodes.nrelToken = value; }
-        }
-
-        public static ScNode NrelWordVariant
-        {
-            get { return SearchKeyNodes.nrelWordVariant; }
-            set { SearchKeyNodes.nrelWordVariant = value; }
-        }
-
-        public static ScNode NrelWordLemma
-        {
-            get { return SearchKeyNodes.nrelWordLemma; }
-            set { SearchKeyNodes.nrelWordLemma = value; }
-        }
-        public static ScNode NrelTokenEndPosition
-        {
-            get { return SearchKeyNodes.nrelTokenEndPosition; }
-            set { SearchKeyNodes.nrelTokenEndPosition = value; }
-        }
-        public static ScNode NrelTokenStartPosition
-        {
-            get { return SearchKeyNodes.nrelTokenStartPosition; }
-            set { SearchKeyNodes.nrelTokenStartPosition = value; }
-        }
-
-        public static ScNode ClassSimpleToken
-        {
-            get { return SearchKeyNodes.classSimpleToken; }
-            set { SearchKeyNodes.classSimpleToken = value; }
-        }
-
-
-        public static ScNode ClassTokenizedLink
-        {
-            get { return SearchKeyNodes.classTokenizedLink; }
-            set { SearchKeyNodes.classTokenizedLink = value; }
-        }
-
-        public static ScNode ClassLinkForTokenize
-        {
-            get { return SearchKeyNodes.classLinkForTokenize; }
-            set { SearchKeyNodes.classLinkForTokenize = value; }
-        }
-     
-     
-
-    
+        public Identifier NrelQuerryResponse
+        { get { return "nrel_querry_response"; } }
+        #endregion
 
         /// <summary>
-        /// Возвращает коллекцию ключевых узлов
+        /// Возвращает экземпляр класса ScDataTypes
         /// </summary>
         /// <value>
-        /// Коллекция ключевых узлов
+        /// Экземпляр класса ScDataTypes
         /// </value>
-        public static List<ScNode> KeyNodes
+        public static SearchKeyNodes Instance
         {
-            get { return SearchKeyNodes.keyNodes; }
+            get
+            {
+                if (instance == null)
+                {
+                    lock (syncRoot)
+                    {
+                        if (instance == null)
+                            instance = new SearchKeyNodes();
+                    }
+                }
+
+                return instance;
+            }
         }
 
-
-       
-
-
-
-        private static ScNode CreateKeyNode(ScMemoryContext context, ElementType elementType, Identifier identifier)
+        private ScNode CreateKeyNode(ScMemoryContext context, ElementType elementType, Identifier identifier)
         {
-            Console.WriteLine("Create SearchKeyNode KeyNode: {0}", identifier);
+            Console.WriteLine("Create ScFulltextSearch KeyNode: {0}", identifier);
             return context.CreateNode(elementType, identifier);
         }
+        /// <summary>
+        /// Создает ключевые узлы
+        /// </summary>
+        /// <returns></returns>
+        internal bool CreateKeyNodes()
+        {
+
+            using (var context = new ScMemoryContext(ScAccessLevels.MinLevel))
+            {
+                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.ClassLinkForTokenize);
+                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.ClassTokenizedLink);
+                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.ClassSimpleToken);
+                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.ClassWord);
+                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.ClassWordLemma);
+                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.ClassWordVariant);
+                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.ClassQuerryString);
+                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.ClassQuerryResponse);
+                this.CreateKeyNode(context, ElementType.NonRoleConstantNode_c, this.NrelToken);
+                this.CreateKeyNode(context, ElementType.NonRoleConstantNode_c, this.NrelTokenEndPosition);
+                this.CreateKeyNode(context, ElementType.NonRoleConstantNode_c, this.NrelTokenStartPosition);
+                this.CreateKeyNode(context, ElementType.NonRoleConstantNode_c, this.NrelTokenWord);
+                this.CreateKeyNode(context, ElementType.NonRoleConstantNode_c, this.NrelWordLemma);
+                this.CreateKeyNode(context, ElementType.NonRoleConstantNode_c, this.NrelWordVariant);
+                this.CreateKeyNode(context, ElementType.NonRoleConstantNode_c, this.NrelQuerryResponse);
+            }
+            return true;
+        }
+
+
+     
+
     }
 }

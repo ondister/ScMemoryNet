@@ -1,4 +1,5 @@
 ﻿using EP.Text;
+using ScEngineNet;
 using ScEngineNet.ExtensionsNet;
 using ScEngineNet.SafeElements;
 using System;
@@ -12,6 +13,11 @@ namespace ScFullTextSearch
     public  class PullEntiAgent : IScExtensionNet
     {
         private PullEntiEngine pullEntyEngine;
+        private ScMemoryContext context;
+        private ScNode classLinkForTokenize;
+        private FTSearchEngine ftSearchEngine;
+        private ScNode classQuerryString;
+
         public string NetExtensionName
         {
             get { return "PullEnti Agent "; }
@@ -28,16 +34,52 @@ namespace ScFullTextSearch
             Morphology.Initialize();
             
             //создаем ключевые узлы
-            SearchKeyNodes.CreateKeyNodes();
-            
-            //подписываемся на событие добавление к узлу for_tokenize_string дуги и ссылки
-            SearchKeyNodes.ClassLinkForTokenize.OutputArcAdded += ForTokenizeString_OutputArcAdded;
+            SearchKeyNodes.Instance.CreateKeyNodes();
 
-            //инициируем движок 
+            //создаем контекст, который уничтожим только после выгрузки расширения
+            context = new ScMemoryContext(ScAccessLevels.MinLevel);
+
+            //подписываемся на событие добавление к узлу class_link_for_tokenize дуги и ссылки
+            this.classLinkForTokenize = context.FindNode(SearchKeyNodes.Instance.ClassLinkForTokenize);
+            
+            if (this.classLinkForTokenize.ScAddress != ScAddress.Invalid)
+            {
+                this.classLinkForTokenize.OutputArcAdded += ForTokenizeString_OutputArcAdded;
+            }
+            else
+            {
+                Console.WriteLine("KeyNode {0} not found", SearchKeyNodes.Instance.ClassLinkForTokenize);
+            }
+
+            //инициируем движок токенизатора
             pullEntyEngine = new PullEntiEngine();
-           
+
+            //подписываемся на событие добавление к узлу class_querry_string нового экземпляра
+            this.classQuerryString = context.FindNode(SearchKeyNodes.Instance.ClassQuerryString);
+
+            if (this.classQuerryString.ScAddress != ScAddress.Invalid)
+            {
+                this.classQuerryString.OutputArcAdded += classQuerryString_OutputArcAdded;
+            }
+            else
+            {
+                Console.WriteLine("KeyNode {0} not found", SearchKeyNodes.Instance.ClassQuerryString);
+            }
+            ftSearchEngine = new FTSearchEngine();
+
+
 
             return ScResult.SC_RESULT_OK;
+        }
+
+        void classQuerryString_OutputArcAdded(object sender, ScEventArgs e)
+        {
+            var addedElement = e.Arc.EndElement;
+            if (addedElement.ElementType == ElementType.ConstantNode_c)
+            {
+                Console.WriteLine("Querry added");
+                ftSearchEngine.AddQuerry((ScNode)addedElement);
+            }
         }
 
         void ForTokenizeString_OutputArcAdded(object sender, ScEventArgs e)
@@ -45,14 +87,22 @@ namespace ScFullTextSearch
             var addedElement= e.Arc.EndElement;
             if (addedElement.ElementType == ElementType.Link_a)
             {
+                Console.WriteLine("Link for tokenize added");
                 pullEntyEngine.AddLink((ScLink)addedElement);
             }
         }
 
         public ScResult ShutDown()
         {
+            
             //отписываемся от события добавление к узлу for_tokenize_string дуги и ссылки
-            SearchKeyNodes.ClassLinkForTokenize.OutputArcAdded -= ForTokenizeString_OutputArcAdded; 
+            this.classLinkForTokenize.OutputArcAdded -= ForTokenizeString_OutputArcAdded;
+            this.classQuerryString.OutputArcAdded -= classQuerryString_OutputArcAdded;
+
+            this.classQuerryString.Dispose();
+            this.classLinkForTokenize.Dispose();
+            //уничтожаем контекст
+            context.Dispose();
 
             return ScResult.SC_RESULT_OK;
         }

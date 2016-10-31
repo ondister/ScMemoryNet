@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PullEntiEngine.cs" />
+    <Compile Include="FTSearchEngine.cs" />
     <Compile Include="SearchKeyNodes.cs" />
     <Compile Include="PullEntiAgent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -60,6 +61,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <None Include="Docs\search_agent.gwf" />
     <None Include="Docs\token_construction.gwf" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

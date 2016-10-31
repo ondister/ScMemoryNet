@@ -45,7 +45,7 @@ namespace ScEngineNet.SafeElements
             this.iterator5type = ScIterator5Type.sc_iterator5_unknown;
 
             p1 = new ScIteratorParam() { IsType = true, Type = t1 };
-            p2 = new ScIteratorParam() { IsType = true, Type = t1 };
+            p2 = new ScIteratorParam() { IsType = true, Type = t2 };
             p3 = new ScIteratorParam() { IsType = false, Address = e1.ScAddress.WScAddress };
 
 

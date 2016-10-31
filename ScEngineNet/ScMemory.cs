@@ -74,21 +74,27 @@ namespace ScMemoryNet
             if (!File.Exists(parameters.ConfigFile)) { throw new Exception("Отсутствует указанный конфигурационный файл"); }
             if (!Directory.Exists(parameters.RepoPath)) { throw new Exception("Отсутствует указанная директория репозитория"); }
             if (!Directory.Exists(parameters.ExtensionsPath)) { throw new Exception("Отсутствует указанная директория расширений"); }
-            if (!Directory.Exists(parameters.NetExtensionsPath)) { throw new Exception("Отсутствует указанная директория расширений .net"); }
-
+            
+            listExtensionsNet = new List<IScExtensionNet>();
+          
             if (ScMemoryContext.IsMemoryInitialized() == false)
             {
 
                 NativeMethods.sc_memory_initialize(parameters.scParams);
-
-                ScMemory.LoadExtensionsNets(parameters.NetExtensionsPath);
+                //только если указанная директория существует
+                if (Directory.Exists(parameters.NetExtensionsPath) == true)
+                {
+                    ScMemory.LoadExtensionsNets(parameters.NetExtensionsPath);
+                }
 
                 ScDataTypes.Instance.CreateKeyNodes();
+                ScKeyNodes.Instance.CreateKeyNodes();
             }
             else
             {
                 throw new Exception("Память уже инициализирована. Нельзя использовать одновременно несколько экземпляров памяти. Создайте новый ScMemoryContext");
             }
+
         }
 
 
@@ -98,7 +104,6 @@ namespace ScMemoryNet
         {
             string[] files = Directory.GetFiles(netExtensionsPath, "*.dll");
             Console.WriteLine("** Message: Initialize .net extensions from " + netExtensionsPath);
-            listExtensionsNet = new List<IScExtensionNet>();
             foreach (string fName in files)
             {
                 Assembly assembly = Assembly.LoadFrom(fName);
@@ -106,13 +111,13 @@ namespace ScMemoryNet
                 {
                     if (typeof(IScExtensionNet).GetTypeInfo().IsAssignableFrom(t.GetTypeInfo()))
                     {
-                        //var exNet = (IScExtensionNet)assembly.CreateInstance(t.FullName);
+                        var exNet = (IScExtensionNet)assembly.CreateInstance(t.FullName);
 
-                        //if (exNet.Initialize() == ScResult.SC_RESULT_OK)
-                        //{
-                        //    listExtensionsNet.Add(exNet);
-                        //    Console.WriteLine("** Message: .net module: {0} initialized ", fName);
-                        //}
+                        if (exNet.Initialize() == ScResult.SC_RESULT_OK)
+                        {
+                            listExtensionsNet.Add(exNet);
+                            Console.WriteLine("** Message: .net module: {0} initialized ", fName);
+                        }
 
                     }
                 }

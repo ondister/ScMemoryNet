@@ -47,6 +47,8 @@ namespace ScEngineNet
             ScArc arc = null;
             if (ScMemoryContext.IsMemoryInitialized())
             {
+                if(beginElement!=null && endElement!=null)
+                {
                 if (!NativeMethods.sc_helper_check_arc(scExtContext.PtrScMemoryContext, beginElement.ScAddress.WScAddress, endElement.ScAddress.WScAddress, arcType))
                 {
                     arc = new ScArc(new ScAddress(NativeMethods.sc_memory_arc_new(scExtContext.PtrScMemoryContext, arcType, beginElement.ScAddress.WScAddress, endElement.ScAddress.WScAddress)), scExtContext);
@@ -56,6 +58,7 @@ namespace ScEngineNet
 
                     var container = scExtContext.CreateIterator(beginElement, arcType, endElement);
                     arc = (ScArc)container.ElementAt(0)[1];
+                }
                 }
             }
 
@@ -139,13 +142,17 @@ namespace ScEngineNet
 
         internal static ScNode FindNode(ScMemoryContext scExtContext, Identifier identifier)
         {
-            var node = new ScNode(ScAddress.Invalid, scExtContext);
+            ScNode node = null;
             byte[] bytes = identifier.GetBytes();
             if (ScMemoryContext.IsMemoryInitialized())
             {
                 WScAddress address;
                 NativeMethods.sc_helper_find_element_by_system_identifier(scExtContext.PtrScMemoryContext, bytes, (uint)bytes.Length, out address);
-                node = new ScNode(new ScAddress(address), scExtContext);
+                var scAddress = new ScAddress(address);
+                if (scAddress.IsValid)
+                {
+                    node = new ScNode(new ScAddress(address), scExtContext);
+                }
             }
             return node;
         }
@@ -160,7 +167,7 @@ namespace ScEngineNet
             }
             //определяем тип ссылки
             Identifier classNodeidentifier = ScDataTypes.Instance.TypeBinary;
-            var container = scExtContext.CreateIterator(ElementType.ClassNode_a, ElementType.PositiveConstantPermanentAccessArc_c, link);
+            var container = scExtContext.CreateIterator(ElementType.ClassConstantNode_c, ElementType.PositiveConstantPermanentAccessArc_c, link);
             foreach (var construction in container)
             {
                 if (ScDataTypes.Instance.KeyLinkTypes.Contains(((ScNode)construction[0]).SystemIdentifier))
@@ -183,7 +190,7 @@ namespace ScEngineNet
                 result = NativeMethods.sc_memory_set_link_content(scExtContext.PtrScMemoryContext, link.ScAddress.WScAddress, content.ScStream);
                 //delete arc from class_node
 
-                var container = scExtContext.CreateIterator(ElementType.ClassNode_a, ElementType.PositiveConstantPermanentAccessArc_c, link);
+                var container = scExtContext.CreateIterator(ElementType.ClassConstantNode_c, ElementType.PositiveConstantPermanentAccessArc_c, link);
                 foreach (var construction in container)
                 {
                     if (ScDataTypes.Instance.KeyLinkTypes.Contains(((ScNode)construction[0]).SystemIdentifier))

@@ -31,6 +31,11 @@ namespace ScEngineNet.SafeElements
         private ScMemoryContext context;
         private readonly ScEventType eventType;
 
+        fEventCallback cb;
+        fDeleteCallback db;
+
+
+
         /// <summary>
         /// Событие элемента
         /// </summary>
@@ -48,8 +53,17 @@ namespace ScEngineNet.SafeElements
 
             if (ElementEvent != null)
             {
-                ScEventArgs args = new ScEventArgs(eventType, ScMemorySafeMethods.GetElement(elementAddress.WScAddress, this.context), new ScArc(arcAddress, this.context));
-                ElementEvent(this, args);
+                if (eventType != ScEventType.SC_EVENT_REMOVE_ELEMENT)
+                {
+                    ScEventArgs args = new ScEventArgs(eventType, ScMemorySafeMethods.GetElement(elementAddress.WScAddress, this.context), new ScArc(arcAddress, this.context));
+                    ElementEvent(this, args);
+                }
+                else
+                {
+                    ScEventArgs args = new ScEventArgs(eventType, null, null);
+                    ElementEvent(null, args);
+                }
+                    
             }
         }
 
@@ -61,8 +75,8 @@ namespace ScEngineNet.SafeElements
 
             if (ElementDelete != null)
             {
-                ScEventArgs args = new ScEventArgs(ScEventType.SC_EVENT_REMOVE_ELEMENT, ScMemorySafeMethods.GetElement(elementAddress.WScAddress, this.context), new ScArc(ScAddress.Invalid, context));
-                ElementDelete(this, args);
+                ScEventArgs args = new ScEventArgs(ScEventType.SC_EVENT_REMOVE_ELEMENT, null, null);
+                ElementDelete(null, args);
             }
         }
 
@@ -108,9 +122,9 @@ namespace ScEngineNet.SafeElements
 
 
             this.context = context;
-            fEventCallback cb = new fEventCallback(ECallback);
-            fDeleteCallback db = new fDeleteCallback(DCallback);
 
+             cb = new fEventCallback(ECallback);
+             db = new fDeleteCallback(DCallback);
             if (this.Disposed == true) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
             if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
             if (this.context.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
@@ -145,6 +159,8 @@ namespace ScEngineNet.SafeElements
             if (ScMemoryContext.IsMemoryInitialized() == true && this.wScEvent != IntPtr.Zero)
             {
                 isDelete = NativeMethods.sc_event_destroy(this.wScEvent) == ScResult.SC_RESULT_OK ? true : false;
+                cb = null;
+                db = null;
                 this.wScEvent = IntPtr.Zero;
             }
             else
@@ -170,7 +186,7 @@ namespace ScEngineNet.SafeElements
 
         protected virtual void Dispose(bool disposing)
         {
-            Console.WriteLine("call Dispose({0}) ScEvent with {1}", disposing, this.ToString());
+           // Console.WriteLine("call Dispose({0}) ScEvent with {1}", disposing, this.ToString());
 
 
             if (!disposed && ScMemoryContext.IsMemoryInitialized())

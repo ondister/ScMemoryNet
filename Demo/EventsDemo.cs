@@ -50,7 +50,7 @@ namespace Demo
                  nnn.DeleteFromMemory();
 
                 //добавляем входящую дугу
-                var inputArc = node.AddInputArc(link, ElementType.PositiveConstantPermanentAccessArc_c);
+                var inputArc = node.AddInputArc( ElementType.PositiveConstantPermanentAccessArc_c,link);
                 inputArc.ElementRemoved += inputArc_ElementRemoved;
                 Console.WriteLine("inputArc" + inputArc.ScAddress);
                 //удаляем входящую дугу

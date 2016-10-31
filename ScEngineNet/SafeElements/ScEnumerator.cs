@@ -80,7 +80,7 @@ namespace ScEngineNet.SafeElements
         {
             get
             {
-                if (iterator == null || currentConstruction == null)
+                if (iterator == IntPtr.Zero || currentConstruction == null)
                 {
                     throw new InvalidOperationException();
                 }
@@ -214,7 +214,7 @@ namespace ScEngineNet.SafeElements
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
-            Console.WriteLine("call Dispose({0}) ScEnumerator with {1}", disposing, this.iterator);
+         //   Console.WriteLine("call Dispose({0}) ScEnumerator with {1}", disposing, this.iterator);
 
 
             if (!disposed && ScMemoryContext.IsMemoryInitialized())

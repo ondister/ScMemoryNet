@@ -80,7 +80,7 @@ namespace ScEngineNet.SafeElements
         /// <param name="args">The <see cref="ScEventArgs"/> instance containing the event data.</param>
         protected virtual void OnContentChangeEvent(ScEventArgs args)
         {
-            base.EventSet.Raise(contentChangeEventKey, this, args);
+            base.EventSet.Raise(contentChangeEventKey, (object)this, args);
         }
 
         #endregion

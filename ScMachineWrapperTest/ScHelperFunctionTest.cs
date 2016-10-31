@@ -30,7 +30,7 @@ namespace ScEngineNetTest
                         
             //sc_helper_set_system_identifier
             var identifier=new ScString("sc_helper_test_idtf");
-            var nodeAddr = NativeMethods.sc_memory_node_new(scMemoryContext, ElementType.ClassNode_a);
+            var nodeAddr = NativeMethods.sc_memory_node_new(scMemoryContext, ElementType.ClassConstantNode_c);
             var resultSetIdtf = NativeMethods.sc_helper_set_system_identifier(scMemoryContext, nodeAddr, identifier.Bytes, (uint)identifier.Value.Length);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultSetIdtf);
 
@@ -65,7 +65,7 @@ namespace ScEngineNetTest
             Assert.AreNotEqual(0, keyNodeAddress.Offset);
           
             //sc_helper_check_arc
-            WScAddress beginNodeAddr = NativeMethods.sc_memory_node_new(  scMemoryContext, ElementType.ClassNode_a);
+            WScAddress beginNodeAddr = NativeMethods.sc_memory_node_new(scMemoryContext, ElementType.ClassConstantNode_c);
             WScAddress EndNodeAddr = NativeMethods.sc_memory_node_new(  scMemoryContext, ElementType.Node_a);
             WScAddress arcAddr = NativeMethods.sc_memory_arc_new(  scMemoryContext, ElementType.PositiveConstantPermanentAccessArc_c, beginNodeAddr, EndNodeAddr);
             bool isExist = NativeMethods.sc_helper_check_arc(  scMemoryContext, beginNodeAddr, EndNodeAddr, ElementType.PositiveConstantPermanentAccessArc_c);

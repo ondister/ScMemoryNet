@@ -40,9 +40,9 @@ namespace ScEngineNet.SafeElements
         /// <param name="elementTypes">Тип элемента</param>
         /// <param name="addElementTypes">Добавляемый подтип</param>
         /// <returns>Взвращает итоговый тип</returns>
-        public static ElementType AddType(this ElementType elementTypes, ElementType addElementTypes)
+        public static void AddType(this ElementType elementTypes, ElementType addElementTypes)
         {
-            return elementTypes | addElementTypes;
+            elementTypes = elementTypes | addElementTypes;
         }
 
         /// <summary>

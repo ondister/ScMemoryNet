@@ -425,7 +425,7 @@ namespace ScEngineNet.SafeElements
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
-            Console.WriteLine("call Dispose({0}) ScLinkContent with {1}", disposing, this.scStream);
+          //  Console.WriteLine("call Dispose({0}) ScLinkContent with {1}", disposing, this.scStream);
 
 
             if (!disposed && ScMemoryContext.IsMemoryInitialized())

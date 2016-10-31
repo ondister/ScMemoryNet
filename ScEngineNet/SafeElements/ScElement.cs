@@ -52,7 +52,7 @@ namespace ScEngineNet.SafeElements
         {
             get
             {
-                return this.isValid();
+                return this.scAddress.IsValid;
             }
         }
 
@@ -115,7 +115,7 @@ namespace ScEngineNet.SafeElements
         /// <param name="beginElement">Начальный элемент</param>
         /// <param name="arcType">Тип дуги</param>
         /// <returns></returns>
-        public ScArc AddInputArc(ScElement beginElement, ElementType arcType)
+        public ScArc AddInputArc(ElementType arcType,ScElement beginElement)
         {
             if (this.Disposed == true) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
             if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
@@ -190,14 +190,7 @@ namespace ScEngineNet.SafeElements
             return element;
         }
 
-        private bool isValid()
-        {
-            bool isValid = false;
-            if (this != null && this.scAddress.IsValid)
-            { isValid = true; }
-            return isValid;
-        }
-
+      
 
         #region Реализация сравнения
 
@@ -258,13 +251,14 @@ namespace ScEngineNet.SafeElements
         /// <returns>Возвращает True, если элементы равны</returns>
         public static bool operator ==(ScElement scElement1, ScElement scElement2)
         {
-            bool isEqual = false;
-            if (((object)scElement1 != null) && ((object)scElement2 != null))
-            {
-                isEqual = scElement1.Equals(scElement2);
-            }
 
-            return isEqual;
+            if (ReferenceEquals(scElement1, null) || ReferenceEquals(scElement2, null))
+            {
+                return ReferenceEquals(scElement1, scElement2);
+            }
+            return scElement1.Equals(scElement2);
+
+
         }
 
         /// <summary>
@@ -275,7 +269,12 @@ namespace ScEngineNet.SafeElements
         /// <returns>Возвращает True, если  элементы равны</returns>
         public static bool operator !=(ScElement scElement1, ScElement scElement2)
         {
-            return !(scElement1 == scElement2);
+            //return !(scElement1 == scElement2);
+            if (ReferenceEquals(scElement1, null) || ReferenceEquals(scElement2, null))
+            {
+                return !ReferenceEquals(scElement1, scElement2);
+            }
+            return !scElement1.Equals(scElement2);
         }
 
         #endregion
@@ -320,7 +319,7 @@ namespace ScEngineNet.SafeElements
         /// <param name="args">The <see cref="ScEventArgs"/> instance containing the event data.</param>
         protected virtual void OnOutputArcAdded(ScEventArgs args)
         {
-            elementEventSet.Raise(outputArcAddedEventKey, this, args);
+            elementEventSet.Raise(outputArcAddedEventKey, (object)this, args);
         }
 
         #endregion
@@ -360,7 +359,7 @@ namespace ScEngineNet.SafeElements
         /// <param name="args">The <see cref="ScEventArgs"/> instance containing the event data.</param>
         protected virtual void OnOutputArcRemoved(ScEventArgs args)
         {
-            elementEventSet.Raise(outputArcRemovedEventKey, this, args);
+            elementEventSet.Raise(outputArcRemovedEventKey, (object)this, args);
         }
 
         #endregion
@@ -399,7 +398,7 @@ namespace ScEngineNet.SafeElements
         /// <param name="args">The <see cref="ScEventArgs"/> instance containing the event data.</param>
         protected virtual void OnInputArcRemoved(ScEventArgs args)
         {
-            elementEventSet.Raise(inputArcRemovedEventKey, this, args);
+            elementEventSet.Raise(inputArcRemovedEventKey, (object)this, args);
         }
 
         #endregion
@@ -438,7 +437,7 @@ namespace ScEngineNet.SafeElements
         /// <param name="args">The <see cref="ScEventArgs"/> instance containing the event data.</param>
         protected virtual void OnInputArcAdded(ScEventArgs args)
         {
-            elementEventSet.Raise(inputArcAddedEventKey, this, args);
+            elementEventSet.Raise(inputArcAddedEventKey, (object)this, args);
         }
 
         #endregion
@@ -482,7 +481,7 @@ namespace ScEngineNet.SafeElements
         /// <param name="args">The <see cref="ScEventArgs"/> instance containing the event data.</param>
         protected virtual void OnElementRemoved(ScEventArgs args)
         {
-            elementEventSet.Raise(elementRemovedEventKey, this, args);
+            elementEventSet.Raise(elementRemovedEventKey, (object)this, args);
         }
 
         #endregion
@@ -511,7 +510,7 @@ namespace ScEngineNet.SafeElements
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
-            Console.WriteLine("call Dispose({0}) ScElement with {1}", disposing, this.ScAddress);
+           // Console.WriteLine("call Dispose({0}) ScElement with {1}", disposing, this.ScAddress);
 
 
             if (!disposed && ScMemoryContext.IsMemoryInitialized())

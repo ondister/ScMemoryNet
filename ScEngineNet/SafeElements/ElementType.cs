@@ -89,15 +89,26 @@ namespace ScEngineNet.SafeElements
         /// </summary>
         RoleNode_a = 0x200,
 
+
         /// <summary>
         /// SC-узел, обозначающий неролевое отношение.
         /// </summary>
         NonRoleNode_a = 0x400,
 
         /// <summary>
+        /// Константный SC-узел, обозначающий неролевое отношение.
+        /// </summary>
+        NonRoleConstantNode_c = (NonRoleNode_a | Constant_a|Node_a),
+
+        /// <summary>
         /// SC-узел, не являющейся отношением.
         /// </summary>
         ClassNode_a = 0x800,
+
+        /// <summary>
+        /// The class constant node_c
+        /// </summary>
+        ClassConstantNode_c = (ClassNode_a  | Constant_a),
 
         /// <summary>
         /// SC-узел, обозначающий абстрактный объект, не являющийся множеством.

@@ -56,10 +56,13 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="ScIterator5FunctionsTest.cs" />
-    <Compile Include="ScIterator3FunctionsTest.cs" />
+    <Compile Include="EventsTests.cs" />
+    <Compile Include="IteratorsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SafeElements\ElementTypeExtensionMethodsTests.cs" />
+    <Compile Include="ScElementTests.cs" />
     <Compile Include="ScHelperFunctionTest.cs" />
+    <Compile Include="ScMemoryContextTests.cs" />
     <Compile Include="ScMemoryFunctionsTest.cs" />
   </ItemGroup>
   <ItemGroup>

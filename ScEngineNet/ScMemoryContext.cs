@@ -204,9 +204,11 @@ namespace ScEngineNet
         {
             if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
             if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
-
-            bool result = NativeMethods.sc_helper_check_arc(this.PtrScMemoryContext, beginElement.ScAddress.WScAddress, endElement.ScAddress.WScAddress, arcType);
-
+            bool result = false;
+           if(beginElement!=null && endElement!=null)
+           {
+            result = NativeMethods.sc_helper_check_arc(this.PtrScMemoryContext, beginElement.ScAddress.WScAddress, endElement.ScAddress.WScAddress, arcType);
+           }
             return result;
 
         }
@@ -238,12 +240,12 @@ namespace ScEngineNet
         /// <returns>Созданный узел</returns>
         public ScNode CreateNode(ElementType nodeType, Identifier sysIdentifier)
         {
-            if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
+            ////if (this.ptrScMemoryContext == IntPtr.Zero) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
             if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
 
 
             ScNode createdNode = this.FindNode(sysIdentifier);
-            if (createdNode.ScAddress == ScAddress.Invalid)
+            if (createdNode==null)
             {
                 createdNode = this.CreateNode(nodeType);
                 createdNode.SystemIdentifier = sysIdentifier;
@@ -317,11 +319,8 @@ namespace ScEngineNet
 
             ScNode createdNode = null;
             var scElement = ScMemorySafeMethods.GetElement(nodeAddress.WScAddress, this);
-            if (scElement.ElementType.HasAnyType(ElementType.NodeOrStructureMask_c))
-            {
-                createdNode = (ScNode)scElement;
-            }
-            return createdNode;
+                    createdNode = (ScNode)scElement;
+           return createdNode;
         }
 
         #endregion
@@ -566,6 +565,7 @@ namespace ScEngineNet
 
             return new ScIterator(this, e1, t1, e2, t2, e3);
         }
+       
 
         #endregion
 
@@ -591,7 +591,7 @@ namespace ScEngineNet
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
-            Console.WriteLine("call Dispose({0}) ScContext with {1}", disposing, this.ptrScMemoryContext);
+        //    Console.WriteLine("call Dispose({0}) ScContext with {1}", disposing, this.ptrScMemoryContext);
 
 
             if (!disposed && ScMemoryContext.IsMemoryInitialized())

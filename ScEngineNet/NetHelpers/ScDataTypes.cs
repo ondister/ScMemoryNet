@@ -27,14 +27,16 @@ namespace ScEngineNet.NetHelpers
 
         private ScDataTypes()
         {
-            keyLinkTypes = new List<Identifier>(){
+            keyLinkTypes = new List<Identifier>()
+            {
                 this.NumericByte,
                 this.NumericDouble,
                 this.NumericInt,
                 this.NumericLong,
                 this.TypeBinary,
                 this.TypeBool,
-                this.TypeString};
+                this.TypeString
+            };
         }
 
         #region datatypes
@@ -159,15 +161,15 @@ namespace ScEngineNet.NetHelpers
 
             using (var context = new ScMemoryContext(ScAccessLevels.MinLevel))
             {
-                this.CreateKeyNode(context, ElementType.ClassNode_a, this.NumericInt);
-                this.CreateKeyNode(context, ElementType.ClassNode_a, this.NumericDouble);
-                this.CreateKeyNode(context, ElementType.ClassNode_a, this.NumericLong);
-                this.CreateKeyNode(context, ElementType.ClassNode_a, this.NumericByte);
-                this.CreateKeyNode(context, ElementType.ClassNode_a, this.TypeBinary);
-                this.CreateKeyNode(context, ElementType.ClassNode_a, this.TypeBool);
-                this.CreateKeyNode(context, ElementType.ClassNode_a, this.TypeString);
-                this.CreateKeyNode(context, ElementType.ClassNode_a, this.LanguageEn);
-                this.CreateKeyNode(context, ElementType.ClassNode_a, this.LanguageRu);
+                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.NumericInt);
+                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.NumericDouble);
+                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.NumericLong);
+                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.NumericByte);
+                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.TypeBinary);
+                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.TypeBool);
+                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.TypeString);
+                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.LanguageEn);
+                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.LanguageRu);
             }
             return true;
         }

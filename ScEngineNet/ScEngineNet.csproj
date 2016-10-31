@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NetHelpers\ScKeyNodes.cs" />
     <Compile Include="NetHelpers\ScDataTypes.cs" />
     <Compile Include="SafeElements\EventSet.cs" />
     <Compile Include="SafeElements\ScIterator.cs" />
