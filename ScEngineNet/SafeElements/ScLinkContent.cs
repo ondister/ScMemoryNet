@@ -353,8 +353,10 @@ namespace ScEngineNet.SafeElements
             if (obj == null)
                 return false;
             ScLinkContent ScLinkContentBinary = obj as ScLinkContent;
-            if (ScLinkContentBinary as ScLinkContent == null)
+            if (ScLinkContentBinary == null)
+            {
                 return false;
+            }
             return ScLinkContentBinary.Bytes.SequenceEqual(this.Bytes);
         }
 

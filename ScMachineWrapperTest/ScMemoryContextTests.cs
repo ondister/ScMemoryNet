@@ -66,7 +66,6 @@ namespace ScEngineNet.Tests
             Assert.IsTrue(ScMemoryContext.IsMemoryInitialized());
         }
 
-      
         [TestMethod()]
         public void GetStatisticsTest()
         {
@@ -101,13 +100,13 @@ namespace ScEngineNet.Tests
             node.SystemIdentifier = context.CreateUniqueIdentifier(node);
             //как только такой идентификатор уже в базе, на основе этого узла будет создан другой
             Assert.AreNotEqual(node.SystemIdentifier, context.CreateUniqueIdentifier(node));
-        
+
         }
 
         [TestMethod()]
         public void CreateUniqueIdentifierTest1()
         {
-            Assert.IsTrue(context.CreateUniqueIdentifier(ScNode.InstancePreffix,node).ToString().Length != 0);
+            Assert.IsTrue(context.CreateUniqueIdentifier(ScNode.InstancePreffix, node).ToString().Length != 0);
         }
 
         [TestMethod()]
@@ -146,8 +145,8 @@ namespace ScEngineNet.Tests
         public void FindArcTest()
         {
             var arc = context.CreateArc(node, node1, ElementType.PositiveConstantPermanentAccessArc_c);
-            var findedArc= context.FindArc(arc.ScAddress);
-           
+            var findedArc = context.FindArc(arc.ScAddress);
+
             Assert.AreEqual(arc, findedArc);
 
             arc.DeleteFromMemory();
@@ -176,9 +175,9 @@ namespace ScEngineNet.Tests
         [TestMethod()]
         public void CreateNodeTest()
         {
-            var node5 = context.CreateNode(ElementType.ClassNode_a);
+            var node5 = context.CreateNode(ElementType.Node_a);
             Assert.IsNotNull(node5);
-            Assert.AreEqual(ElementType.ClassNode_a, node5.ElementType);
+            Assert.AreEqual(ElementType.Node_a, node5.ElementType);
             node5.DeleteFromMemory();
             node5.Dispose();
         }
@@ -186,9 +185,9 @@ namespace ScEngineNet.Tests
         [TestMethod()]
         public void CreateNodeTestIdentifiers()
         {
-            Identifier sysId="test_node";
-            Identifier ruId="тестовая нода";
-            Identifier enId="testing node";
+            Identifier sysId = "test_node";
+            Identifier ruId = "тестовая нода";
+            Identifier enId = "testing node";
             var node5 = context.CreateNode(ElementType.Node_a, sysId, ruId, enId);
             Assert.IsNotNull(node5);
             Assert.AreEqual(ElementType.Node_a, node5.ElementType);
@@ -200,7 +199,6 @@ namespace ScEngineNet.Tests
             node5.DeleteFromMemory();
             node5.Dispose();
         }
-
 
         [TestMethod()]
         public void FindNodeTest()
@@ -217,8 +215,6 @@ namespace ScEngineNet.Tests
             Assert.IsNull(findedNodeByInvalidId);
         }
 
-     
-
         [TestMethod()]
         public void CreateLinkTest()
         {
@@ -227,31 +223,69 @@ namespace ScEngineNet.Tests
             var expectedClassNode = testLink.LinkContent.ClassNodeIdentifier;
             Assert.IsNotNull(testLink);
             Assert.AreEqual(ElementType.Link_a, testLink.ElementType);
-         var classnode=   testLink.LinkContent.ClassNodeIdentifier;
-         Assert.AreEqual(expectedClassNode, classnode);
-         Assert.AreEqual(content.Value, ((ScString)testLink.LinkContent).Value);
-        }
+            var classnode = testLink.LinkContent.ClassNodeIdentifier;
+            Assert.AreEqual(expectedClassNode, classnode);
+            Assert.AreEqual(content, ((ScString)testLink.LinkContent));
+            
+            //проверка создания ссылки с дублирующим контентом.
+          
+            var testLink1 = context.CreateLink(content);
 
-       
+            var links = context.FindLinks(content);
+            Assert.AreEqual(1, links.Count);
+
+            testLink.DeleteFromMemory();
+            testLink.Dispose();
+            testLink1.DeleteFromMemory();
+            testLink1.Dispose();
+        }
 
         [TestMethod()]
         public void FindLinkTest()
         {
-            Assert.Fail();
+           ScString content = "Test_content_1234Тестовый контент";
+
+           var testLink = context.CreateLink(content);
+           var findedTestLink = context.FindLink(testLink.ScAddress);
+           Assert.AreEqual(testLink, findedTestLink);
+           Assert.AreEqual(content, ((ScString)findedTestLink.LinkContent));
+
+           testLink.DeleteFromMemory();
+           testLink.Dispose();
+
+           findedTestLink.DeleteFromMemory();
+           findedTestLink.Dispose();
         }
 
         [TestMethod()]
         public void FindLinksTest()
         {
-            Assert.Fail();
-        }
+            ScString content = "FindLinksTestContent Контент тесового метода 12345";
+            var testLink = context.CreateLink(content);
+            var links = context.FindLinks(content);
 
-      
+            Assert.AreEqual(1, links.Count);
+           
+            foreach (var link in links)
+            {
+                Assert.AreEqual(content, ((ScString)link.LinkContent));
+            }
+
+            testLink.DeleteFromMemory();
+            testLink.Dispose();
+           
+        }
 
         [TestMethod()]
         public void DisposeTest()
         {
-            Assert.Fail();
+            var testContext = new ScMemoryContext(ScAccessLevels.MedLevel);
+            Assert.AreEqual(ScAccessLevels.MedLevel, testContext.AccessLevel);
+            Assert.IsFalse(testContext.Disposed);
+
+            testContext.Dispose();
+
+            Assert.IsTrue(testContext.Disposed);
         }
     }
 }

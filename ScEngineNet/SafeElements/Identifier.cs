@@ -39,7 +39,8 @@ namespace ScEngineNet.SafeElements
         {
             Identifier identifier = Identifier.Invalid;
             identifier = "idtf_" + node.ScAddress.GetHashCode();
-            while (ScMemorySafeMethods.IsElementExist(scExtContext, (ScMemorySafeMethods.FindNode(scExtContext, identifier)).ScAddress) != false)
+           
+            while (ScMemorySafeMethods.FindNode(scExtContext, identifier) != null)
             {
                 Random rand = new Random();
                 identifier = identifier + "_" + rand.Next();
