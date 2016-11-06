@@ -1,10 +1,10 @@
 ﻿using System;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 using ScEngineNet;
-using ScEngineNet.NativeElements;
-using ScEngineNet.SafeElements;
+using ScEngineNet.Native;
+using ScEngineNet.ScElements;
+using ScEngineNet.LinkContent;
 
 namespace ScEngineNetTest
 {
@@ -22,15 +22,17 @@ namespace ScEngineNetTest
                 ExtensionsPath = @"extensions"
             };
             //sc_memory_initialize 
-            IntPtr scMemoryContext = NativeMethods.sc_memory_initialize(scParams);
-
-            //sc_memory_is_initialized
             bool isInitialized = NativeMethods.sc_memory_is_initialized();
+            NativeMethods.sc_memory_initialize(scParams); 
+            
+            IntPtr scMemoryContext = NativeMethods.sc_memory_context_new(0);
+            //sc_memory_is_initialized
+            isInitialized = NativeMethods.sc_memory_is_initialized();
             Assert.IsTrue(isInitialized);
                         
             //sc_helper_set_system_identifier
             var identifier=new ScString("sc_helper_test_idtf");
-            var nodeAddr = NativeMethods.sc_memory_node_new(scMemoryContext, ElementType.ClassConstantNode_c);
+            var nodeAddr = NativeMethods.sc_memory_node_new(scMemoryContext, ElementTypes.ClassConstantNode_c);
             var resultSetIdtf = NativeMethods.sc_helper_set_system_identifier(scMemoryContext, nodeAddr, identifier.Bytes, (uint)identifier.Value.Length);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultSetIdtf);
 
@@ -50,7 +52,7 @@ namespace ScEngineNetTest
             IntPtr stream;
             ScResult resultgetlinkContent = NativeMethods.sc_memory_get_link_content(  scMemoryContext, linkAddress, out stream);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultgetlinkContent);
-            Assert.AreEqual(identifier, new ScBinary(stream));
+            Assert.AreEqual(identifier, new ScString(stream));
 
             //sc_helper_find_element_by_system_identifier
             WScAddress findedAddress;
@@ -65,25 +67,22 @@ namespace ScEngineNetTest
             Assert.AreNotEqual(0, keyNodeAddress.Offset);
           
             //sc_helper_check_arc
-            WScAddress beginNodeAddr = NativeMethods.sc_memory_node_new(scMemoryContext, ElementType.ClassConstantNode_c);
-            WScAddress EndNodeAddr = NativeMethods.sc_memory_node_new(  scMemoryContext, ElementType.Node_a);
-            WScAddress arcAddr = NativeMethods.sc_memory_arc_new(  scMemoryContext, ElementType.PositiveConstantPermanentAccessArc_c, beginNodeAddr, EndNodeAddr);
-            bool isExist = NativeMethods.sc_helper_check_arc(  scMemoryContext, beginNodeAddr, EndNodeAddr, ElementType.PositiveConstantPermanentAccessArc_c);
+            WScAddress beginNodeAddr = NativeMethods.sc_memory_node_new(scMemoryContext,ElementTypes.ClassConstantNode_c);
+            WScAddress EndNodeAddr = NativeMethods.sc_memory_node_new(  scMemoryContext, ElementTypes.Node_a);
+            WScAddress arcAddr = NativeMethods.sc_memory_arc_new(  scMemoryContext, ElementTypes.PositiveConstantPermanentAccessArc_c, beginNodeAddr, EndNodeAddr);
+            bool isExist = NativeMethods.sc_helper_check_arc(scMemoryContext, beginNodeAddr, EndNodeAddr, ElementTypes.PositiveConstantPermanentAccessArc_c);
             Assert.IsTrue(isExist);
 
             //sc_helper_check_version_equal
             byte major = 0;
-            byte minor = 2;
+            byte minor = 3;
             byte patch = 0;
             bool isRight = NativeMethods.sc_helper_check_version_equal(major, minor, patch);
-            Assert.IsTrue(isRight, "Тест может и не проходить, если версия библиотеки не верна");
+            Assert.IsTrue(isRight, "Тест может не проходить, если версия библиотеки не верна.");
 
             //sc_memory_shutdown
+            NativeMethods.sc_memory_context_free(scMemoryContext);
             bool isShutDown = NativeMethods.sc_memory_shutdown(false);
-            if (isShutDown)
-            {
-                scMemoryContext = IntPtr.Zero;
-            }
             Assert.IsTrue(isShutDown);
         }
     }

@@ -1,7 +1,8 @@
 ﻿using EP.Text;
 using ScEngineNet;
+using ScEngineNet.Events;
 using ScEngineNet.ExtensionsNet;
-using ScEngineNet.SafeElements;
+using ScEngineNet.ScElements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,7 +76,7 @@ namespace ScFullTextSearch
         void classQuerryString_OutputArcAdded(object sender, ScEventArgs e)
         {
             var addedElement = e.Arc.EndElement;
-            if (addedElement.ElementType == ElementType.ConstantNode_c)
+            if (addedElement.ElementType == ScTypes.NodeConstant)
             {
                 Console.WriteLine("Querry added");
                 ftSearchEngine.AddQuerry((ScNode)addedElement);
@@ -85,7 +86,7 @@ namespace ScFullTextSearch
         void ForTokenizeString_OutputArcAdded(object sender, ScEventArgs e)
         {
             var addedElement= e.Arc.EndElement;
-            if (addedElement.ElementType == ElementType.Link_a)
+            if (addedElement.ElementType == ScTypes.Link)
             {
                 Console.WriteLine("Link for tokenize added");
                 pullEntyEngine.AddLink((ScLink)addedElement);

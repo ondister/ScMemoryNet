@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ScEngineNet;
-using ScEngineNet.SafeElements;
+using ScEngineNet.Events;
+using ScEngineNet.ScElements;
 using ScMemoryNet;
 using System;
 using System.Collections.Generic;
@@ -30,24 +31,24 @@ namespace ScEngineNetTest
         [ClassInitialize]
         public static void InitializeMemory(TestContext testContext)
         {
-            ScMemory.Initialize(true, configFile, repoPath, extensionPath, netExtensionPath);
+            if (!ScMemory.IsInitialized) { ScMemory.Initialize(true, configFile, repoPath, extensionPath, netExtensionPath); }
             context = new ScMemoryContext(ScAccessLevels.MinLevel);
 
             //создаем элементы
-            node = context.CreateNode(ElementType.ConstantNode_c);
+            node = context.CreateNode(ScTypes.NodeConstant);
             node.SystemIdentifier = "test_construction_node";
             link = context.CreateLink("link");
-            nrelNode = context.CreateNode(ElementType.NonRoleConstantNode_c);
+            nrelNode = context.CreateNode(ScTypes.NodeConstantNonRole);
 
 
             Assert.IsTrue(node.ScAddress.IsValid);
-            Assert.AreEqual(ElementType.ConstantNode_c, node.ElementType);
+            Assert.AreEqual(ScTypes.NodeConstant, node.ElementType);
 
             Assert.IsTrue(link.ScAddress.IsValid);
-            Assert.AreEqual(ElementType.Link_a, link.ElementType);
+            Assert.AreEqual(ScTypes.Link, link.ElementType);
 
             Assert.IsTrue(nrelNode.ScAddress.IsValid);
-            Assert.AreEqual(ElementType.NonRoleConstantNode_c, nrelNode.ElementType);
+            Assert.AreEqual(ScTypes.NodeConstantNonRole, nrelNode.ElementType);
 
         }
         #endregion
@@ -61,7 +62,7 @@ namespace ScEngineNetTest
             nrelNode.Dispose();
 
             context.Dispose();
-            ScMemory.ShutDown(true);
+            if (ScMemory.IsInitialized) { ScMemory.ShutDown(true); }
         }
         #endregion
 
@@ -84,7 +85,7 @@ namespace ScEngineNetTest
                 eventType = e.EventType;
                 autoResetEvent.Set();
             };
-            commonArc = node.AddOutputArc(link, ElementType.ConstantCommonArc_c);
+            commonArc = node.AddOutputArc(link, ScTypes.ArcCommonConstant);
             autoResetEvent.WaitOne();
 
            Assert.AreEqual(node, (ScNode)obj);
@@ -114,7 +115,7 @@ namespace ScEngineNetTest
                 eventType = e.EventType;
                 autoResetEvent.Set();
             };
-            commonArc = node.AddOutputArc(link, ElementType.ConstantCommonArc_c);
+            commonArc = node.AddOutputArc(link, ScTypes.ArcCommonConstant);
             autoResetEvent.WaitOne();
 
             Assert.AreEqual(link, (ScLink)obj);
@@ -134,7 +135,7 @@ namespace ScEngineNetTest
             ScEventType expectedEventType = ScEventType.SC_EVENT_REMOVE_ELEMENT;
 
             AutoResetEvent autoResetEvent = new AutoResetEvent(false);
-            commonArc = node.AddOutputArc(link, ElementType.ConstantCommonArc_c);
+            commonArc = node.AddOutputArc(link, ScTypes.ArcCommonConstant);
 
             commonArc.ElementRemoved += delegate(object o, ScEventArgs e)
             {
@@ -161,7 +162,7 @@ namespace ScEngineNetTest
             ScEventType expectedEventType = ScEventType.SC_EVENT_REMOVE_OUTPUT_ARC;
 
             AutoResetEvent autoResetEvent = new AutoResetEvent(false);
-            commonArc = node.AddOutputArc(link, ElementType.ConstantCommonArc_c);
+            commonArc = node.AddOutputArc(link, ScTypes.ArcCommonConstant);
             node.OutputArcRemoved += delegate(object o, ScEventArgs e)
             {
                 obj = o;
@@ -191,7 +192,7 @@ namespace ScEngineNetTest
             ScEventType expectedEventType = ScEventType.SC_EVENT_REMOVE_INPUT_ARC;
 
             AutoResetEvent autoResetEvent = new AutoResetEvent(false);
-            commonArc = node.AddOutputArc(link, ElementType.ConstantCommonArc_c);
+            commonArc = node.AddOutputArc(link, ScTypes.ArcCommonConstant);
             link.InputArcRemoved += delegate(object o, ScEventArgs e)
             {
                 obj = o;
@@ -221,7 +222,7 @@ namespace ScEngineNetTest
             ScEventType expectedEventType = ScEventType.SC_EVENT_REMOVE_INPUT_ARC;
 
             AutoResetEvent autoResetEvent = new AutoResetEvent(false);
-            commonArc = node.AddOutputArc(link, ElementType.ConstantCommonArc_c);
+            commonArc = node.AddOutputArc(link, ScTypes.ArcCommonConstant);
             link.InputArcRemoved += delegate(object o, ScEventArgs e)
             {
                 obj = o;
@@ -267,7 +268,7 @@ namespace ScEngineNetTest
         {
 
             var link1 = context.CreateLink("testlink");
-            commonArc = node.AddOutputArc(link1, ElementType.ConstantCommonArc_c);
+            commonArc = node.AddOutputArc(link1, ScTypes.ArcCommonConstant);
             link1.InputArcRemoved -= delegate(object o, ScEventArgs e)
             {
                
@@ -288,7 +289,7 @@ namespace ScEngineNetTest
             ScEventType expectedEventType = ScEventType.SC_EVENT_CONTENT_CHANGED;
 
             AutoResetEvent autoResetEvent = new AutoResetEvent(false);
-            commonArc = node.AddOutputArc(link, ElementType.ConstantCommonArc_c);
+            commonArc = node.AddOutputArc(link, ScTypes.ArcCommonConstant);
             link.ContentChanged += delegate(object o, ScEventArgs e)
             {
                 obj = o;

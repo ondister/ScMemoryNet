@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ScEngineNet.SafeElements;
+using ScEngineNet.ScElements;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ScEngineNet;
 using ScMemoryNet;
 using ScEngineNet.NetHelpers;
+using ScEngineNet.LinkContent;
 
 namespace ScEngineNetTest
 {
@@ -31,21 +32,21 @@ namespace ScEngineNetTest
         [ClassInitialize]
         public static void InitializeMemory(TestContext testContext)
         {
-            ScMemory.Initialize(true, configFile, repoPath, extensionPath, netExtensionPath);
+            if (!ScMemory.IsInitialized) { ScMemory.Initialize(true, configFile, repoPath, extensionPath, netExtensionPath); }
             context = new ScMemoryContext(ScAccessLevels.MinLevel);
 
             //создаем элементы
-            node = context.CreateNode(ElementType.ConstantNode_c);
+            node = context.CreateNode(ScTypes.NodeConstant);
             node.SystemIdentifier = "test_construction_node";
-            node1 = context.CreateNode(ElementType.ConstantNode_c);
+            node1 = context.CreateNode(ScTypes.NodeConstant);
             node2 = context.FindNode("test_construction_node");
             link = context.CreateLink("link");
           
             Assert.IsTrue(node.ScAddress.IsValid);
-            Assert.AreEqual(ElementType.ConstantNode_c, node.ElementType);
+            Assert.AreEqual(ScTypes.NodeConstant, node.ElementType);
 
             Assert.IsTrue(link.ScAddress.IsValid);
-            Assert.AreEqual(ElementType.Link_a, link.ElementType);
+            Assert.AreEqual(ScTypes.Link, link.ElementType);
 
         }
         #endregion
@@ -59,7 +60,7 @@ namespace ScEngineNetTest
             node1.Dispose();
             node2.Dispose();
             context.Dispose();
-            ScMemory.ShutDown(true);
+            if (ScMemory.IsInitialized) { ScMemory.ShutDown(true); }
         }
         #endregion
 
@@ -67,7 +68,7 @@ namespace ScEngineNetTest
         [TestMethod()]
         public void DeleteFromMemoryTest()
         {
-            var node3 = context.CreateNode(ElementType.ClassConstantNode_c);
+            var node3 = context.CreateNode(ScTypes.NodeConstantClass);
             Assert.IsTrue(node3.IsValid);
 
            var result= node3.DeleteFromMemory();
@@ -82,24 +83,14 @@ namespace ScEngineNetTest
             
         }
 
-        [TestMethod()]
-        public void ChangeSubTypeTest()
-        {
-            ElementType subType = ElementType.Constant_a;
-            var node3= context.CreateNode(ElementType.Node_a);
-            Assert.AreEqual(ElementType.Node_a, node3.ElementType);
-
-            node3.ChangeSubType(subType);
-            Assert.AreEqual(ElementType.ConstantNode_c, node3.ElementType);
-        }
 
         [TestMethod()]
         public void AddInputArcTest()
         {
-          var arc=  node1.AddInputArc(ElementType.PositiveConstantPermanentAccessArc_c, node);
+          var arc=  node1.AddInputArc(ScTypes.ArcAccessConstantPositivePermanent, node);
           
           Assert.AreEqual(node, arc.BeginElement);
-          Assert.AreEqual(ElementType.PositiveConstantPermanentAccessArc_c, arc.ElementType);
+          Assert.AreEqual(ScTypes.ArcAccessConstantPositivePermanent, arc.ElementType);
           Assert.AreEqual(node, arc.BeginElement);
           Assert.AreEqual(node1, arc.EndElement);
           arc.DeleteFromMemory();
@@ -110,10 +101,10 @@ namespace ScEngineNetTest
         [TestMethod()]
         public void AddOutputArcTest()
         {
-            var arc = node.AddOutputArc(node1,ElementType.PositiveConstantPermanentAccessArc_c);
+            var arc = node.AddOutputArc(node1,ScTypes.ArcAccessConstantPositivePermanent);
 
             Assert.AreEqual(node, arc.BeginElement);
-            Assert.AreEqual(ElementType.PositiveConstantPermanentAccessArc_c, arc.ElementType);
+            Assert.AreEqual(ScTypes.ArcAccessConstantPositivePermanent, arc.ElementType);
             Assert.AreEqual(node, arc.BeginElement);
             Assert.AreEqual(node1, arc.EndElement);
             arc.DeleteFromMemory();
@@ -126,7 +117,7 @@ namespace ScEngineNetTest
             string idtf = "main_node_idtf";
             node.MainIdentifiers[ScDataTypes.Instance.LanguageRu] = idtf;
 
-            var main_idtf_link = (ScLink)node.GetElementByNrelClass(context.FindNode(ScKeyNodes.Instance.NrelMainIdtf), context.FindNode(ScDataTypes.Instance.LanguageRu), ElementType.Link_a);
+            var main_idtf_link = (ScLink)node.GetElementByNrelClass(context.FindNode(ScKeyNodes.Instance.NrelMainIdtf), context.FindNode(ScDataTypes.Instance.LanguageRu), ScTypes.Link);
             Assert.IsNotNull(main_idtf_link);
            
             var text = ((ScString)main_idtf_link.LinkContent).Value;
@@ -161,7 +152,7 @@ namespace ScEngineNetTest
         [TestMethod()]
         public void DisposeTest()
         {
-            var node3 = context.CreateNode(ElementType.ClassConstantNode_c);
+            var node3 = context.CreateNode(ScTypes.NodeConstantClass);
             Assert.IsTrue(node3.IsValid);
             Assert.IsFalse(node3.Disposed);
 

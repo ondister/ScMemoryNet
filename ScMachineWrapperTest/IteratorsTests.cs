@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ScMemoryNet;
 using ScEngineNet;
-using ScEngineNet.SafeElements;
+using ScEngineNet.ScElements;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ScEngineNet.NetHelpers;
 
@@ -32,31 +32,31 @@ namespace ScEngineNetTest
         [ClassInitialize]
         public static void InitializeMemory(TestContext testContext)
         {
-            ScMemory.Initialize(true, configFile, repoPath, extensionPath, netExtensionPath);
+            if (!ScMemory.IsInitialized) { ScMemory.Initialize(true, configFile, repoPath, extensionPath, netExtensionPath); }
             context = new ScMemoryContext(ScAccessLevels.MinLevel);
 
             //создаем элементы
-            node = context.CreateNode(ElementType.ConstantNode_c);
+            node = context.CreateNode(ScTypes.NodeConstant);
             node.SystemIdentifier = "test_construction_node";
             link = context.CreateLink("link");
-            nrelNode = context.CreateNode(ElementType.NonRoleConstantNode_c);
-            commonArc = node.AddOutputArc(link, ElementType.ConstantCommonArc_c);
-            nrelArc = commonArc.AddInputArc(ElementType.PositiveConstantPermanentAccessArc_c, nrelNode);
+            nrelNode = context.CreateNode(ScTypes.NodeConstantNonRole);
+            commonArc = node.AddOutputArc(link, ScTypes.ArcCommonConstant);
+            nrelArc = commonArc.AddInputArc(ScTypes.ArcAccessConstantPositivePermanent, nrelNode);
 
             Assert.IsTrue(node.ScAddress.IsValid);
-            Assert.AreEqual(ElementType.ConstantNode_c, node.ElementType);
+            Assert.AreEqual(ScTypes.NodeConstant, node.ElementType);
 
             Assert.IsTrue(link.ScAddress.IsValid);
-            Assert.AreEqual(ElementType.Link_a, link.ElementType);
+            Assert.AreEqual(ScTypes.Link, link.ElementType);
 
             Assert.IsTrue(nrelNode.ScAddress.IsValid);
-            Assert.AreEqual(ElementType.NonRoleConstantNode_c, nrelNode.ElementType);
+            Assert.AreEqual(ScTypes.NodeConstantNonRole, nrelNode.ElementType);
 
             Assert.IsTrue(commonArc.ScAddress.IsValid);
-            Assert.AreEqual(ElementType.ConstantCommonArc_c, commonArc.ElementType);
+            Assert.AreEqual(ScTypes.ArcCommonConstant, commonArc.ElementType);
 
             Assert.IsTrue(nrelArc.ScAddress.IsValid);
-            Assert.AreEqual(ElementType.PositiveConstantPermanentAccessArc_c, nrelArc.ElementType);
+            Assert.AreEqual(ScTypes.ArcAccessConstantPositivePermanent, nrelArc.ElementType);
         }
         #endregion
 
@@ -71,7 +71,7 @@ namespace ScEngineNetTest
             nrelArc.Dispose();
 
             context.Dispose();
-            ScMemory.ShutDown(true);
+            if (ScMemory.IsInitialized) { ScMemory.ShutDown(true); }
         }
         #endregion
 
@@ -122,8 +122,8 @@ namespace ScEngineNetTest
         [TestMethod]
         public void TestIterator5FAFAF()
         {
-            var iterator5FAFAF = context.CreateIterator(node, ElementType.ConstantCommonArc_c, link,
-                                                        ElementType.PositiveConstantPermanentAccessArc_c, nrelNode);
+            var iterator5FAFAF = context.CreateIterator(node, ScTypes.ArcCommonConstant, link,
+                                                        ScTypes.ArcAccessConstantPositivePermanent, nrelNode);
 
             Assert.IsTrue(iterator5FAFAF.Count() != 0);
 

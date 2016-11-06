@@ -1,7 +1,8 @@
 ﻿using ScEngineNet;
 using ScEngineNet.ExtensionsNet;
+using ScEngineNet.Native;
 using ScEngineNet.NetHelpers;
-using ScEngineNet.SafeElements;
+using ScEngineNet.ScElements;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -92,7 +93,7 @@ namespace ScMemoryNet
             }
             else
             {
-                throw new Exception("Память уже инициализирована. Нельзя использовать одновременно несколько экземпляров памяти. Создайте новый ScMemoryContext");
+                throw new Exception("Память уже инициализирована. Нельзя использовать одновременно несколько экземпляров памяти. Лучше создайте новый ScMemoryContext");
             }
 
         }

@@ -1,7 +1,8 @@
 ﻿using EP.Text;
 using ScEngineNet;
+using ScEngineNet.LinkContent;
 using ScEngineNet.NetHelpers;
-using ScEngineNet.SafeElements;
+using ScEngineNet.ScElements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +45,7 @@ namespace ScFullTextSearch
                       //добавляем к узлу ответа найденное слово
                       if ((object)wordNode != null)
                       {
-                          responseNode.AddOutputArc(wordNode, ElementType.PositiveConstantPermanentAccessArc_c);
+                          responseNode.AddOutputArc(wordNode, ScTypes.ArcAccessConstantPositivePermanent);
                           Console.WriteLine("Слово {0} добавлено в ответ", tokensList[tokenIndex].Lemma);
                       }
                       else
@@ -56,8 +57,8 @@ namespace ScFullTextSearch
               //добавляем ответ к запросу
               if ((object)querryNode != null)
               {
-                  querryNode.AddOutputArc(responseNode, ElementType.ConstantCommonArc_c)
-                            .AddInputArc(ElementType.PositiveConstantPermanentAccessArc_c, context.FindNode(SearchKeyNodes.Instance.NrelQuerryResponse));
+                  querryNode.AddOutputArc(responseNode, ScTypes.ArcCommonConstant)
+                            .AddInputArc(ScTypes.ArcAccessConstantPositivePermanent, context.FindNode(SearchKeyNodes.Instance.NrelQuerryResponse));
               }
 
           }

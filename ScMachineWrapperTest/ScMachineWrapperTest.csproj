@@ -60,11 +60,12 @@
     <Compile Include="IteratorsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SafeElements\ScLinkContentTests.cs" />
+    <Compile Include="SafeElements\ScTypesTests.cs" />
     <Compile Include="ScElementTests.cs" />
     <Compile Include="ScHelperFunctionTest.cs" />
-    <Compile Include="ElementTypesTests.cs" />
     <Compile Include="ScMemoryContextTests.cs" />
     <Compile Include="ScMemoryFunctionsTest.cs" />
+    <Compile Include="ScMemoryTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ScEngineNet\ScEngineNet.csproj">

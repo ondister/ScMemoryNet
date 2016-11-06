@@ -1,4 +1,4 @@
-﻿using ScEngineNet.NativeElements;
+﻿using ScEngineNet.Native;
 
 namespace ScMemoryNet
 {

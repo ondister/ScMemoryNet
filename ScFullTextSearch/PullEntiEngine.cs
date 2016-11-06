@@ -1,7 +1,8 @@
 ﻿using EP.Text;
 using ScEngineNet;
+using ScEngineNet.LinkContent;
 using ScEngineNet.NetHelpers;
-using ScEngineNet.SafeElements;
+using ScEngineNet.ScElements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,13 +31,13 @@ namespace ScFullTextSearch
                 var classLinkForTokenize = context.FindNode(SearchKeyNodes.Instance.ClassLinkForTokenize);
                 var classTokenizedLink = context.FindNode(SearchKeyNodes.Instance.ClassTokenizedLink);
 
-                if (context.ArcIsExist(classLinkForTokenize, Link, ElementType.PositiveConstantPermanentAccessArc_c) == true)
+                if (context.ArcIsExist(classLinkForTokenize, Link, ScTypes.ArcAccessConstantPositivePermanent) == true)
                 {
-                    var linkIterator = context.CreateIterator(classLinkForTokenize, ElementType.PositiveConstantPermanentAccessArc_c, Link);
+                    var linkIterator = context.CreateIterator(classLinkForTokenize, ScTypes.ArcAccessConstantPositivePermanent, Link);
                     linkIterator.ElementAt(0)[1].DeleteFromMemory();//убираем дугу от класса ClassLinkForTokenize
 
                     //и добавляем дугу от класса   classTokenizedLink, то есть ссылка токенизирована
-                    classTokenizedLink.AddOutputArc(Link, ElementType.PositiveConstantPermanentAccessArc_c);
+                    classTokenizedLink.AddOutputArc(Link, ScTypes.ArcAccessConstantPositivePermanent);
                 }
 
                 classLinkForTokenize.Dispose();
@@ -79,19 +80,19 @@ namespace ScFullTextSearch
             ScNode tokenNode = this.CreateClassNodeInstance(context, classSimpleToken);
 
             //добавляем общую дугу принадлежности токена к элементу и неролевое отношение 
-            element.AddOutputArc(tokenNode, ElementType.ConstantCommonArc_c)
-                   .AddInputArc(ElementType.PositiveConstantPermanentAccessArc_c,nrelToken);
+            element.AddOutputArc(tokenNode, ScTypes.ArcCommonConstant)
+                   .AddInputArc(ScTypes.ArcAccessConstantPositivePermanent, nrelToken);
 
             //добавляем основной идентификатор
             tokenNode.MainIdentifiers[ScDataTypes.Instance.LanguageRu] = new ScString(Token.Term);
 
             //добавляем начальную и конечную позицию токена
             ScLink linkStartPosition = context.CreateLink(new ScInt32(Token.BeginChar));
-            tokenNode.AddOutputArc(linkStartPosition, ElementType.ConstantCommonArc_c)
-                     .AddInputArc(ElementType.PositiveConstantPermanentAccessArc_c, nrelTokenStartPosition);
+            tokenNode.AddOutputArc(linkStartPosition, ScTypes.ArcCommonConstant)
+                     .AddInputArc(ScTypes.ArcAccessConstantPositivePermanent, nrelTokenStartPosition);
             ScLink linkEndPosition = context.CreateLink(new ScInt32(Token.EndChar));
-            tokenNode.AddOutputArc(linkEndPosition, ElementType.ConstantCommonArc_c)
-                     .AddInputArc( ElementType.PositiveConstantPermanentAccessArc_c,nrelTokenEndPosition);
+            tokenNode.AddOutputArc(linkEndPosition, ScTypes.ArcCommonConstant)
+                     .AddInputArc(ScTypes.ArcAccessConstantPositivePermanent, nrelTokenEndPosition);
 
             //привязываемся к существующей словарной форме или создаем новую
          
@@ -106,8 +107,8 @@ namespace ScFullTextSearch
             //прикрепляем словарное слово к токену
             if ((object)wordConcept != null)
             {
-                tokenNode.AddOutputArc(wordConcept, ElementType.ConstantCommonArc_c)
-                         .AddInputArc( ElementType.PositiveConstantPermanentAccessArc_c,context.FindNode(SearchKeyNodes.Instance.NrelTokenWord));
+                tokenNode.AddOutputArc(wordConcept, ScTypes.ArcCommonConstant)
+                         .AddInputArc(ScTypes.ArcAccessConstantPositivePermanent, context.FindNode(SearchKeyNodes.Instance.NrelTokenWord));
                 Console.WriteLine("Слово {0} уже есть.", Token.Lemma);
             }
             else
@@ -133,17 +134,17 @@ namespace ScFullTextSearch
             ScNode nodeLemma = this.CreateClassNodeInstance(context, context.FindNode(SearchKeyNodes.Instance.ClassWordLemma));
             nodeLemma.MainIdentifiers[ScDataTypes.Instance.LanguageRu] = new ScString(Token.Lemma);
             //присоединяем ее к словарному слову
-            nodeWord.AddOutputArc(nodeLemma, ElementType.ConstantCommonArc_c)
-                    .AddInputArc( ElementType.PositiveConstantPermanentAccessArc_c,context.FindNode(SearchKeyNodes.Instance.NrelWordLemma));
+            nodeWord.AddOutputArc(nodeLemma, ScTypes.ArcCommonConstant)
+                    .AddInputArc(ScTypes.ArcAccessConstantPositivePermanent, context.FindNode(SearchKeyNodes.Instance.NrelWordLemma));
 
             return nodeWord;
         }
 
         public ScNode CreateClassNodeInstance(ScMemoryContext context, ScNode classNode)
         {
-            ScNode node = context.CreateNode(ElementType.ConstantNode_c);
+            ScNode node = context.CreateNode(ScTypes.NodeConstant);
             node.SystemIdentifier = context.CreateUniqueIdentifier(ScNode.InstancePreffix + classNode.SystemIdentifier, node);
-            classNode.AddOutputArc(node, ElementType.PositiveConstantPermanentAccessArc_c);
+            classNode.AddOutputArc(node, ScTypes.ArcAccessConstantPositivePermanent);
             return node;
         }
 
@@ -161,11 +162,11 @@ namespace ScFullTextSearch
             foreach(var link in lemmaLinks)
             {
                 ScNode main_idtf = context.FindNode(ScKeyNodes.Instance.NrelMainIdtf);
-                ScIterator lemmaIterator = context.CreateIterator(ElementType.ConstantNode_c, ElementType.ConstantCommonArc_c, link, ElementType.PositiveConstantPermanentAccessArc_c, main_idtf);
+                ScIterator lemmaIterator = context.CreateIterator(ScTypes.NodeConstant, ScTypes.ArcCommon, link, ScTypes.ArcAccessConstantPositivePermanent, main_idtf);
 
                 foreach (var construction in lemmaIterator)
                 {
-                    ScIterator wordIterator = context.CreateIterator(ElementType.ConstantNode_c, ElementType.ConstantCommonArc_c, construction[0], ElementType.PositiveConstantPermanentAccessArc_c, context.FindNode(SearchKeyNodes.Instance.NrelWordLemma));
+                    ScIterator wordIterator = context.CreateIterator(ScTypes.NodeConstant, ScTypes.ArcCommon, construction[0], ScTypes.ArcAccessConstantPositivePermanent, context.FindNode(SearchKeyNodes.Instance.NrelWordLemma));
                     if (wordIterator.Count() != 0)
                     {
                         node = (ScNode)wordIterator.ElementAt(0)[0];

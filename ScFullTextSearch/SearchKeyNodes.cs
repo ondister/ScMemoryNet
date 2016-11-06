@@ -1,5 +1,5 @@
 ﻿using ScEngineNet;
-using ScEngineNet.SafeElements;
+using ScEngineNet.ScElements;
 using System;
 using System.Collections.Generic;
 
@@ -80,7 +80,7 @@ namespace ScFullTextSearch
             }
         }
 
-        private ScNode CreateKeyNode(ScMemoryContext context, ElementType elementType, Identifier identifier)
+        private ScNode CreateKeyNode(ScMemoryContext context, ScTypes  elementType, Identifier identifier)
         {
             Console.WriteLine("Create ScFulltextSearch KeyNode: {0}", identifier);
             return context.CreateNode(elementType, identifier);
@@ -94,21 +94,21 @@ namespace ScFullTextSearch
 
             using (var context = new ScMemoryContext(ScAccessLevels.MinLevel))
             {
-                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.ClassLinkForTokenize);
-                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.ClassTokenizedLink);
-                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.ClassSimpleToken);
-                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.ClassWord);
-                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.ClassWordLemma);
-                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.ClassWordVariant);
-                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.ClassQuerryString);
-                this.CreateKeyNode(context, ElementType.ClassConstantNode_c, this.ClassQuerryResponse);
-                this.CreateKeyNode(context, ElementType.NonRoleConstantNode_c, this.NrelToken);
-                this.CreateKeyNode(context, ElementType.NonRoleConstantNode_c, this.NrelTokenEndPosition);
-                this.CreateKeyNode(context, ElementType.NonRoleConstantNode_c, this.NrelTokenStartPosition);
-                this.CreateKeyNode(context, ElementType.NonRoleConstantNode_c, this.NrelTokenWord);
-                this.CreateKeyNode(context, ElementType.NonRoleConstantNode_c, this.NrelWordLemma);
-                this.CreateKeyNode(context, ElementType.NonRoleConstantNode_c, this.NrelWordVariant);
-                this.CreateKeyNode(context, ElementType.NonRoleConstantNode_c, this.NrelQuerryResponse);
+                this.CreateKeyNode(context, ScTypes.NodeConstantClass, this.ClassLinkForTokenize);
+                this.CreateKeyNode(context, ScTypes.NodeConstantClass, this.ClassTokenizedLink);
+                this.CreateKeyNode(context, ScTypes.NodeConstantClass, this.ClassSimpleToken);
+                this.CreateKeyNode(context, ScTypes.NodeConstantClass, this.ClassWord);
+                this.CreateKeyNode(context, ScTypes.NodeConstantClass, this.ClassWordLemma);
+                this.CreateKeyNode(context, ScTypes.NodeConstantClass, this.ClassWordVariant);
+                this.CreateKeyNode(context, ScTypes.NodeConstantClass, this.ClassQuerryString);
+                this.CreateKeyNode(context, ScTypes.NodeConstantClass, this.ClassQuerryResponse);
+                this.CreateKeyNode(context, ScTypes.NodeConstantNonRole, this.NrelToken);
+                this.CreateKeyNode(context, ScTypes.NodeConstantNonRole, this.NrelTokenEndPosition);
+                this.CreateKeyNode(context, ScTypes.NodeConstantNonRole, this.NrelTokenStartPosition);
+                this.CreateKeyNode(context, ScTypes.NodeConstantNonRole, this.NrelTokenWord);
+                this.CreateKeyNode(context, ScTypes.NodeConstantNonRole, this.NrelWordLemma);
+                this.CreateKeyNode(context, ScTypes.NodeConstantNonRole, this.NrelWordVariant);
+                this.CreateKeyNode(context, ScTypes.NodeConstantNonRole, this.NrelQuerryResponse);
             }
             return true;
         }

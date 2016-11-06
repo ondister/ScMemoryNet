@@ -3,8 +3,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ScEngineNet;
-using ScEngineNet.NativeElements;
-using ScEngineNet.SafeElements;
+using ScEngineNet.Native;
+using ScEngineNet.ScElements;
+using ScEngineNet.LinkContent;
 
 namespace ScEngineNetTest
 {
@@ -22,15 +23,16 @@ namespace ScEngineNetTest
                 ExtensionsPath = @"extensions"
             };
 
-            //sc_memory_initialize 
-            IntPtr scMemoryContext = NativeMethods.sc_memory_initialize(scParams);
-
-            //sc_memory_is_initialized
             bool isInitialized = NativeMethods.sc_memory_is_initialized();
+            if (isInitialized == false) { NativeMethods.sc_memory_initialize(scParams); }
+
+            IntPtr scMemoryContext = NativeMethods.sc_memory_context_new(0);
+            //sc_memory_is_initialized
+            isInitialized = NativeMethods.sc_memory_is_initialized();
             Assert.IsTrue(isInitialized);
 
             // sc_memory_node_new
-            WScAddress nodeAddr = NativeMethods.sc_memory_node_new( scMemoryContext, ElementType.Node_a);
+            WScAddress nodeAddr = NativeMethods.sc_memory_node_new( scMemoryContext, ElementTypes.Node_a);
             Assert.AreNotEqual(0, nodeAddr.Offset);
 
             //sc_memory_is_element
@@ -38,15 +40,15 @@ namespace ScEngineNetTest
             Assert.IsTrue(isExist);
 
             //sc_memory_change_element_subtype
-            const ElementType newType = ElementType.Constant_a;
+            const ElementTypes newType = ElementTypes.Constant_a;
             ScResult resultChangeType = NativeMethods.sc_memory_change_element_subtype( scMemoryContext, nodeAddr, newType);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultChangeType);
 
             //sc_memory_get_element_type
-            var gettingType = ElementType.Unknown;
+            var gettingType = ElementTypes.Unknown;
             var resultGetElementType = NativeMethods.sc_memory_get_element_type( scMemoryContext, nodeAddr, out gettingType);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultGetElementType);
-            Assert.AreEqual(ElementType.ConstantNode_c, gettingType);
+            Assert.AreEqual(ElementTypes.ConstantNode_c, gettingType);
 
             //sc_memory_link_new
             WScAddress linkAddr = NativeMethods.sc_memory_link_new( scMemoryContext);
@@ -60,7 +62,7 @@ namespace ScEngineNetTest
             //sc_memory_get_link_content
             IntPtr streamPtr = IntPtr.Zero;
             NativeMethods.sc_memory_get_link_content( scMemoryContext, linkAddr, out streamPtr);
-            ScLinkContent gettingContent = new ScBinary(streamPtr);
+            ScLinkContent gettingContent = new ScString(streamPtr);
             Assert.AreEqual(linkContent, gettingContent);
 
             //sc_memory_find_links_with_content
@@ -76,7 +78,7 @@ namespace ScEngineNetTest
             NativeMethods.sc_memory_free_buff(addressesPtr);
 
             //sc_memory_arc_new
-            WScAddress arcAddr = NativeMethods.sc_memory_arc_new( scMemoryContext, ElementType.PositiveConstantPermanentAccessArc_c, nodeAddr, linkAddr);
+            WScAddress arcAddr = NativeMethods.sc_memory_arc_new(scMemoryContext, ElementTypes.PositiveConstantPermanentAccessArc_c, nodeAddr, linkAddr);
             Assert.AreNotEqual(0, arcAddr.Offset);
 
             // sc_memory_get_arc_begin
@@ -91,17 +93,27 @@ namespace ScEngineNetTest
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultGetArcEnd);
             Assert.AreEqual(linkAddr.Offset, gettingArcEndAddr.Offset);
 
+            //sc_memory_get_arc_info
+            WScAddress startArcAddr;
+            WScAddress endArcAddr;
+            ScResult resultGetArcInfo = NativeMethods.sc_memory_get_arc_info(scMemoryContext, arcAddr, out startArcAddr, out endArcAddr);
+            Assert.AreEqual(ScResult.SC_RESULT_OK, resultGetArcInfo);
+            Assert.AreEqual(nodeAddr.Offset, startArcAddr.Offset);
+            Assert.AreEqual(linkAddr.Offset, endArcAddr.Offset);
+
+
             //sc_memory_get_element_access_levels
             byte gettingAccessLevel = 0; ;
             ScResult resultgetAccessLevel = NativeMethods.sc_memory_get_element_access_levels( scMemoryContext, nodeAddr, out gettingAccessLevel);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultgetAccessLevel);
-            Assert.AreNotEqual(0, gettingAccessLevel);
+            Assert.AreEqual(0, gettingAccessLevel);
 
             //sc_memory_set_element_access_levels
-            byte settingAccessLevel = 128; ;
-            ScResult resultsetAccessLevel = NativeMethods.sc_memory_set_element_access_levels( scMemoryContext, nodeAddr, settingAccessLevel, out gettingAccessLevel);
+            byte oldAccessLevel = 1;
+            byte settingAccessLevel = 50; ;
+            ScResult resultsetAccessLevel = NativeMethods.sc_memory_set_element_access_levels( scMemoryContext, nodeAddr, settingAccessLevel, out oldAccessLevel);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultsetAccessLevel);
-            Assert.AreEqual(settingAccessLevel, gettingAccessLevel);
+            Assert.AreEqual(settingAccessLevel, oldAccessLevel);
 
             //sc_memory_stat
             ScStat statistics;
@@ -123,11 +135,8 @@ namespace ScEngineNetTest
 
 
             //sc_memory_shutdown
+            NativeMethods.sc_memory_context_free(scMemoryContext);
             bool isShutDown = NativeMethods.sc_memory_shutdown(false);
-            if (isShutDown)
-            {
-                scMemoryContext = IntPtr.Zero;
-            }
             Assert.IsTrue(isShutDown);
         }
     }

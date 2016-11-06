@@ -1,4 +1,4 @@
-﻿using ScEngineNet.SafeElements;
+﻿using ScEngineNet.ScElements;
 using System;
 using System.Collections.Generic;
 
@@ -60,7 +60,7 @@ namespace ScEngineNet.NetHelpers
             }
         }
 
-        private ScNode CreateKeyNode(ScMemoryContext context, ElementType elementType, Identifier identifier)
+        private ScNode CreateKeyNode(ScMemoryContext context, ScTypes elementType, Identifier identifier)
         {
             Console.WriteLine("Create ScMemory.net KeyNode: {0}", identifier);
             return context.CreateNode(elementType, identifier);
@@ -74,7 +74,7 @@ namespace ScEngineNet.NetHelpers
 
             using (var context = new ScMemoryContext(ScAccessLevels.MinLevel))
             {
-                this.CreateKeyNode(context, ElementType.NonRoleConstantNode_c, this.NrelMainIdtf);
+                this.CreateKeyNode(context, ScTypes.NodeConstantNonRole, this.NrelMainIdtf);
             }
             return true;
         }
