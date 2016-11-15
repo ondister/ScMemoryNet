@@ -227,8 +227,6 @@ namespace ScEngineNet.LinkContent
 
         #endregion
 
-
-
         #region Конвертация
 
 
@@ -239,7 +237,7 @@ namespace ScEngineNet.LinkContent
         /// <returns>
         /// A <see cref="System.String" /> that represents this instance.
         /// </returns>
-        internal static string ToString(byte[] bytes)
+        public static string ToString(byte[] bytes)
         {
             return ScEngineNet.TextEncoding.GetString(bytes);
         }
@@ -250,7 +248,7 @@ namespace ScEngineNet.LinkContent
         /// </summary>
         /// <param name="content">The content.</param>
         /// <returns></returns>
-        internal static int ToInt32(ScLinkContent content)
+        public static int ToInt32(ScLinkContent content)
         {
             int result;
             if (content.Bytes.Length == 4)
@@ -270,7 +268,7 @@ namespace ScEngineNet.LinkContent
         /// </summary>
         /// <param name="content">The content.</param>
         /// <returns></returns>
-        internal static byte[] ToBinary(ScLinkContent content)
+        public static byte[] ToBinary(ScLinkContent content)
         {
             return content.Bytes;
         }
@@ -281,7 +279,7 @@ namespace ScEngineNet.LinkContent
         /// </summary>
         /// <param name="content">The content.</param>
         /// <returns></returns>
-        internal static double ToDouble(ScLinkContent content)
+        public static double ToDouble(ScLinkContent content)
         {
             double result = double.NaN;
             if (content.Bytes.Length == 8)
@@ -301,7 +299,7 @@ namespace ScEngineNet.LinkContent
         /// </summary>
         /// <param name="content">The content.</param>
         /// <returns></returns>
-        internal static long ToLong(ScLinkContent content)
+        public static long ToLong(ScLinkContent content)
         {
             long result = 0;
             if (content.Bytes.Length == 8)
@@ -321,7 +319,7 @@ namespace ScEngineNet.LinkContent
         /// </summary>
         /// <param name="content">The content.</param>
         /// <returns></returns>
-        internal static bool ToBool(ScLinkContent content)
+        public static bool ToBool(ScLinkContent content)
         {
             return BitConverter.ToBoolean(content.Bytes, 0);
         }
@@ -331,7 +329,7 @@ namespace ScEngineNet.LinkContent
         /// </summary>
         /// <param name="content">The content.</param>
         /// <returns></returns>
-        internal static byte ToByte(ScLinkContent content)
+        public static byte ToByte(ScLinkContent content)
         {
             return content.bytes[0];
         }
