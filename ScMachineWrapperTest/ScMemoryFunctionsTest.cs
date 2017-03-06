@@ -26,7 +26,7 @@ namespace ScEngineNetTest
             bool isInitialized = NativeMethods.sc_memory_is_initialized();
             if (isInitialized == false) { NativeMethods.sc_memory_initialize(scParams); }
 
-            IntPtr scMemoryContext = NativeMethods.sc_memory_context_new(0);
+            IntPtr scMemoryContext = NativeMethods.sc_memory_context_new(10);
             //sc_memory_is_initialized
             isInitialized = NativeMethods.sc_memory_is_initialized();
             Assert.IsTrue(isInitialized);
@@ -106,9 +106,10 @@ namespace ScEngineNetTest
             byte gettingAccessLevel = 0; ;
             ScResult resultgetAccessLevel = NativeMethods.sc_memory_get_element_access_levels( scMemoryContext, nodeAddr, out gettingAccessLevel);
             Assert.AreEqual(ScResult.SC_RESULT_OK, resultgetAccessLevel);
-            Assert.AreEqual(0, gettingAccessLevel);
+            Assert.AreEqual(10, gettingAccessLevel);
 
             //sc_memory_set_element_access_levels
+#warning проблема с изменением уровня доступа
             byte oldAccessLevel = 1;
             byte settingAccessLevel = 50; ;
             ScResult resultsetAccessLevel = NativeMethods.sc_memory_set_element_access_levels( scMemoryContext, nodeAddr, settingAccessLevel, out oldAccessLevel);

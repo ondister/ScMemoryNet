@@ -11,14 +11,7 @@ namespace ScEngineNet.Native
     [StructLayout(LayoutKind.Sequential, CharSet = ScEngineNet.DefaultCharset)]
     internal struct WScEvent
     {
-        /// <summary>
-        /// Содержимое памяти
-        /// </summary>
-        internal IntPtr ScMemoryContext;
-        /// <summary>
-        /// Адрес элемента, которые подписывается на событие
-        /// </summary>
-        internal WScAddress Element;
+       internal WScAddress Element;
         /// <summary>
         /// Тип события
         /// </summary>
@@ -31,9 +24,18 @@ namespace ScEngineNet.Native
         /// Функция обратного вызова при произошедшем событии
         /// </summary>
         internal fEventCallback Callback;
+
+        internal fEventCallbackEx CallbackEx;
         /// <summary>
         /// Функция обратного вызова при удалении элемента
         /// </summary>
         internal fDeleteCallback DeleteCallback;
+
+        internal volatile int ref_count;
+        //! Context lock 
+        internal volatile IntPtr thread_lock;
+        //! Access levels
+        internal byte access_levels;
+    
     }
 }

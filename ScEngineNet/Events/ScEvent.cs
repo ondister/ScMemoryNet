@@ -1,5 +1,4 @@
 using ScEngineNet.Native;
-using ScEngineNet.Native;
 using ScEngineNet.ScElements;
 using ScEngineNet.ScExceptions;
 using System;
@@ -34,7 +33,7 @@ namespace ScEngineNet.Events
         private ScMemoryContext context;
         private readonly ScEventType eventType;
 
-        fEventCallback cb;
+        fEventCallbackEx cb;
         fDeleteCallback db;
 
 
@@ -126,18 +125,19 @@ namespace ScEngineNet.Events
 
             this.context = context;
 
-             cb = new fEventCallback(ECallback);
+             cb = new fEventCallbackEx(ECallback);
              db = new fDeleteCallback(DCallback);
             if (this.Disposed == true) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
             if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
             if (this.context.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
 
-            this.wScEvent = NativeMethods.sc_event_new(this.context.PtrScMemoryContext, this.elementAddress.WScAddress, this.eventType, IntPtr.Zero, cb, db);
+            this.wScEvent = NativeMethods.sc_event_new_ex(this.context.PtrScMemoryContext, this.elementAddress.WScAddress, this.eventType, IntPtr.Zero, cb, db);
             return this.wScEvent != IntPtr.Zero ? true : false;
         }
 
 
-        private ScResult ECallback(ref WScEvent scEvent, WScAddress arg)
+        //TODO:otherElement тоже переместить в события
+        private ScResult ECallback(ref WScEvent scEvent, WScAddress arg, WScAddress otherElement )
         {
             OnElementEvent(scEvent.Type, new ScAddress(scEvent.Element), new ScAddress(arg));
             return ScResult.SC_RESULT_OK;
@@ -161,10 +161,13 @@ namespace ScEngineNet.Events
             bool isDelete = false;
             if (ScMemoryContext.IsMemoryInitialized() == true && this.wScEvent != IntPtr.Zero)
             {
-                isDelete = NativeMethods.sc_event_destroy(this.wScEvent) == ScResult.SC_RESULT_OK ? true : false;
-                cb = null;
-                db = null;
-                this.wScEvent = IntPtr.Zero;
+                if (eventType != ScEventType.SC_EVENT_REMOVE_ELEMENT)
+                {
+                    isDelete = NativeMethods.sc_event_destroy(this.wScEvent) == ScResult.SC_RESULT_OK ? true : false;
+                    cb = null;
+                    db = null;
+                    this.wScEvent = IntPtr.Zero;
+                }
             }
             else
             {

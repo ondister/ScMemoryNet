@@ -13,10 +13,10 @@
         /// <summary>
         /// The medium level
         /// </summary>
-        MedLevel = 128,
+        MedLevel = 6,
         /// <summary>
         /// The maximum level
         /// </summary>
-        MaxLevel = 255
+        MaxLevel = 15
     }
 }

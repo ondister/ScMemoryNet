@@ -286,6 +286,7 @@ namespace ScEngineNet.Tests
         public void DisposeTest()
         {
             var testContext = new ScMemoryContext(ScAccessLevels.MedLevel);
+#warning проблема с установкой уровня доступа
             Assert.AreEqual(ScAccessLevels.MedLevel, testContext.AccessLevel);
             Assert.IsFalse(testContext.Disposed);
 

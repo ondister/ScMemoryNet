@@ -34,8 +34,8 @@ namespace ScEngineNet.LinkContent
             base(bytes)
         { }
 
-        internal ScLong(IntPtr Stream) :
-            base(Stream)
+        internal ScLong(IntPtr stream) :
+            base(stream)
         { }
 
         /// <summary>

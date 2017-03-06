@@ -41,8 +41,8 @@ namespace ScEngineNet.LinkContent
             base(bytes)
         { }
 
-        internal ScBinary(IntPtr Stream) :
-            base(Stream)
+        internal ScBinary(IntPtr stream) :
+            base(stream)
         { }
 
         /// <summary>

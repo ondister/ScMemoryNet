@@ -29,15 +29,15 @@ namespace ScEngineNet.LinkContent
         /// </value>
         public bool Value
         {
-            get { return ScLinkContent.ToBool(base.Bytes); }
+            get { return ToBool(base.Bytes); }
         }
 
         internal ScBool(byte[] bytes) :
             base(bytes)
         { }
 
-        internal ScBool(IntPtr Stream) :
-            base(Stream)
+        internal ScBool(IntPtr stream) :
+            base(stream)
         { }
 
         public static bool True

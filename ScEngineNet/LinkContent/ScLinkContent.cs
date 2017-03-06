@@ -95,7 +95,11 @@ namespace ScEngineNet.LinkContent
             {  ScDataTypes.Instance.NumericDouble, bytes => new ScDouble(bytes) },
             {  ScDataTypes.Instance.NumericLong, bytes => new ScLong(bytes) },
             {  ScDataTypes.Instance.TypeBool, bytes => new ScBool(bytes) },
-            {  ScDataTypes.Instance.NumericByte, bytes => new ScByte(bytes) }
+            {  ScDataTypes.Instance.NumericByte, bytes => new ScByte(bytes) },
+            {  ScDataTypes.Instance.Date, bytes => new ScDate(bytes) },
+            {  ScDataTypes.Instance.DateTime, bytes => new ScDateTime(bytes) },
+            {  ScDataTypes.Instance.Time, bytes => new ScTime(bytes) },
+            {  ScDataTypes.Instance.Bitmap, bytes => new ScBitmap(bytes) },
         };
 
 
@@ -111,6 +115,11 @@ namespace ScEngineNet.LinkContent
             { ScDataTypes.Instance.NumericLong, streamIntPtr => new ScLong(streamIntPtr) },
             { ScDataTypes.Instance.TypeBool, streamIntPtr => new ScBool(streamIntPtr) },
             { ScDataTypes.Instance.NumericByte, streamIntPtr => new ScByte(streamIntPtr) },
+            { ScDataTypes.Instance.Date, streamIntPtr => new ScDate(streamIntPtr) },
+            { ScDataTypes.Instance.DateTime, streamIntPtr => new ScDateTime(streamIntPtr) },
+            { ScDataTypes.Instance.Time, streamIntPtr => new ScTime(streamIntPtr) },
+            { ScDataTypes.Instance.Bitmap, streamIntPtr => new ScBitmap(streamIntPtr) },
+           
         };
 
 

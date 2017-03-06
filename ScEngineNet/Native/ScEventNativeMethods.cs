@@ -5,7 +5,10 @@ using System.Runtime.InteropServices;
 
 namespace ScEngineNet.Native
 {
-    //typedef sc_result (*fEventCallback)(const sc_event *event, sc_addr arg);
+    //   typedef sc_result (*fEventCallbackEx)(const sc_event *event, sc_addr arg, sc_addr other_el);
+    [UnmanagedFunctionPointer(ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
+    internal delegate ScResult fEventCallbackEx(ref WScEvent scEvent, WScAddress arg, WScAddress other_el);
+
     [UnmanagedFunctionPointer(ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
     internal delegate ScResult fEventCallback(ref WScEvent scEvent, WScAddress arg);
 
@@ -19,7 +22,12 @@ namespace ScEngineNet.Native
         //_SC_EXTERN sc_event* sc_event_new(sc_memory_context const * ctx, sc_addr el, sc_event_type type, sc_pointer data, fEventCallback callback, fDeleteCallback delete_callback);
 
         [DllImport(ScEngineNet.ScMemoryDllName, CallingConvention = ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
-        internal static extern IntPtr sc_event_new(IntPtr context, WScAddress element, ScEventType typeEvent, IntPtr dataPtr, fEventCallback CallBack, fDeleteCallback DeleteCallBack);
+        internal static extern IntPtr sc_event_new1(IntPtr context, WScAddress element, ScEventType typeEvent, IntPtr dataPtr, fEventCallback CallBack, fDeleteCallback DeleteCallBack);
+
+        //_SC_EXTERN sc_event* sc_event_new_ex(sc_memory_context const * ctx, sc_addr el, sc_event_type type, sc_pointer data, fEventCallbackEx callback, fDeleteCallback delete_callback);
+        [DllImport(ScEngineNet.ScMemoryDllName, CallingConvention = ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
+        internal static extern IntPtr sc_event_new_ex(IntPtr context, WScAddress element, ScEventType typeEvent, IntPtr dataPtr, fEventCallbackEx CallBack, fDeleteCallback DeleteCallBack);
+
 
         ///*! Destroys specified sc-event
         //_SC_EXTERN sc_result sc_event_destroy(sc_event *event);

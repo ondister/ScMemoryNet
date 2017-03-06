@@ -11,7 +11,7 @@ namespace ScEngineNet.Native
         /// <summary>
         /// The identifier
         /// </summary>
-        internal ushort Id;
+        internal uint Id;
         /// <summary>
         /// The access levels
         /// </summary>

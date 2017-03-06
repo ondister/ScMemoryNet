@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace ScEngineNet
@@ -18,6 +19,10 @@ namespace ScEngineNet
         /// </summary>
         internal static readonly Encoding TextEncoding = new UTF8Encoding();
 
+        /// <summary>
+        /// Региональные параметры
+        /// </summary>
+        internal static readonly CultureInfo CultureInfo= new CultureInfo("ru-Ru");
 
         /// <summary>
         /// Соглашение о вызове по умолчанию.

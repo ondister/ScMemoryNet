@@ -1,47 +1,40 @@
-﻿using ScEngineNet.ScElements;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using ScEngineNet.ScElements;
 
 namespace ScEngineNet.NetHelpers
 {
     /// <summary>
-    /// Класс, содержащий идентификаторы типов данных для ссылок
+    ///     Класс, содержащий идентификаторы типов данных для ссылок
     /// </summary>
     public sealed class ScKeyNodes
     {
         private static volatile ScKeyNodes instance;
-        private static object syncRoot = new Object();
-
-       
-
-      
+        private static readonly object syncRoot = new Object();
 
         private ScKeyNodes()
         {
-           
         }
 
         #region keyNodes
 
-
         /// <summary>
-        /// Gets the nrel main idtf.
+        ///     Gets the nrel main idtf.
         /// </summary>
         /// <value>
-        /// The nrel main idtf.
+        ///     The nrel main idtf.
         /// </value>
         public Identifier NrelMainIdtf
-        { get { return "nrel_main_idtf"; } }
-
-       
+        {
+            get { return "nrel_main_idtf"; }
+        }
 
         #endregion
 
         /// <summary>
-        /// Возвращает экземпляр класса ScDataTypes
+        ///     Возвращает экземпляр класса ScDataTypes
         /// </summary>
         /// <value>
-        /// Экземпляр класса ScDataTypes
+        ///     Экземпляр класса ScDataTypes
         /// </value>
         public static ScKeyNodes Instance
         {
@@ -65,16 +58,16 @@ namespace ScEngineNet.NetHelpers
             Console.WriteLine("Create ScMemory.net KeyNode: {0}", identifier);
             return context.CreateNode(elementType, identifier);
         }
+
         /// <summary>
-        /// Создает ключевые узлы
+        ///     Создает ключевые узлы
         /// </summary>
         /// <returns></returns>
         internal bool CreateKeyNodes()
         {
-
             using (var context = new ScMemoryContext(ScAccessLevels.MinLevel))
             {
-                this.CreateKeyNode(context, ScTypes.NodeConstantNonRole, this.NrelMainIdtf);
+                CreateKeyNode(context, ScTypes.NodeConstantNonRole, NrelMainIdtf);
             }
             return true;
         }
