@@ -17,8 +17,8 @@ namespace ScMachineWrapperTest
 
         #region InitializeMemory
 
-        [ClassInitialize]
-        public static void InitializeMemory(TestContext testContext)
+       
+        public  void InitializeMemory()
         {
             if (!ScMemory.IsInitialized)
             {
@@ -48,8 +48,8 @@ namespace ScMachineWrapperTest
 
         #region ShutDownMemory
 
-        [ClassCleanup]
-        public static void ShutDown()
+    
+        public  void ShutDown()
         {
             node.Dispose();
             link.Dispose();
@@ -67,6 +67,27 @@ namespace ScMachineWrapperTest
         #region EventTests
 
         [TestMethod]
+        public void RunEventTests()
+        {
+            InitializeMemory();
+
+            TestAddInputArcEvent();
+            TestAddOutputArcEvent();
+            TestInputArcRemovedEvent();
+            TestOutputArcRemovedEvent();
+            TestChangeLinkContentEvent();
+
+
+
+            //тесты на неправильное использование
+            TestAddDoubleEvent();
+            TestRemoveVoidEvent();
+            //тест на удаление элемента
+            TestElementRemovedEvent();
+
+            ShutDown();
+        }
+
         public void TestAddOutputArcEvent()
         {
             object obj = null;
@@ -93,7 +114,7 @@ namespace ScMachineWrapperTest
             commonArc.Dispose();
         }
 
-        [TestMethod]
+
         public void TestAddInputArcEvent()
         {
             object obj = null;
@@ -119,7 +140,7 @@ namespace ScMachineWrapperTest
             commonArc.Dispose();
         }
 
-        [TestMethod]
+
         public void TestElementRemovedEvent()
         {
             var eventType = ScEventType.ScEventUnknown;
@@ -140,7 +161,7 @@ namespace ScMachineWrapperTest
             commonArc.Dispose();
         }
 
-        [TestMethod]
+
         public void TestOutputArcRemovedEvent()
         {
             object obj = null;
@@ -165,7 +186,7 @@ namespace ScMachineWrapperTest
             commonArc.Dispose();
         }
 
-        [TestMethod]
+
         public void TestInputArcRemovedEvent()
         {
             object obj = null;
@@ -192,7 +213,7 @@ namespace ScMachineWrapperTest
             commonArc.Dispose();
         }
 
-        [TestMethod]
+ 
         public void TestAddDoubleEvent()
         {
             object obj = null;
@@ -230,7 +251,7 @@ namespace ScMachineWrapperTest
             commonArc.Dispose();
         }
 
-        [TestMethod]
+
         public void TestRemoveVoidEvent()
         {
             var link1 = context.CreateLink("testlink");
@@ -243,7 +264,7 @@ namespace ScMachineWrapperTest
             }
         }
 
-        [TestMethod]
+
         public void TestChangeLinkContentEvent()
         {
             object obj = null;

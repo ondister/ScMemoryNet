@@ -31,11 +31,13 @@ namespace ScEngineNet.Native
         /// </summary>
         internal fDeleteCallback DeleteCallback;
 
-        internal volatile int ref_count;
+        internal volatile uint ref_count;
         //! Context lock 
         internal volatile IntPtr thread_lock;
         //! Access levels
         internal byte access_levels;
     
     }
+
+   
 }

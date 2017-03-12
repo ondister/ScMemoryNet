@@ -9,6 +9,7 @@ namespace ScEngineNet.Native
     [UnmanagedFunctionPointer(ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
     internal delegate ScResult fEventCallbackEx(ref WScEvent scEvent, WScAddress arg, WScAddress other_el);
 
+    /// Backward compatibility
     [UnmanagedFunctionPointer(ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
     internal delegate ScResult fEventCallback(ref WScEvent scEvent, WScAddress arg);
 
@@ -18,15 +19,13 @@ namespace ScEngineNet.Native
 
     internal static partial class NativeMethods
     {
-        // *! Subscribe for events from specified sc-element
         //_SC_EXTERN sc_event* sc_event_new(sc_memory_context const * ctx, sc_addr el, sc_event_type type, sc_pointer data, fEventCallback callback, fDeleteCallback delete_callback);
-
         [DllImport(ScEngineNet.ScMemoryDllName, CallingConvention = ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
-        internal static extern IntPtr sc_event_new1(IntPtr context, WScAddress element, ScEventType typeEvent, IntPtr dataPtr, fEventCallback CallBack, fDeleteCallback DeleteCallBack);
+        internal static extern IntPtr sc_event_new(IntPtr context, WScAddress element, ScEventType typeEvent, IntPtr dataPtr, fEventCallback callback, fDeleteCallback deleteCallBack);
 
         //_SC_EXTERN sc_event* sc_event_new_ex(sc_memory_context const * ctx, sc_addr el, sc_event_type type, sc_pointer data, fEventCallbackEx callback, fDeleteCallback delete_callback);
         [DllImport(ScEngineNet.ScMemoryDllName, CallingConvention = ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
-        internal static extern IntPtr sc_event_new_ex(IntPtr context, WScAddress element, ScEventType typeEvent, IntPtr dataPtr, fEventCallbackEx CallBack, fDeleteCallback DeleteCallBack);
+        internal static extern IntPtr sc_event_new_ex(IntPtr context, WScAddress element, ScEventType typeEvent, IntPtr dataPtr, fEventCallbackEx callBack, fDeleteCallback DeleteCallBack);
 
 
         ///*! Destroys specified sc-event

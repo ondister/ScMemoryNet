@@ -168,10 +168,10 @@ namespace ScEngineNet.Events
             {
                 if (EventType != ScEventType.ScEventRemoveElement)
                 {
-                    isDelete = NativeMethods.sc_event_destroy(WScEvent) == ScResult.ScResultOk ? true : false;
+                    isDelete = NativeMethods.sc_event_destroy(WScEvent) == ScResult.ScResultOk;
                     cb = null;
                     db = null;
-                    WScEvent = IntPtr.Zero;
+                   WScEvent = IntPtr.Zero;
                 }
             }
             else
