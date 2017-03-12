@@ -61,10 +61,10 @@ namespace ScEngineNet.NetHelpers
             }
         }
 
-        private ScNode CreateKeyNode(ScMemoryContext context, ScTypes elementType, Identifier identifier)
+        private static void CreateKeyNode(ScMemoryContext context, ScTypes elementType, Identifier identifier)
         {
             Console.WriteLine("Create ScMemory.net KeyNode: {0}", identifier);
-            return context.CreateNode(elementType, identifier);
+            context.CreateNode(elementType, identifier);
         }
 
         /// <summary>

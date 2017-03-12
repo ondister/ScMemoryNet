@@ -1,172 +1,177 @@
+using System;
 using ScEngineNet.Native;
 using ScEngineNet.ScElements;
 using ScEngineNet.ScExceptions;
-using System;
-using System.Runtime.InteropServices;
 
 namespace ScEngineNet.Events
 {
     /// <summary>
-    /// Делегат события
+    ///     Делегат события
     /// </summary>
     /// <param name="sender">The sender.</param>
-    /// <param name="e">The <see cref="ScEventArgs"/> instance containing the event data.</param>
+    /// <param name="e">The <see cref="ScEventArgs" /> instance containing the event data.</param>
     public delegate void ElementEventHandler(object sender, ScEventArgs e);
+
     /// <summary>
-    /// Делегат удаления элемента, подписанного на событие
+    ///     Делегат удаления элемента, подписанного на событие
     /// </summary>
     /// <param name="sender">The sender.</param>
-    /// <param name="e">The <see cref="ScEventArgs"/> instance containing the event data.</param>
+    /// <param name="e">The <see cref="ScEventArgs" /> instance containing the event data.</param>
     public delegate void ElementDeleteHandler(object sender, ScEventArgs e);
 
     /// <summary>
-    /// Событие для элемента. Создается посредством вызова метода CreateEvent класса <see cref="ScMemoryContext" />
+    ///     Событие для элемента. Создается посредством вызова метода CreateEvent класса <see cref="ScMemoryContext" />
     /// </summary>
     internal class ScEvent : IDisposable
     {
-        private const string disposalException_msg = "Был вызван метод Dispose и cсылка на объект в памяти уже удалена";
-        private const string memoryNotInitializedException_msg = "Библиотека ScMemory.Net не инициализирована";
-        private const string contextInvalidException_msg = "Указанная ссылка на ScContext не действительна";
-
-        private IntPtr wScEvent;
-        private ScAddress elementAddress;
+        private const string disposalExceptionMsg = "Был вызван метод Dispose и cсылка на объект в памяти уже удалена";
+        private const string memoryNotInitializedExceptionMsg = "Библиотека ScMemory.Net не инициализирована";
+        private const string contextInvalidExceptionMsg = "Указанная ссылка на ScContext не действительна";
+        private fEventCallbackEx cb;
         private ScMemoryContext context;
-        private readonly ScEventType eventType;
+        private fDeleteCallback db;
 
-        fEventCallbackEx cb;
-        fDeleteCallback db;
-
-
+        internal ScEvent(ScAddress elementAddress, ScEventType eventType)
+        {
+            ElementAddress = elementAddress;
+            EventType = eventType;
+        }
 
         /// <summary>
-        /// Событие элемента
+        ///     Возвращает адрес элемента, подписанного на событие.
+        /// </summary>
+        /// <value>
+        ///     The element address.
+        /// </value>
+        public ScAddress ElementAddress { get; }
+
+        /// <summary>
+        ///     Возвращает тип события.
+        /// </summary>
+        /// <value>
+        ///     Тип события <see cref="ScEventType" />
+        /// </value>
+        public ScEventType EventType { get; }
+
+        internal IntPtr WScEvent { get; private set; }
+
+        /// <summary>
+        ///     Событие элемента
         /// </summary>
         public event ElementEventHandler ElementEvent;
+
         /// <summary>
-        /// Событие удаления элемента
+        ///     Событие удаления элемента
         /// </summary>
         public event ElementDeleteHandler ElementDelete;
 
         internal void OnElementEvent(ScEventType eventType, ScAddress elementAddress, ScAddress arcAddress)
         {
-            if (this.Disposed == true) { throw new ObjectDisposedException("ScEvent", disposalException_msg); }
-            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
-            if (this.context.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
+            if (Disposed)
+            {
+                throw new ObjectDisposedException("ScEvent", disposalExceptionMsg);
+            }
+            if (ScMemoryContext.IsMemoryInitialized() != true)
+            {
+                throw new ScMemoryNotInitializeException(memoryNotInitializedExceptionMsg);
+            }
+            if (context.PtrScMemoryContext == IntPtr.Zero)
+            {
+                throw new ScContextInvalidException(contextInvalidExceptionMsg);
+            }
 
             if (ElementEvent != null)
             {
-                if (eventType != ScEventType.SC_EVENT_REMOVE_ELEMENT)
+                if (eventType != ScEventType.ScEventRemoveElement)
                 {
-                    ScEventArgs args = new ScEventArgs(eventType, this.context.GetElement(elementAddress), new ScArc(arcAddress, this.context));
+                    var args = new ScEventArgs(eventType, context.GetElement(elementAddress),
+                        new ScArc(arcAddress, context));
                     ElementEvent(this, args);
                 }
                 else
                 {
-                    ScEventArgs args = new ScEventArgs(eventType, null, null);
+                    var args = new ScEventArgs(eventType, null, null);
                     ElementEvent(null, args);
                 }
-                    
             }
         }
 
         internal void OnElementDelete(ScAddress elementAddress)
         {
-            if (this.Disposed == true) { throw new ObjectDisposedException("ScEvent", disposalException_msg); }
-            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
-            if (this.context.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
+            if (Disposed)
+            {
+                throw new ObjectDisposedException("ScEvent", disposalExceptionMsg);
+            }
+            if (ScMemoryContext.IsMemoryInitialized() != true)
+            {
+                throw new ScMemoryNotInitializeException(memoryNotInitializedExceptionMsg);
+            }
+            if (context.PtrScMemoryContext == IntPtr.Zero)
+            {
+                throw new ScContextInvalidException(contextInvalidExceptionMsg);
+            }
 
             if (ElementDelete != null)
             {
-                ScEventArgs args = new ScEventArgs(ScEventType.SC_EVENT_REMOVE_ELEMENT, null, null);
+                var args = new ScEventArgs(ScEventType.ScEventRemoveElement, null, null);
                 ElementDelete(null, args);
             }
         }
 
-        /// <summary>
-        /// Возвращает адрес элемента, подписанного на событие.
-        /// </summary>
-        /// <value>
-        /// The element address.
-        /// </value>
-        public ScAddress ElementAddress
-        {
-            get { return elementAddress; }
-        }
-
-
-
-        /// <summary>
-        /// Возвращает тип события.
-        /// </summary>
-        /// <value>
-        /// Тип события <see cref="ScEventType"/>
-        /// </value>
-        public ScEventType EventType
-        {
-            get { return eventType; }
-        }
-
-        internal IntPtr WScEvent
-        {
-            get { return wScEvent; }
-        }
-
-
-        internal ScEvent(ScAddress elementAddress, ScEventType eventType)
-        {
-            this.elementAddress = elementAddress;
-            this.eventType = eventType;
-        }
-
         internal bool Subscribe(ScMemoryContext context)
         {
-
-
-
             this.context = context;
 
-             cb = new fEventCallbackEx(ECallback);
-             db = new fDeleteCallback(DCallback);
-            if (this.Disposed == true) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
-            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
-            if (this.context.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
+            cb = ECallback;
+            db = DCallback;
+            if (Disposed)
+            {
+                throw new ObjectDisposedException(ToString(), disposalExceptionMsg);
+            }
+            if (ScMemoryContext.IsMemoryInitialized() != true)
+            {
+                throw new ScMemoryNotInitializeException(memoryNotInitializedExceptionMsg);
+            }
+            if (this.context.PtrScMemoryContext == IntPtr.Zero)
+            {
+                throw new ScContextInvalidException(contextInvalidExceptionMsg);
+            }
 
-            this.wScEvent = NativeMethods.sc_event_new_ex(this.context.PtrScMemoryContext, this.elementAddress.WScAddress, this.eventType, IntPtr.Zero, cb, db);
-            return this.wScEvent != IntPtr.Zero ? true : false;
+            WScEvent = NativeMethods.sc_event_new_ex(this.context.PtrScMemoryContext, ElementAddress.WScAddress,
+                EventType, IntPtr.Zero, cb, db);
+            return WScEvent != IntPtr.Zero;
         }
 
-
         //TODO:otherElement тоже переместить в события
-        private ScResult ECallback(ref WScEvent scEvent, WScAddress arg, WScAddress otherElement )
+        private ScResult ECallback(ref WScEvent scEvent, WScAddress arg, WScAddress otherElement)
         {
             OnElementEvent(scEvent.Type, new ScAddress(scEvent.Element), new ScAddress(arg));
-            return ScResult.SC_RESULT_OK;
+            return ScResult.ScResultOk;
         }
 
         private ScResult DCallback(ref WScEvent scEvent)
         {
             OnElementDelete(new ScAddress(scEvent.Element));
-            return ScResult.SC_RESULT_OK;
+            return ScResult.ScResultOk;
         }
-
 
         #region IDisposal
 
         /// <summary>
-        /// Удаляет событие
+        ///     Удаляет событие
         /// </summary>
         /// <returns></returns>
         private bool Delete()
         {
-            bool isDelete = false;
-            if (ScMemoryContext.IsMemoryInitialized() == true && this.wScEvent != IntPtr.Zero)
+            var isDelete = false;
+            if (ScMemoryContext.IsMemoryInitialized() && WScEvent != IntPtr.Zero)
             {
-                if (eventType != ScEventType.SC_EVENT_REMOVE_ELEMENT)
+                if (EventType != ScEventType.ScEventRemoveElement)
                 {
-                    isDelete = NativeMethods.sc_event_destroy(this.wScEvent) == ScResult.SC_RESULT_OK ? true : false;
+                    isDelete = NativeMethods.sc_event_destroy(WScEvent) == ScResult.ScResultOk ? true : false;
                     cb = null;
                     db = null;
-                    this.wScEvent = IntPtr.Zero;
+                    WScEvent = IntPtr.Zero;
                 }
             }
             else
@@ -177,57 +182,45 @@ namespace ScEngineNet.Events
         }
 
 
-        private bool disposed;
-
         /// <summary>
-        /// Gets a value indicating whether this <see cref="ScEvent"/> is disposed.
+        ///     Gets a value indicating whether this <see cref="ScEvent" /> is disposed.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if disposed; otherwise, <c>false</c>.
+        ///     <c>true</c> if disposed; otherwise, <c>false</c>.
         /// </value>
-        public bool Disposed
-        {
-            get { return disposed; }
-        }
+        public bool Disposed { get; private set; }
 
         protected virtual void Dispose(bool disposing)
         {
-           // Console.WriteLine("call Dispose({0}) ScEvent with {1}", disposing, this.ToString());
+            // Console.WriteLine("call Dispose({0}) ScEvent with {1}", disposing, this.ToString());
 
 
-            if (!disposed && ScMemoryContext.IsMemoryInitialized())
+            if (!Disposed && ScMemoryContext.IsMemoryInitialized())
             {
                 // Dispose of resources held by this instance.
-                this.Delete();
+                Delete();
                 // Suppress finalization of this disposed instance.
                 if (disposing)
                 {
-
                     GC.SuppressFinalize(this);
                 }
-                disposed = true;
+                Disposed = true;
             }
-
-
         }
 
         /// <summary>
-        /// Выполняет определяемые приложением задачи, связанные с высвобождением или сбросом неуправляемых ресурсов.
+        ///     Выполняет определяемые приложением задачи, связанные с высвобождением или сбросом неуправляемых ресурсов.
         /// </summary>
         public void Dispose()
         {
             Dispose(true);
-
         }
 
         ~ScEvent()
         {
             Dispose(false);
         }
+
         #endregion
-
-
-
-
     }
 }

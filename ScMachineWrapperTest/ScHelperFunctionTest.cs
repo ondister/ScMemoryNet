@@ -1,12 +1,10 @@
 ﻿using System;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ScEngineNet;
+using ScEngineNet.LinkContent;
 using ScEngineNet.Native;
 using ScEngineNet.ScElements;
-using ScEngineNet.LinkContent;
 
-namespace ScEngineNetTest
+namespace ScMachineWrapperTest
 {
     [TestClass]
     public class ScHelperFunctionsTest
@@ -17,73 +15,113 @@ namespace ScEngineNetTest
             var scParams = new WScMemoryParams
             {
                 Clear = true,
-                ConfigFile = @"sc-memory.ini",
-                RepoPath = @"repo",
-                ExtensionsPath = @"extensions"
+                ConfigFile = TestParams.ConfigFile,
+                RepoPath = TestParams.RepoPath,
+                ExtensionsPath = TestParams.ExtensionPath
             };
-            //sc_memory_initialize 
-            bool isInitialized = NativeMethods.sc_memory_is_initialized();
-            NativeMethods.sc_memory_initialize(scParams); 
-            
-            IntPtr scMemoryContext = NativeMethods.sc_memory_context_new(0);
-            //sc_memory_is_initialized
-            isInitialized = NativeMethods.sc_memory_is_initialized();
-            Assert.IsTrue(isInitialized);
-                        
-            //sc_helper_set_system_identifier
-            var identifier=new ScString("sc_helper_test_idtf");
-            var nodeAddr = NativeMethods.sc_memory_node_new(scMemoryContext, ElementTypes.ClassConstantNode_c);
-            var resultSetIdtf = NativeMethods.sc_helper_set_system_identifier(scMemoryContext, nodeAddr, identifier.Bytes, (uint)identifier.Value.Length);
-            Assert.AreEqual(ScResult.SC_RESULT_OK, resultSetIdtf);
 
-            //sc_helper_resolve_system_identifier
+            #region sc_memory_initialize 
+
+            if (!NativeMethods.sc_memory_is_initialized())
+            {
+                NativeMethods.sc_memory_initialize(scParams);
+            }
+
+            var scMemoryContext = NativeMethods.sc_memory_context_new(0);
+            //sc_memory_is_initialized
+            var isInitialized = NativeMethods.sc_memory_is_initialized();
+            Assert.IsTrue(isInitialized);
+
+            #endregion
+
+            #region sc_helper_set_system_identifier
+
+            var identifier = new ScString("sc_helper_test_idtf");
+            var nodeAddr = NativeMethods.sc_memory_node_new(scMemoryContext, ElementTypes.ClassConstantNodeC);
+            var resultSetIdtf = NativeMethods.sc_helper_set_system_identifier(scMemoryContext, nodeAddr,
+                identifier.Bytes, (uint) identifier.Value.Length);
+            Assert.AreEqual(ScResult.ScResultOk, resultSetIdtf);
+
+            #endregion
+
+            #region sc_helper_resolve_system_identifier
+
             WScAddress resolvedAddr;
-            bool isResolve = NativeMethods.sc_helper_resolve_system_identifier(scMemoryContext, identifier.Bytes, out resolvedAddr);
+            var isResolve = NativeMethods.sc_helper_resolve_system_identifier(scMemoryContext, identifier.Bytes,
+                out resolvedAddr);
             Assert.IsTrue(isResolve);
             Assert.AreEqual(nodeAddr.Offset, resolvedAddr.Offset);
 
-            //sc_helper_get_system_identifier_link
+            #endregion
+
+            #region sc_helper_get_system_identifier_link
+
             WScAddress linkAddress;
-            ScResult resultGetIdtfLink = NativeMethods.sc_helper_get_system_identifier_link(  scMemoryContext, resolvedAddr, out linkAddress);
-            Assert.AreEqual(ScResult.SC_RESULT_OK, resultGetIdtfLink);
+            var resultGetIdtfLink = NativeMethods.sc_helper_get_system_identifier_link(scMemoryContext, resolvedAddr,
+                out linkAddress);
+            Assert.AreEqual(ScResult.ScResultOk, resultGetIdtfLink);
             Assert.AreNotEqual(0, linkAddress.Offset);
 
-            //проверяем идентичность содержимого ссылок
+            #endregion
+
+            #region проверяем идентичность содержимого ссылок
+
             IntPtr stream;
-            ScResult resultgetlinkContent = NativeMethods.sc_memory_get_link_content(  scMemoryContext, linkAddress, out stream);
-            Assert.AreEqual(ScResult.SC_RESULT_OK, resultgetlinkContent);
+            var resultgetlinkContent = NativeMethods.sc_memory_get_link_content(scMemoryContext, linkAddress, out stream);
+            Assert.AreEqual(ScResult.ScResultOk, resultgetlinkContent);
             Assert.AreEqual(identifier, new ScString(stream));
 
-            //sc_helper_find_element_by_system_identifier
+            #endregion
+
+            #region sc_helper_find_element_by_system_identifier
+
             WScAddress findedAddress;
-            ScResult resultFindElement = NativeMethods.sc_helper_find_element_by_system_identifier(scMemoryContext, identifier.Bytes, (uint)identifier.Bytes.Length, out findedAddress);
-            Assert.AreEqual(ScResult.SC_RESULT_OK, resultFindElement);
+            var resultFindElement = NativeMethods.sc_helper_find_element_by_system_identifier(scMemoryContext,
+                identifier.Bytes, (uint) identifier.Bytes.Length, out findedAddress);
+            Assert.AreEqual(ScResult.ScResultOk, resultFindElement);
             Assert.AreEqual(nodeAddr.Offset, findedAddress.Offset);
 
-            //sc_helper_get_keynode
+            #endregion
+
+            #region sc_helper_get_keynode
+
             WScAddress keyNodeAddress;
-            ScResult resultGetKeyNode = NativeMethods.sc_helper_get_keynode(  scMemoryContext, KeyNode.SC_KEYNODE_NREL_SYSTEM_IDENTIFIER, out keyNodeAddress);
-            Assert.AreEqual(ScResult.SC_RESULT_OK, resultGetKeyNode);
+            var resultGetKeyNode = NativeMethods.sc_helper_get_keynode(scMemoryContext,
+                KeyNode.ScKeynodeNrelSystemIdentifier, out keyNodeAddress);
+            Assert.AreEqual(ScResult.ScResultOk, resultGetKeyNode);
             Assert.AreNotEqual(0, keyNodeAddress.Offset);
-          
-            //sc_helper_check_arc
-            WScAddress beginNodeAddr = NativeMethods.sc_memory_node_new(scMemoryContext,ElementTypes.ClassConstantNode_c);
-            WScAddress EndNodeAddr = NativeMethods.sc_memory_node_new(  scMemoryContext, ElementTypes.Node_a);
-            WScAddress arcAddr = NativeMethods.sc_memory_arc_new(  scMemoryContext, ElementTypes.PositiveConstantPermanentAccessArc_c, beginNodeAddr, EndNodeAddr);
-            bool isExist = NativeMethods.sc_helper_check_arc(scMemoryContext, beginNodeAddr, EndNodeAddr, ElementTypes.PositiveConstantPermanentAccessArc_c);
+
+            #endregion
+
+            #region sc_helper_check_arc
+
+            var beginNodeAddr = NativeMethods.sc_memory_node_new(scMemoryContext, ElementTypes.ClassConstantNodeC);
+            var endNodeAddr = NativeMethods.sc_memory_node_new(scMemoryContext, ElementTypes.NodeA);
+            NativeMethods.sc_memory_arc_new(scMemoryContext,
+                ElementTypes.PositiveConstantPermanentAccessArcC, beginNodeAddr, endNodeAddr);
+            var isExist = NativeMethods.sc_helper_check_arc(scMemoryContext, beginNodeAddr, endNodeAddr,
+                ElementTypes.PositiveConstantPermanentAccessArcC);
             Assert.IsTrue(isExist);
 
-            //sc_helper_check_version_equal
-            byte major = 0;
-            byte minor = 3;
-            byte patch = 0;
-            bool isRight = NativeMethods.sc_helper_check_version_equal(major, minor, patch);
+            #endregion
+
+            #region sc_helper_check_version_equal
+
+            const byte major = 0;
+            const byte minor = 3;
+            const byte patch = 0;
+            var isRight = NativeMethods.sc_helper_check_version_equal(major, minor, patch);
             Assert.IsTrue(isRight, "Тест может не проходить, если версия библиотеки не верна.");
 
-            //sc_memory_shutdown
+            #endregion
+
+            #region sc_memory_shutdown
+
             NativeMethods.sc_memory_context_free(scMemoryContext);
-            bool isShutDown = NativeMethods.sc_memory_shutdown(false);
+            var isShutDown = NativeMethods.sc_memory_shutdown(false);
             Assert.IsTrue(isShutDown);
+
+            #endregion
         }
     }
 }

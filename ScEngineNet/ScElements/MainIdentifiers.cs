@@ -1,79 +1,80 @@
-﻿using ScEngineNet.LinkContent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using ScEngineNet.LinkContent;
 
 namespace ScEngineNet.ScElements
 {
     /// <summary>
-    /// Основные идентификаторы узла. 
+    ///     Основные идентификаторы узла.
     /// </summary>
     public class MainIdentifiers
     {
-        private ScNode node;
-        private ScMemoryContext scContext;
+        private readonly ScNode node;
+        private readonly ScMemoryContext scContext;
 
         internal MainIdentifiers(ScNode node)
         {
             this.node = node;
-            this.scContext = node.ScContext;
+            scContext = node.ScContext;
         }
 
         /// <summary>
-        /// Задает или получает основной идентификатор с указанным узлом класса данных.
-        /// Это ключевые узлы из коллекций <see cref="NetHelpers.ScDataTypes"/>
+        ///     Задает или получает основной идентификатор с указанным узлом класса данных.
+        ///     Это ключевые узлы из коллекций <see cref="NetHelpers.ScDataTypes" />
         /// </summary>
         /// <value>
-        /// Содержимое ссылки идентификатора <see cref="ScLinkContent"/>. Его необходимо привести к нужному типу.
+        ///     Содержимое ссылки идентификатора <see cref="ScLinkContent" />. Его необходимо привести к нужному типу.
         /// </value>
-        /// <param name="ClassNodeIdentifier">Это ключевые узлы из коллекций <see cref="NetHelpers.ScDataTypes"/> </param>
-        public ScLinkContent this[Identifier ClassNodeIdentifier]
+        /// <param name="classNodeIdentifier">Это ключевые узлы из коллекций <see cref="NetHelpers.ScDataTypes" /> </param>
+        public ScLinkContent this[Identifier classNodeIdentifier]
         {
-            set { this.setIdentifier(ClassNodeIdentifier, value); }
-            get { return this.getIdentifier(ClassNodeIdentifier); }
+            set { SetIdentifier(classNodeIdentifier, value); }
+            get { return GetIdentifier(classNodeIdentifier); }
         }
 
-        private List<ScLink> getLinks()
+        private IEnumerable<ScLink> GetLinks()
         {
-            List<ScLink> links = new List<ScLink>();
-            ScNode main_idtf = scContext.FindNode("nrel_main_idtf");
-            ScIterator container = scContext.CreateIterator(node, ScTypes.ArcCommonConstant, ScTypes.Link, ScTypes.ArcAccessConstantPositivePermanent, main_idtf);
-            foreach (var construction in container)
-            {
-                links.Add((construction[2] as ScLink));
-            }
+            var mainIdtf = scContext.FindNode("nrel_main_idtf");
+            var container = scContext.CreateIterator(node, ScTypes.ArcCommonConstant, ScTypes.Link,
+                ScTypes.ArcAccessConstantPositivePermanent, mainIdtf);
 
-            return links;
+            return container.Select(construction => (construction[2] as ScLink)).ToList();
         }
 
-        private ScLinkContent getIdentifier(Identifier ClassNodeIdentifier)
+        private ScLinkContent GetIdentifier(Identifier classNodeIdentifier)
         {
             ScLinkContent identifier = "";
-            List<ScLink> links = this.getLinks();
+            var links = GetLinks();
 
             foreach (var link in links)
             {
-                var container = scContext.CreateIterator(scContext.FindNode(ClassNodeIdentifier), ScTypes.ArcAccessConstantPositivePermanent, link);
+                var container = scContext.CreateIterator(scContext.FindNode(classNodeIdentifier),
+                    ScTypes.ArcAccessConstantPositivePermanent, link);
                 if (container.Count() != 0)
                 {
-                    ScLinkContent content = (container.ElementAt(0)[2] as ScLink).LinkContent;
-                    identifier = content;
+                    var scLink = container.ElementAt(0)[2] as ScLink;
+                    if (scLink != null)
+                    {
+                        var content = scLink.LinkContent;
+                        identifier = content;
+                    }
                 }
-
             }
 
             return identifier;
         }
 
-        private void setIdentifier(Identifier ClassNodeIdentifier, ScLinkContent identifier)
+        private void SetIdentifier(Identifier classNodeIdentifier, ScLinkContent identifier)
         {
-            if (this.getIdentifier(ClassNodeIdentifier) == "")
+            if (GetIdentifier(classNodeIdentifier) == "")
             {
-                ScNode main_idtf = scContext.FindNode("nrel_main_idtf");
-                ScLink idtfLink = scContext.CreateLink(identifier);
+                var mainIdtf = scContext.FindNode("nrel_main_idtf");
+                var idtfLink = scContext.CreateLink(identifier);
                 var commonArc = scContext.CreateArc(node, idtfLink, ScTypes.ArcCommonConstant);
                 //another arcs
-                var arc1 = scContext.CreateArc(main_idtf, commonArc, ScTypes.ArcAccessConstantPositivePermanent);
-                var arc2 = scContext.CreateArc(scContext.FindNode(ClassNodeIdentifier), idtfLink, ScTypes.ArcAccessConstantPositivePermanent);
+                scContext.CreateArc(mainIdtf, commonArc, ScTypes.ArcAccessConstantPositivePermanent);
+                scContext.CreateArc(scContext.FindNode(classNodeIdentifier), idtfLink,
+                    ScTypes.ArcAccessConstantPositivePermanent);
             }
         }
     }

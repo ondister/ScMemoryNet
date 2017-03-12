@@ -1,13 +1,13 @@
 ﻿using ScEngineNet.Native;
 
-namespace ScMemoryNet
+namespace ScEngineNet
 {
     /// <summary>
     /// Параметры памяти при инициализации
     /// </summary>
    public class ScMemoryParams
     {
-       internal WScMemoryParams scParams;
+       internal WScMemoryParams ScParams;
        private readonly string netExtensionsPath;
 
        /// <summary>
@@ -18,7 +18,7 @@ namespace ScMemoryNet
        /// </value>
        public string ExtensionsPath
        {
-           get { return scParams.ExtensionsPath; }
+           get { return ScParams.ExtensionsPath; }
        }
 
        /// <summary>
@@ -29,7 +29,7 @@ namespace ScMemoryNet
        /// </value>
        public string ConfigFile
        {
-           get { return scParams.ConfigFile; }
+           get { return ScParams.ConfigFile; }
        }
 
        /// <summary>
@@ -40,7 +40,7 @@ namespace ScMemoryNet
        /// </value>
        public string RepoPath
        {
-           get { return scParams.RepoPath; }
+           get { return ScParams.RepoPath; }
        }
 
        /// <summary>
@@ -64,7 +64,7 @@ namespace ScMemoryNet
        /// <param name="netExtensionsPath">Путь к расширениям .net</param>
        public ScMemoryParams(bool clearBeforeInit, string configFile, string repoPath, string extensionsPath, string netExtensionsPath)
        {
-           this.scParams = new WScMemoryParams() { Clear = clearBeforeInit, ConfigFile = configFile, RepoPath = repoPath, ExtensionsPath = extensionsPath };
+           ScParams = new WScMemoryParams() { Clear = clearBeforeInit, ConfigFile = configFile, RepoPath = repoPath, ExtensionsPath = extensionsPath };
            this.netExtensionsPath = netExtensionsPath;
        }
     }

@@ -1,37 +1,30 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Threading;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ScEngineNet;
 using ScEngineNet.Events;
 using ScEngineNet.ScElements;
-using ScMemoryNet;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace ScEngineNetTest
+namespace ScMachineWrapperTest
 {
     [TestClass]
     public class EventsTests
     {
-        static ScNode node;
-        static ScLink link;
-        static ScNode nrelNode;
-        static ScArc commonArc;
-        const string configFile = @"d:\OSTIS\sc-machine-master\bin\sc-memory.ini";
-        const string repoPath = @"d:\OSTIS\sc-machine-master\bin\repo";
-        const string extensionPath = @"d:\OSTIS\sc-machine-master\bin\extensions";
-        const string netExtensionPath = "";
-        static ScMemoryContext context;
-
+        private static ScNode node;
+        private static ScLink link;
+        private static ScNode nrelNode;
+        private static ScArc commonArc;
+        private static ScMemoryContext context;
 
         #region InitializeMemory
 
         [ClassInitialize]
         public static void InitializeMemory(TestContext testContext)
         {
-            if (!ScMemory.IsInitialized) { ScMemory.Initialize(true, configFile, repoPath, extensionPath, netExtensionPath); }
+            if (!ScMemory.IsInitialized)
+            {
+                ScMemory.Initialize(true, TestParams.ConfigFile, TestParams.RepoPath, TestParams.ExtensionPath,
+                    TestParams.NetExtensionPath);
+            }
             context = new ScMemoryContext(ScAccessLevels.MinLevel);
 
             //создаем элементы
@@ -49,11 +42,12 @@ namespace ScEngineNetTest
 
             Assert.IsTrue(nrelNode.ScAddress.IsValid);
             Assert.AreEqual(ScTypes.NodeConstantNonRole, nrelNode.ElementType);
-
         }
+
         #endregion
 
         #region ShutDownMemory
+
         [ClassCleanup]
         public static void ShutDown()
         {
@@ -62,34 +56,36 @@ namespace ScEngineNetTest
             nrelNode.Dispose();
 
             context.Dispose();
-            if (ScMemory.IsInitialized) { ScMemory.ShutDown(true); }
+            if (ScMemory.IsInitialized)
+            {
+                ScMemory.ShutDown(true);
+            }
         }
+
         #endregion
 
         #region EventTests
+
         [TestMethod]
         public void TestAddOutputArcEvent()
         {
             object obj = null;
             ScArc arc = null;
-            ScElement scElement = null;
-            ScEventType eventType = ScEventType.SC_EVENT_UNKNOWN;
-            ScEventType expectedEventType = ScEventType.SC_EVENT_ADD_OUTPUT_ARC;
+            var eventType = ScEventType.ScEventUnknown;
+            const ScEventType expectedEventType = ScEventType.ScEventAddOutputArc;
 
-            AutoResetEvent autoResetEvent = new AutoResetEvent(false);
+            var autoResetEvent = new AutoResetEvent(false);
             node.OutputArcAdded += delegate(object o, ScEventArgs e)
             {
                 obj = o;
                 arc = e.Arc;
-                scElement = e.Element;
                 eventType = e.EventType;
                 autoResetEvent.Set();
             };
             commonArc = node.AddOutputArc(link, ScTypes.ArcCommonConstant);
             autoResetEvent.WaitOne();
 
-           Assert.AreEqual(node, (ScNode)obj);
-        //    Assert.AreEqual(node, (ScNode)scElement);
+            Assert.AreEqual(node, (ScNode) obj);
             Assert.AreEqual(commonArc, arc);
             Assert.AreEqual(expectedEventType, eventType);
 
@@ -102,24 +98,20 @@ namespace ScEngineNetTest
         {
             object obj = null;
             ScArc arc = null;
-            ScElement scElement = null;
-            ScEventType eventType = ScEventType.SC_EVENT_UNKNOWN;
-            ScEventType expectedEventType = ScEventType.SC_EVENT_ADD_INPUT_ARC;
+            var eventType = ScEventType.ScEventUnknown;
+            const ScEventType expectedEventType = ScEventType.ScEventAddInputArc;
 
-            AutoResetEvent autoResetEvent = new AutoResetEvent(false);
+            var autoResetEvent = new AutoResetEvent(false);
             link.InputArcAdded += delegate(object o, ScEventArgs e)
             {
                 obj = o;
                 arc = e.Arc;
-                scElement = e.Element;
                 eventType = e.EventType;
                 autoResetEvent.Set();
             };
             commonArc = node.AddOutputArc(link, ScTypes.ArcCommonConstant);
             autoResetEvent.WaitOne();
-#warning неправильное возвращение типа события
-            Assert.AreEqual(link, (ScLink)obj);
-          //  Assert.AreEqual(link, (ScLink)scElement);
+            Assert.AreEqual(link, (ScLink) obj);
             Assert.AreEqual(commonArc, arc);
             Assert.AreEqual(expectedEventType, eventType);
 
@@ -130,18 +122,14 @@ namespace ScEngineNetTest
         [TestMethod]
         public void TestElementRemovedEvent()
         {
-           
-            ScEventType eventType = ScEventType.SC_EVENT_UNKNOWN;
-            ScEventType expectedEventType = ScEventType.SC_EVENT_REMOVE_ELEMENT;
+            var eventType = ScEventType.ScEventUnknown;
+            const ScEventType expectedEventType = ScEventType.ScEventRemoveElement;
 
-            AutoResetEvent autoResetEvent = new AutoResetEvent(false);
+            var autoResetEvent = new AutoResetEvent(false);
             commonArc = node.AddOutputArc(link, ScTypes.ArcCommonConstant);
 
             commonArc.ElementRemoved += delegate(object o, ScEventArgs e)
             {
-               // Assert.IsFalse(((ScElement)o).IsValid);
-               // Assert.IsNull(e.Arc);
-               // Assert.IsNull(e.Element);
                 eventType = e.EventType;
                 autoResetEvent.Set();
             };
@@ -157,29 +145,24 @@ namespace ScEngineNetTest
         {
             object obj = null;
             ScArc arc = null;
-            ScElement scElement = null;
-            ScEventType eventType = ScEventType.SC_EVENT_UNKNOWN;
-            ScEventType expectedEventType = ScEventType.SC_EVENT_REMOVE_OUTPUT_ARC;
+            var eventType = ScEventType.ScEventUnknown;
+            const ScEventType expectedEventType = ScEventType.ScEventRemoveOutputArc;
 
-            AutoResetEvent autoResetEvent = new AutoResetEvent(false);
+            var autoResetEvent = new AutoResetEvent(false);
             commonArc = node.AddOutputArc(link, ScTypes.ArcCommonConstant);
             node.OutputArcRemoved += delegate(object o, ScEventArgs e)
             {
                 obj = o;
                 arc = e.Arc;
-                scElement = e.Element;
                 eventType = e.EventType;
                 autoResetEvent.Set();
             };
             commonArc.DeleteFromMemory();
             autoResetEvent.WaitOne();
-#warning неправильное возвращение типа события
-            Assert.AreEqual(node, (ScNode)obj);
-           // Assert.AreEqual(node, (ScNode)scElement);
+            Assert.AreEqual(node, (ScNode) obj);
             Assert.IsNotNull(arc);
             Assert.AreEqual(expectedEventType, eventType);
             commonArc.Dispose();
-            
         }
 
         [TestMethod]
@@ -187,25 +170,22 @@ namespace ScEngineNetTest
         {
             object obj = null;
             ScArc arc = null;
-            ScElement scElement = null;
-            ScEventType eventType = ScEventType.SC_EVENT_UNKNOWN;
-            ScEventType expectedEventType = ScEventType.SC_EVENT_REMOVE_INPUT_ARC;
+            var eventType = ScEventType.ScEventUnknown;
+            const ScEventType expectedEventType = ScEventType.ScEventRemoveInputArc;
 
-            AutoResetEvent autoResetEvent = new AutoResetEvent(false);
+            var autoResetEvent = new AutoResetEvent(false);
             commonArc = node.AddOutputArc(link, ScTypes.ArcCommonConstant);
             link.InputArcRemoved += delegate(object o, ScEventArgs e)
             {
                 obj = o;
                 arc = e.Arc;
-                scElement = e.Element;
                 eventType = e.EventType;
                 autoResetEvent.Set();
             };
             commonArc.DeleteFromMemory();
             autoResetEvent.WaitOne();
 
-            Assert.AreEqual(link, (ScLink)obj);
-          //  Assert.AreEqual(link, (ScLink)scElement);
+            Assert.AreEqual(link, (ScLink) obj);
             Assert.IsNotNull(arc);
             Assert.AreEqual(expectedEventType, eventType);
 
@@ -217,17 +197,15 @@ namespace ScEngineNetTest
         {
             object obj = null;
             ScArc arc = null;
-            ScElement scElement = null;
-            ScEventType eventType = ScEventType.SC_EVENT_UNKNOWN;
-            ScEventType expectedEventType = ScEventType.SC_EVENT_REMOVE_INPUT_ARC;
+            var eventType = ScEventType.ScEventUnknown;
+            const ScEventType expectedEventType = ScEventType.ScEventRemoveInputArc;
 
-            AutoResetEvent autoResetEvent = new AutoResetEvent(false);
+            var autoResetEvent = new AutoResetEvent(false);
             commonArc = node.AddOutputArc(link, ScTypes.ArcCommonConstant);
             link.InputArcRemoved += delegate(object o, ScEventArgs e)
             {
                 obj = o;
                 arc = e.Arc;
-                scElement = e.Element;
                 eventType = e.EventType;
                 autoResetEvent.Set();
             };
@@ -236,7 +214,6 @@ namespace ScEngineNetTest
             {
                 obj = o;
                 arc = e.Arc;
-                scElement = e.Element;
                 eventType = e.EventType;
                 autoResetEvent.Set();
             };
@@ -244,70 +221,48 @@ namespace ScEngineNetTest
 
             commonArc.DeleteFromMemory();
             autoResetEvent.WaitOne();
-#warning неправильное возвращение типа события
-            Assert.AreEqual(link, (ScLink)obj);
-         //   Assert.AreEqual(link, (ScLink)scElement);
+            Assert.AreEqual(link, (ScLink) obj);
             Assert.IsNotNull(arc);
             Assert.AreEqual(expectedEventType, eventType);
 
-            link.InputArcRemoved -= delegate(object o, ScEventArgs e)
-            {
-               
-            };
-            link.InputArcRemoved -= delegate(object o, ScEventArgs e)
-            {
 
-            };
-            
-            
+
             commonArc.Dispose();
         }
 
         [TestMethod]
         public void TestRemoveVoidEvent()
         {
-
             var link1 = context.CreateLink("testlink");
             commonArc = node.AddOutputArc(link1, ScTypes.ArcCommonConstant);
-            link1.InputArcRemoved -= delegate(object o, ScEventArgs e)
+            if (link1 != null)
             {
-               
-            };
-            link1.DeleteFromMemory();
-            link1.Dispose();
-          
+                link1.InputArcRemoved -= delegate { };
+                link1.DeleteFromMemory();
+                link1.Dispose();
+            }
         }
 
         [TestMethod]
         public void TestChangeLinkContentEvent()
         {
-
             object obj = null;
-            ScArc arc = null;
-            ScElement scElement = null;
-            ScEventType eventType = ScEventType.SC_EVENT_UNKNOWN;
-            ScEventType expectedEventType = ScEventType.SC_EVENT_CONTENT_CHANGED;
+            var eventType = ScEventType.ScEventUnknown;
+            const ScEventType expectedEventType = ScEventType.ScEventContentChanged;
 
-            AutoResetEvent autoResetEvent = new AutoResetEvent(false);
+            var autoResetEvent = new AutoResetEvent(false);
             commonArc = node.AddOutputArc(link, ScTypes.ArcCommonConstant);
             link.ContentChanged += delegate(object o, ScEventArgs e)
             {
                 obj = o;
-                arc = e.Arc;
-                scElement = e.Element;
                 eventType = e.EventType;
                 autoResetEvent.Set();
             };
             link.LinkContent = "new link content";
             autoResetEvent.WaitOne();
-#warning неправильное возвращение типа события
-            Assert.AreEqual(link, (ScLink)obj);
-         //   Assert.AreEqual(link, (ScLink)scElement);
-          //  Assert.IsNotNull(arc);
+            Assert.AreEqual(link, (ScLink) obj);
             Assert.AreEqual(expectedEventType, eventType);
-
         }
-
 
         #endregion
     }

@@ -3,46 +3,51 @@
 namespace ScEngineNet.ScElements
 {
     /// <summary>
-    /// Идентификатор SC-элемента. Он может быть только текстовым. 
+    ///     Идентификатор SC-элемента. Он может быть только текстовым.
     /// </summary>
     public class Identifier : IEquatable<Identifier>
     {
         /// <summary>
-        /// Значение.
-        /// </summary>
-        public string Value
-        { get { return value; } }
-
-        private readonly string value;
-
-        /// <summary>
-        /// Инициализирует новый идентификатор SC-элемента.
-        /// </summary>
-        /// <param name="value">значение</param>
-        public Identifier(string value)
-        {
-            this.value = value;
-        }
-
-        /// <summary>
-        /// Возвращает пустой идентификатор, который не разрешен в системе
+        ///     Возвращает пустой идентификатор, который не разрешен в системе
         /// </summary>
         public static readonly Identifier Invalid = String.Empty;
 
         /// <summary>
-        /// Возвращает уникльный идентификатор
+        ///     Инициализирует новый идентификатор SC-элемента.
+        /// </summary>
+        /// <param name="value">значение</param>
+        public Identifier(string value)
+        {
+            Value = value;
+        }
+
+        /// <summary>
+        ///     Значение.
+        /// </summary>
+        public string Value { get; }
+
+        /// <summary>
+        ///     Определяет равен ли заданный объект <see cref="Identifier" /> текущему объекту
+        /// </summary>
+        /// <param name="obj">объект <see cref="Identifier" /></param>
+        public bool Equals(Identifier obj)
+        {
+            return obj != null && obj.Value == Value;
+        }
+
+        /// <summary>
+        ///     Возвращает уникльный идентификатор
         /// </summary>
         /// <param name="scExtContext">Указатель на контекст</param>
         /// <param name="node">Узел для которого создается идентификатор</param>
         /// <returns>Уникальный идентификатор</returns>
         internal static Identifier GetUnique(ScMemoryContext scExtContext, ScNode node)
         {
-            Identifier identifier = Identifier.Invalid;
-            identifier = "idtf_" + node.ScAddress.GetHashCode();
+            Identifier identifier = "idtf_" + node.ScAddress.GetHashCode();
 
             while (scExtContext.FindNode(identifier) != null)
             {
-                Random rand = new Random();
+                var rand = new Random();
                 identifier = identifier + "_" + rand.Next();
             }
 
@@ -50,7 +55,7 @@ namespace ScEngineNet.ScElements
         }
 
         /// <summary>
-        /// Возвращает уникльный идентификатор
+        ///     Возвращает уникльный идентификатор
         /// </summary>
         /// <param name="scExtContext">Указатель на контекст</param>
         /// <param name="prefix">Преффикс</param>
@@ -58,12 +63,12 @@ namespace ScEngineNet.ScElements
         /// <returns>Уникальный идентификатор</returns>
         internal static Identifier GetUnique(ScMemoryContext scExtContext, string prefix, ScNode node)
         {
-            Identifier initialIdentifier = Identifier.GetUnique(scExtContext, node);
+            var initialIdentifier = GetUnique(scExtContext, node);
             return prefix + "_" + initialIdentifier;
         }
 
         /// <summary>
-        /// Преобразование Идентификатора из строки.
+        ///     Преобразование Идентификатора из строки.
         /// </summary>
         /// <param name="value">строковое значение</param>
         /// <returns>SC-идентификатор</returns>
@@ -73,57 +78,48 @@ namespace ScEngineNet.ScElements
         }
 
         /// <summary>
-        /// Returns the fully qualified type name of this instance.
+        ///     Returns the fully qualified type name of this instance.
         /// </summary>
         /// <returns>
-        /// A <see cref="T:System.String"/> containing a fully qualified type name.
+        ///     A <see cref="T:System.String" /> containing a fully qualified type name.
         /// </returns>
         /// <filterpriority>2</filterpriority>
         public override string ToString()
         {
-            return value;
+            return Value;
         }
 
         /// <summary>
-        /// Определяет равен ли заданный объект <see cref="Identifier"/> текущему объекту
+        ///     Определяет равен ли заданный объект <see cref="T:System.Object" /> текущему объекту
         /// </summary>
-        /// <param name="obj">объект <see cref="Identifier"/></param>
-        public bool Equals(Identifier obj)
-        {
-            return obj != null && obj.Value == this.Value;
-        }
-
-        /// <summary>
-        /// Определяет равен ли заданный объект <see cref="T:System.Object"/> текущему объекту
-        /// </summary>
-        /// <param name="obj">объект <see cref="T:System.Object"/></param>
+        /// <param name="obj">объект <see cref="T:System.Object" /></param>
         public override bool Equals(object obj)
         {
             if (obj == null)
                 return false;
             var identifier = obj as Identifier;
-            return identifier != null && identifier.Value == this.Value;
+            return identifier != null && identifier.Value == Value;
         }
 
         /// <summary>
-        /// Возвращает хэш-код значения
+        ///     Возвращает хэш-код значения
         /// </summary>
         /// <returns>Хэш-код значения</returns>
         public override int GetHashCode()
         {
-            return value.GetHashCode();
+            return Value.GetHashCode();
         }
 
         /// <summary>
-        /// Оператор сравнения идентификаторов
+        ///     Оператор сравнения идентификаторов
         /// </summary>
         /// <param name="identifier1">Первый идентификатор</param>
         /// <param name="identifier2">Второй идентификатор</param>
         /// <returns>Возвращает True, если значения идентификаторов равны</returns>
         public static bool operator ==(Identifier identifier1, Identifier identifier2)
         {
-            bool isEqual = false;
-            if (((object)identifier1 != null) && ((object)identifier2 != null))
+            var isEqual = false;
+            if (((object) identifier1 != null) && ((object) identifier2 != null))
             {
                 isEqual = identifier1.Equals(identifier2);
             }
@@ -131,7 +127,7 @@ namespace ScEngineNet.ScElements
         }
 
         /// <summary>
-        /// Оператор сравнения идентификаторов
+        ///     Оператор сравнения идентификаторов
         /// </summary>
         /// <param name="identifier1">Первый идентификатор</param>
         /// <param name="identifier2">Второй идентификатор</param>
@@ -142,11 +138,11 @@ namespace ScEngineNet.ScElements
         }
 
         /// <summary>
-        /// Получить массив байт для передачи.
+        ///     Получить массив байт для передачи.
         /// </summary>
         internal byte[] GetBytes()
         {
-            return ScEngineNet.TextEncoding.GetBytes(value);
+            return ScEngineNet.TextEncoding.GetBytes(Value);
         }
     }
 }

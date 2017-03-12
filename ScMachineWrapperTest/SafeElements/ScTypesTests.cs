@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ScEngineNet.ScElements;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-namespace ScEngineNet.SafeElements.Tests
+
+namespace ScMachineWrapperTest.SafeElements
 {
-    [TestClass()]
+    [TestClass]
     public class ScTypesTests
     {
-        [TestMethod()]
+        [TestMethod]
         public void IsArcTest()
         {
             Assert.IsFalse(ScTypes.NodeConstant.IsArc);
@@ -34,10 +30,9 @@ namespace ScEngineNet.SafeElements.Tests
             Assert.IsTrue(ScTypes.EdgeCommon.IsArc);
             Assert.IsTrue(ScTypes.EdgeCommonConstant.IsArc);
             Assert.IsTrue(ScTypes.EdgeCommonVariable.IsArc);
-
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void IsLinkTest()
         {
             Assert.IsFalse(ScTypes.NodeConstant.IsLink);
@@ -45,7 +40,7 @@ namespace ScEngineNet.SafeElements.Tests
             Assert.IsTrue(ScTypes.Link.IsLink);
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void IsNodeTest()
         {
             Assert.IsFalse(ScTypes.Link.IsNode);
@@ -70,7 +65,7 @@ namespace ScEngineNet.SafeElements.Tests
             Assert.IsTrue(ScTypes.NodeVariableTuple.IsNode);
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void IsConstantTest()
         {
             Assert.IsFalse(ScTypes.ArcCommonVariable.IsConstant);
@@ -95,7 +90,7 @@ namespace ScEngineNet.SafeElements.Tests
             Assert.IsTrue(ScTypes.NodeConstantTuple.IsConstant);
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void IsVariableTest()
         {
             Assert.IsFalse(ScTypes.ArcCommonConstant.IsVariable);
@@ -121,10 +116,9 @@ namespace ScEngineNet.SafeElements.Tests
             Assert.IsTrue(ScTypes.NodeVariableTuple.IsVariable);
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void EqualsTest()
         {
-            Assert.IsTrue(ScTypes.NodeVariableRole == ScTypes.NodeVariableRole);
             Assert.IsTrue(ScTypes.NodeVariableRole != ScTypes.NodeConstantNonRole);
             Assert.AreEqual(ScTypes.NodeVariableRole, ScTypes.NodeVariableRole);
             var type1 = ScTypes.ArcAccess;
@@ -132,11 +126,11 @@ namespace ScEngineNet.SafeElements.Tests
             var type3 = ScTypes.NodeConstant;
             ScTypes type4 = null;
 
-            Assert.AreEqual(type1,type2);
+            Assert.AreEqual(type1, type2);
             Assert.AreNotEqual(type1, type3);
 
             Assert.IsNull(type4);
-            Assert.AreNotEqual(type4, type3);
+            Assert.AreNotEqual(null, type3);
         }
     }
 }

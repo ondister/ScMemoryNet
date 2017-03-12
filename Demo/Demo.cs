@@ -1,54 +1,55 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
+using ScEngineNet;
 using ScEngineNet.LinkContent;
 using ScEngineNet.ScElements;
-using ScMemoryNet;
 
 namespace Demo
 {
     public class Demo
     {
+        private Stopwatch watch;
         /// <summary>
-        /// Повазывает возможность сохранения ссылки с содержимым типа изображение
+        ///     Повазывает возможность сохранения ссылки с содержимым типа изображение
         /// </summary>
         public void Start()
         {
-
-
-
-            const string configFile = @"d:\Maps\SapfirProject_ostis\Servers\bin\specialdataserver\sc-memory.ini";
-            const string repoPath = @"d:\Maps\SapfirProject_ostis\Servers\bin\specialdataserver\repo\";
-            const string extensionPath = @"d:\Maps\SapfirProject_ostis\Servers\bin\specialdataserver\extensions";
-            const string netExtensionPath = @"d:\Maps\SapfirProject_ostis\Servers\bin\specialdataserver\netextensions";
+            watch= new Stopwatch();
+            const string configFile = @"d:\develop\ostis\ostis-master\config\sc-web.ini";
+            const string repoPath = @"d:\develop\ostis\ostis-master\kb.bin";
+            const string extensionPath = @"d:\develop\ostis\ostis-master\sc-machine\bin\extensions";
+            const string netExtensionPath = @"d:\develop\ostis\ostis-master\sc-machine\bin\netextensions";
             ScMemory.Initialize(true, configFile, repoPath, extensionPath, netExtensionPath);
             Console.WriteLine(ScMemory.IsInitialized);
 
+            var context = new ScMemoryContext(ScAccessLevels.MinLevel);
+            var node = context.CreateNode(ScTypes.NodeConstant);
+            var link = context.CreateLink("link");
+            link.InputArcAdded += Link_InputArcAdded;
+          
+            node.ElementRemoved += Node_ElementRemoved;
 
-            ScBitmap bitmap = new Bitmap(@"d:\test.jpg");
+            watch.Start();
+            node.AddOutputArc(link, ScTypes.ArcCommonVariable);
+            node.DeleteFromMemory();
 
-            using (var context = new ScMemoryContext(ScAccessLevels.MinLevel))
-            {
-                context.CreateLink(bitmap);
-
-                var links = context.FindLinks(bitmap);
-                int cnt = 0;
-                foreach (var link in links)
-                {
-                    var result = link.LinkContent as ScBitmap;
-                    if (result != null)
-                    {
-                        result.Value.Save(String.Format(@"d:\result{0}.jpg",cnt));
-                    }
-                    cnt++;
-                }
-            }
-
-            
-
-
-            //Console.ReadKey();
-            //ScMemory.ShutDown(false);
+            Console.ReadKey();
+            node.Dispose();
+            link.Dispose();
+            context.Dispose();
+            ScMemory.ShutDown(false);
         }
 
+        private void Node_ElementRemoved(object sender, ScEngineNet.Events.ScEventArgs e)
+        {
+            Console.WriteLine("node delete for: {0} ms", watch.ElapsedMilliseconds);
+        }
+
+        private void Link_InputArcAdded(object sender, ScEngineNet.Events.ScEventArgs e)
+        {
+            watch.Stop();
+            Console.WriteLine("Input arc added for: {0} ms", watch.ElapsedMilliseconds);
+        }
     }
 }

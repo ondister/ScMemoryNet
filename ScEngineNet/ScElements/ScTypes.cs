@@ -1,138 +1,281 @@
-﻿using ScEngineNet.Native;
-using System;
+﻿using System;
+using ScEngineNet.Native;
 
 namespace ScEngineNet.ScElements
 {
     public class ScTypes : IEquatable<ScTypes>
     {
-        private ElementTypes elementType;
-
-        internal ElementTypes ElementType
-        {
-            get { return elementType; }
-        }
-
         internal ScTypes(ElementTypes elementType)
         {
-            this.elementType = elementType;
+            ElementType = elementType;
+        }
+
+        internal ElementTypes ElementType { get; }
+
+        public override int GetHashCode()
+        {
+            return (int) ElementType;
+        }
+
+        public override string ToString()
+        {
+            return ElementType.ToString();
         }
 
         #region StaticProperties
+
         public static ScTypes UnKnown
-        { get { return new ScTypes(ElementTypes.Unknown); } }
+        {
+            get { return new ScTypes(ElementTypes.Unknown); }
+        }
+
         public static ScTypes EdgeCommon
-        { get { return new ScTypes(ElementTypes.CommonEdge_a); } }
+        {
+            get { return new ScTypes(ElementTypes.CommonEdgeA); }
+        }
 
         public static ScTypes ArcCommon
-        { get { return new ScTypes(ElementTypes.CommonArc_a); } }
+        {
+            get { return new ScTypes(ElementTypes.CommonArcA); }
+        }
 
         public static ScTypes EdgeCommonConstant
-        { get { return new ScTypes(ElementTypes.CommonEdge_a | ElementTypes.Constant_a); } }
+        {
+            get { return new ScTypes(ElementTypes.CommonEdgeA | ElementTypes.ConstantA); }
+        }
 
         public static ScTypes ArcCommonConstant
-        { get { return new ScTypes(ElementTypes.CommonArc_a | ElementTypes.Constant_a); } }
+        {
+            get { return new ScTypes(ElementTypes.CommonArcA | ElementTypes.ConstantA); }
+        }
 
         public static ScTypes ArcAccess
-        { get { return new ScTypes(ElementTypes.AccessArc_a); } }
+        {
+            get { return new ScTypes(ElementTypes.AccessArcA); }
+        }
 
         public static ScTypes ArcAccessConstantPositivePermanent
-        { get { return new ScTypes(ElementTypes.AccessArc_a | ElementTypes.Constant_a | ElementTypes.PositiveArc_a | ElementTypes.PermanentArc_a); } }
+        {
+            get
+            {
+                return
+                    new ScTypes(ElementTypes.AccessArcA | ElementTypes.ConstantA | ElementTypes.PositiveArcA |
+                                ElementTypes.PermanentArcA);
+            }
+        }
 
         public static ScTypes ArcAccessConstantNegativePermanent
-        { get { return new ScTypes(ElementTypes.AccessArc_a | ElementTypes.Constant_a | ElementTypes.NegativeArc_a | ElementTypes.PermanentArc_a); } }
+        {
+            get
+            {
+                return
+                    new ScTypes(ElementTypes.AccessArcA | ElementTypes.ConstantA | ElementTypes.NegativeArcA |
+                                ElementTypes.PermanentArcA);
+            }
+        }
 
         public static ScTypes ArcAccessConstantFuzzyPermanent
-        { get { return new ScTypes(ElementTypes.AccessArc_a | ElementTypes.Constant_a | ElementTypes.FuzzyArc_a | ElementTypes.PermanentArc_a); } }
+        {
+            get
+            {
+                return
+                    new ScTypes(ElementTypes.AccessArcA | ElementTypes.ConstantA | ElementTypes.FuzzyArcA |
+                                ElementTypes.PermanentArcA);
+            }
+        }
 
         public static ScTypes ArcAccessConstantPositiveTemporary
-        { get { return new ScTypes(ElementTypes.AccessArc_a | ElementTypes.Constant_a | ElementTypes.PositiveArc_a | ElementTypes.TemporaryArc_a); } }
+        {
+            get
+            {
+                return
+                    new ScTypes(ElementTypes.AccessArcA | ElementTypes.ConstantA | ElementTypes.PositiveArcA |
+                                ElementTypes.TemporaryArcA);
+            }
+        }
 
         public static ScTypes ArcAccessConstantNegativeTemporary
-        { get { return new ScTypes(ElementTypes.AccessArc_a | ElementTypes.Constant_a | ElementTypes.NegativeArc_a | ElementTypes.TemporaryArc_a); } }
+        {
+            get
+            {
+                return
+                    new ScTypes(ElementTypes.AccessArcA | ElementTypes.ConstantA | ElementTypes.NegativeArcA |
+                                ElementTypes.TemporaryArcA);
+            }
+        }
 
         public static ScTypes ArcAccessConstantFuzzyTemporary
-        { get { return new ScTypes(ElementTypes.AccessArc_a | ElementTypes.Constant_a | ElementTypes.FuzzyArc_a | ElementTypes.TemporaryArc_a); } }
+        {
+            get
+            {
+                return
+                    new ScTypes(ElementTypes.AccessArcA | ElementTypes.ConstantA | ElementTypes.FuzzyArcA |
+                                ElementTypes.TemporaryArcA);
+            }
+        }
 
 
         public static ScTypes EdgeCommonVariable
-        { get { return new ScTypes(ElementTypes.CommonEdge_a | ElementTypes.Variable_a); } }
+        {
+            get { return new ScTypes(ElementTypes.CommonEdgeA | ElementTypes.VariableA); }
+        }
 
         public static ScTypes ArcCommonVariable
-        { get { return new ScTypes(ElementTypes.CommonArc_a | ElementTypes.Variable_a); } }
+        {
+            get { return new ScTypes(ElementTypes.CommonArcA | ElementTypes.VariableA); }
+        }
 
         public static ScTypes ArcAccessVariablePositivePermanent
-        { get { return new ScTypes(ElementTypes.AccessArc_a | ElementTypes.Variable_a | ElementTypes.PositiveArc_a | ElementTypes.PermanentArc_a); } }
+        {
+            get
+            {
+                return
+                    new ScTypes(ElementTypes.AccessArcA | ElementTypes.VariableA | ElementTypes.PositiveArcA |
+                                ElementTypes.PermanentArcA);
+            }
+        }
 
         public static ScTypes ArcAccessVariableNegativePermanent
-        { get { return new ScTypes(ElementTypes.AccessArc_a | ElementTypes.Variable_a | ElementTypes.NegativeArc_a | ElementTypes.PermanentArc_a); } }
+        {
+            get
+            {
+                return
+                    new ScTypes(ElementTypes.AccessArcA | ElementTypes.VariableA | ElementTypes.NegativeArcA |
+                                ElementTypes.PermanentArcA);
+            }
+        }
 
         public static ScTypes ArcAccessVariableFuzzyPermanent
-        { get { return new ScTypes(ElementTypes.AccessArc_a | ElementTypes.Variable_a | ElementTypes.FuzzyArc_a | ElementTypes.PermanentArc_a); } }
+        {
+            get
+            {
+                return
+                    new ScTypes(ElementTypes.AccessArcA | ElementTypes.VariableA | ElementTypes.FuzzyArcA |
+                                ElementTypes.PermanentArcA);
+            }
+        }
 
         public static ScTypes ArcAccessVariablePositiveTemporary
-        { get { return new ScTypes(ElementTypes.AccessArc_a | ElementTypes.Variable_a | ElementTypes.PositiveArc_a | ElementTypes.TemporaryArc_a); } }
+        {
+            get
+            {
+                return
+                    new ScTypes(ElementTypes.AccessArcA | ElementTypes.VariableA | ElementTypes.PositiveArcA |
+                                ElementTypes.TemporaryArcA);
+            }
+        }
 
         public static ScTypes ArcAccessVariableNegativeTemporary
-        { get { return new ScTypes(ElementTypes.AccessArc_a | ElementTypes.Variable_a | ElementTypes.NegativeArc_a | ElementTypes.TemporaryArc_a); } }
+        {
+            get
+            {
+                return
+                    new ScTypes(ElementTypes.AccessArcA | ElementTypes.VariableA | ElementTypes.NegativeArcA |
+                                ElementTypes.TemporaryArcA);
+            }
+        }
 
         public static ScTypes ArcAccessVariableFuzzyTemporary
-        { get { return new ScTypes(ElementTypes.AccessArc_a | ElementTypes.Variable_a | ElementTypes.FuzzyArc_a | ElementTypes.TemporaryArc_a); } }
+        {
+            get
+            {
+                return
+                    new ScTypes(ElementTypes.AccessArcA | ElementTypes.VariableA | ElementTypes.FuzzyArcA |
+                                ElementTypes.TemporaryArcA);
+            }
+        }
 
 
         public static ScTypes Node
-        { get { return new ScTypes(ElementTypes.Node_a); } }
+        {
+            get { return new ScTypes(ElementTypes.NodeA); }
+        }
 
         public static ScTypes Link
-        { get { return new ScTypes(ElementTypes.Link_a); } }
+        {
+            get { return new ScTypes(ElementTypes.LinkA); }
+        }
 
         public static ScTypes NodeConstant
-        { get { return new ScTypes(ElementTypes.Node_a | ElementTypes.Constant_a); } }
+        {
+            get { return new ScTypes(ElementTypes.NodeA | ElementTypes.ConstantA); }
+        }
+
         public static ScTypes NodeVariable
-        { get { return new ScTypes(ElementTypes.Node_a | ElementTypes.Variable_a); } }
+        {
+            get { return new ScTypes(ElementTypes.NodeA | ElementTypes.VariableA); }
+        }
 
         public static ScTypes NodeConstantStructure
-        { get { return new ScTypes(ElementTypes.Node_a | ElementTypes.Constant_a | ElementTypes.StructureNode_a); } }
+        {
+            get { return new ScTypes(ElementTypes.NodeA | ElementTypes.ConstantA | ElementTypes.StructureNodeA); }
+        }
 
         public static ScTypes NodeConstantTuple
-        { get { return new ScTypes(ElementTypes.Node_a | ElementTypes.Constant_a | ElementTypes.TupleNode_a); } }
+        {
+            get { return new ScTypes(ElementTypes.NodeA | ElementTypes.ConstantA | ElementTypes.TupleNodeA); }
+        }
 
         public static ScTypes NodeConstantRole
-        { get { return new ScTypes(ElementTypes.Node_a | ElementTypes.Constant_a | ElementTypes.RoleNode_a); } }
+        {
+            get { return new ScTypes(ElementTypes.NodeA | ElementTypes.ConstantA | ElementTypes.RoleNodeA); }
+        }
 
         public static ScTypes NodeConstantNonRole
-        { get { return new ScTypes(ElementTypes.Node_a | ElementTypes.Constant_a | ElementTypes.NonRoleNode_a); } }
+        {
+            get { return new ScTypes(ElementTypes.NodeA | ElementTypes.ConstantA | ElementTypes.NonRoleNodeA); }
+        }
 
         public static ScTypes NodeConstantClass
-        { get { return new ScTypes(ElementTypes.Node_a | ElementTypes.Constant_a | ElementTypes.ClassNode_a); } }
+        {
+            get { return new ScTypes(ElementTypes.NodeA | ElementTypes.ConstantA | ElementTypes.ClassNodeA); }
+        }
 
         public static ScTypes NodeConstantAbstract
-        { get { return new ScTypes(ElementTypes.Node_a | ElementTypes.Constant_a | ElementTypes.AbstractNode_a); } }
+        {
+            get { return new ScTypes(ElementTypes.NodeA | ElementTypes.ConstantA | ElementTypes.AbstractNodeA); }
+        }
 
         public static ScTypes NodeConstantMaterial
-        { get { return new ScTypes(ElementTypes.Node_a | ElementTypes.Constant_a | ElementTypes.MaterialNode_a); } }
+        {
+            get { return new ScTypes(ElementTypes.NodeA | ElementTypes.ConstantA | ElementTypes.MaterialNodeA); }
+        }
 
 
         public static ScTypes NodeVariableStructure
-        { get { return new ScTypes(ElementTypes.Node_a | ElementTypes.Variable_a | ElementTypes.StructureNode_a); } }
+        {
+            get { return new ScTypes(ElementTypes.NodeA | ElementTypes.VariableA | ElementTypes.StructureNodeA); }
+        }
 
         public static ScTypes NodeVariableTuple
-        { get { return new ScTypes(ElementTypes.Node_a | ElementTypes.Variable_a | ElementTypes.TupleNode_a); } }
+        {
+            get { return new ScTypes(ElementTypes.NodeA | ElementTypes.VariableA | ElementTypes.TupleNodeA); }
+        }
 
         public static ScTypes NodeVariableRole
-        { get { return new ScTypes(ElementTypes.Node_a | ElementTypes.Variable_a | ElementTypes.RoleNode_a); } }
+        {
+            get { return new ScTypes(ElementTypes.NodeA | ElementTypes.VariableA | ElementTypes.RoleNodeA); }
+        }
 
         public static ScTypes NodeVariableNonRole
-        { get { return new ScTypes(ElementTypes.Node_a | ElementTypes.Variable_a | ElementTypes.NonRoleNode_a); } }
+        {
+            get { return new ScTypes(ElementTypes.NodeA | ElementTypes.VariableA | ElementTypes.NonRoleNodeA); }
+        }
 
         public static ScTypes NodeVariableClass
-        { get { return new ScTypes(ElementTypes.Node_a | ElementTypes.Variable_a | ElementTypes.ClassNode_a); } }
+        {
+            get { return new ScTypes(ElementTypes.NodeA | ElementTypes.VariableA | ElementTypes.ClassNodeA); }
+        }
 
         public static ScTypes NodeVariableAbstract
-        { get { return new ScTypes(ElementTypes.Node_a | ElementTypes.Variable_a | ElementTypes.AbstractNode_a); } }
+        {
+            get { return new ScTypes(ElementTypes.NodeA | ElementTypes.VariableA | ElementTypes.AbstractNodeA); }
+        }
 
         public static ScTypes NodeVariableMaterial
-        { get { return new ScTypes(ElementTypes.Node_a | ElementTypes.Variable_a | ElementTypes.MaterialNode_a); } }
-
+        {
+            get { return new ScTypes(ElementTypes.NodeA | ElementTypes.VariableA | ElementTypes.MaterialNodeA); }
+        }
 
         #endregion
 
@@ -140,46 +283,45 @@ namespace ScEngineNet.ScElements
 
         public bool IsArc
         {
-            get { return (this.elementType & ElementTypes.ArcMask_c) != 0; }
+            get { return (ElementType & ElementTypes.ArcMaskC) != 0; }
         }
 
         public bool IsLink
         {
-            get { return (this.elementType & ElementTypes.Link_a) != 0; }
+            get { return (ElementType & ElementTypes.LinkA) != 0; }
         }
 
         public bool IsNode
         {
-            get { return (this.elementType & ElementTypes.Node_a) != 0; }
+            get { return (ElementType & ElementTypes.NodeA) != 0; }
         }
 
         public bool IsConstant
         {
-            get { return (this.elementType & ElementTypes.Constant_a) != 0; }
+            get { return (ElementType & ElementTypes.ConstantA) != 0; }
         }
 
         public bool IsVariable
         {
-            get { return (this.elementType & ElementTypes.Variable_a) != 0; }
+            get { return (ElementType & ElementTypes.VariableA) != 0; }
         }
 
         #endregion
 
-
         #region Equals
+
         public override bool Equals(object obj)
         {
-
             if (obj == null)
                 return false;
 
-            if (object.ReferenceEquals(this, obj))
+            if (ReferenceEquals(this, obj))
                 return true;
 
-            if (this.GetType() != obj.GetType())
+            if (GetType() != obj.GetType())
                 return false;
 
-            return this.Equals(obj as ScTypes);
+            return Equals(obj as ScTypes);
         }
 
         public bool Equals(ScTypes other)
@@ -187,28 +329,26 @@ namespace ScEngineNet.ScElements
             if (other == null)
                 return false;
 
-            if (object.ReferenceEquals(this, other))
+            if (ReferenceEquals(this, other))
                 return true;
 
-            if (this.GetType() != other.GetType())
+            if (GetType() != other.GetType())
                 return false;
 
-            if (this.ElementType.Equals(other.ElementType))
-            { return true; }
-            else
-            { return false; }
+            if (ElementType.Equals(other.ElementType))
+            {
+                return true;
+            }
+            return false;
         }
 
         public static bool operator ==(ScTypes scType1, ScTypes scType2)
         {
-
             if (ReferenceEquals(scType1, null) || ReferenceEquals(scType2, null))
             {
                 return ReferenceEquals(scType1, scType2);
             }
             return scType1.Equals(scType2);
-
-
         }
 
         public static bool operator !=(ScTypes scType1, ScTypes scType2)
@@ -219,11 +359,7 @@ namespace ScEngineNet.ScElements
             }
             return !scType1.Equals(scType2);
         }
-        #endregion
 
-        public override string ToString()
-        {
-            return elementType.ToString();
-        }
+        #endregion
     }
 }

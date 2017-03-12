@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScEngineNet", "ScEngineNet\ScEngineNet.csproj", "{E34AB4BE-7FB2-45C1-944F-6B403BECCF7F}"
 EndProject
@@ -30,9 +30,7 @@ Global
 		{058906C7-02BE-4E74-96AC-0F8937A96169}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{058906C7-02BE-4E74-96AC-0F8937A96169}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2C2C5AD0-D762-4D2B-A09B-6E64E5CE4B88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2C2C5AD0-D762-4D2B-A09B-6E64E5CE4B88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C2C5AD0-D762-4D2B-A09B-6E64E5CE4B88}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2C2C5AD0-D762-4D2B-A09B-6E64E5CE4B88}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

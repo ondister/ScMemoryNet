@@ -1,32 +1,44 @@
-﻿using ScEngineNet.Native;
-using ScEngineNet.ScExceptions;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using ScEngineNet.Native;
+using ScEngineNet.ScExceptions;
 
 namespace ScEngineNet.ScElements
 {
-
     /// <summary>
-    /// Энумератор для итераторов библиотеки
+    ///     Энумератор для итераторов библиотеки
     /// </summary>
-    /// <seealso cref="System.IDisposable" />
-    public class ScEnumerator : IEnumerator<ScConstruction>, IDisposable
+    public class ScEnumerator : IEnumerator<ScConstruction>
     {
-        private const string disposalException_msg = "Был вызван метод Dispose и cсылка на объект в памяти уже удалена";
-        private const string memoryNotInitializedException_msg = "Библиотека ScMemory.Net не инициализирована";
-        private const string contextInvalidException_msg = "Указанная ссылка на ScContext не действительна";
-
+        private const string disposalExceptionMsg = "Был вызван метод Dispose и cсылка на объект в памяти уже удалена";
+        private const string memoryNotInitializedExceptionMsg = "Библиотека ScMemory.Net не инициализирована";
+        private const string contextInvalidExceptionMsg = "Указанная ссылка на ScContext не действительна";
+        private IntPtr iterator;
+        private readonly ScIterator3Type iterator3Type;
+        private readonly ScIterator5Type iterator5Type;
+        private readonly ScIteratorParam p1;
+        private readonly ScIteratorParam p2;
+        private readonly ScIteratorParam p3;
+        private readonly ScIteratorParam p4;
+        private readonly ScIteratorParam p5;
         private readonly ScMemoryContext scContext;
-        private readonly ScIterator3Type iterator3type;
-        private readonly ScIterator5Type iterator5type;
-        private IntPtr iterator = IntPtr.Zero;
 
-        private ScIteratorParam p1;
-        private ScIteratorParam p2;
-        private ScIteratorParam p3;
-        private ScIteratorParam p4;
-        private ScIteratorParam p5;
+        private bool Delete()
+        {
+            const bool isDeleted = false;
+            if (iterator3Type != ScIterator3Type.sc_iterator3_unknown)
+            {
+                NativeMethods.sc_iterator3_free(iterator);
+                iterator = IntPtr.Zero;
+            }
+            else
+            {
+                NativeMethods.sc_iterator5_free(iterator);
+                iterator = IntPtr.Zero;
+            }
+            return isDeleted;
+        }
 
         #region Конструкторы
 
@@ -36,45 +48,60 @@ namespace ScEngineNet.ScElements
         }
 
 
-        internal ScEnumerator(ScMemoryContext scContext, ScIterator3Type iterator3Type, ScIteratorParam p1, ScIteratorParam p2, ScIteratorParam p3)
+        internal ScEnumerator(ScMemoryContext scContext, ScIterator3Type iterator3Type, ScIteratorParam p1,
+            ScIteratorParam p2, ScIteratorParam p3)
             : this(scContext)
         {
-            this.iterator3type = iterator3Type;
-            this.iterator5type = ScIterator5Type.sc_iterator5_unknown;
+            this.iterator3Type = iterator3Type;
+            iterator5Type = ScIterator5Type.sc_iterator5_unknown;
 
-            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
-            if (this.scContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true)
+            {
+                throw new ScMemoryNotInitializeException(memoryNotInitializedExceptionMsg);
+            }
+            if (this.scContext.PtrScMemoryContext == IntPtr.Zero)
+            {
+                throw new ScContextInvalidException(contextInvalidExceptionMsg);
+            }
             this.p1 = p1;
             this.p2 = p2;
             this.p3 = p3;
-            this.iterator = NativeMethods.sc_iterator3_new(this.scContext.PtrScMemoryContext, this.iterator3type, this.p1, this.p2, this.p3);
+            iterator = NativeMethods.sc_iterator3_new(this.scContext.PtrScMemoryContext, this.iterator3Type, this.p1, this.p2,
+                this.p3);
         }
 
-        internal ScEnumerator(ScMemoryContext scContext, ScIterator5Type iterator5Type, ScIteratorParam p1, ScIteratorParam p2, ScIteratorParam p3, ScIteratorParam p4, ScIteratorParam p5)
+        internal ScEnumerator(ScMemoryContext scContext, ScIterator5Type iterator5Type, ScIteratorParam p1,
+            ScIteratorParam p2, ScIteratorParam p3, ScIteratorParam p4, ScIteratorParam p5)
             : this(scContext)
         {
-            this.iterator3type = ScIterator3Type.sc_iterator3_unknown;
-            this.iterator5type = iterator5Type;
+            iterator3Type = ScIterator3Type.sc_iterator3_unknown;
+            this.iterator5Type = iterator5Type;
 
-            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
-            if (this.scContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
+            if (ScMemoryContext.IsMemoryInitialized() != true)
+            {
+                throw new ScMemoryNotInitializeException(memoryNotInitializedExceptionMsg);
+            }
+            if (this.scContext.PtrScMemoryContext == IntPtr.Zero)
+            {
+                throw new ScContextInvalidException(contextInvalidExceptionMsg);
+            }
             this.p1 = p1;
             this.p2 = p2;
             this.p3 = p3;
             this.p4 = p4;
             this.p5 = p5;
-            this.iterator = NativeMethods.sc_iterator5_new(this.scContext.PtrScMemoryContext, this.iterator5type, this.p1, this.p2, this.p3, this.p4, this.p5);
+            iterator = NativeMethods.sc_iterator5_new(this.scContext.PtrScMemoryContext, this.iterator5Type, this.p1, this.p2,
+                this.p3, this.p4, this.p5);
         }
 
         #endregion
-
 
         #region IEnumerator<Construction>
 
         private ScConstruction currentConstruction;
 
         /// <summary>
-        /// Получает элемент коллекции, соответствующий текущей позиции перечислителя.
+        ///     Получает элемент коллекции, соответствующий текущей позиции перечислителя.
         /// </summary>
         /// <exception cref="System.InvalidOperationException"></exception>
         public ScConstruction Current
@@ -92,8 +119,7 @@ namespace ScEngineNet.ScElements
 
         private object Current1
         {
-
-            get { return this.Current; }
+            get { return Current; }
         }
 
         object IEnumerator.Current
@@ -102,22 +128,32 @@ namespace ScEngineNet.ScElements
         }
 
         /// <summary>
-        /// Перемещает перечислитель к следующему элементу коллекции.
+        ///     Перемещает перечислитель к следующему элементу коллекции.
         /// </summary>
         /// <returns>
-        /// Значение true, если перечислитель был успешно перемещен к следующему элементу; значение false, если перечислитель достиг конца коллекции.
+        ///     Значение true, если перечислитель был успешно перемещен к следующему элементу; значение false, если перечислитель
+        ///     достиг конца коллекции.
         /// </returns>
         /// <exception cref="System.ObjectDisposedException"></exception>
         /// <exception cref="ScMemoryNotInitializeException"></exception>
         /// <exception cref="ScContextInvalidException"></exception>
         public bool MoveNext()
         {
-            if (this.Disposed == true) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
-            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
-            if (this.scContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
+            if (Disposed)
+            {
+                throw new ObjectDisposedException(ToString(), disposalExceptionMsg);
+            }
+            if (ScMemoryContext.IsMemoryInitialized() != true)
+            {
+                throw new ScMemoryNotInitializeException(memoryNotInitializedExceptionMsg);
+            }
+            if (scContext.PtrScMemoryContext == IntPtr.Zero)
+            {
+                throw new ScContextInvalidException(contextInvalidExceptionMsg);
+            }
 
-            this.currentConstruction = new ScConstruction();
-            if (this.iterator3type != ScIterator3Type.sc_iterator3_unknown)
+            currentConstruction = new ScConstruction();
+            if (iterator3Type != ScIterator3Type.sc_iterator3_unknown)
             {
                 if (NativeMethods.sc_iterator3_next(iterator) == false)
                 {
@@ -125,9 +161,9 @@ namespace ScEngineNet.ScElements
                 }
                 for (uint element = 0; element < 3; element++)
                 {
-                    this.currentConstruction.AddElement( this.scContext.GetElement(new ScAddress(NativeMethods.sc_iterator3_value(this.iterator, element))));
+                    currentConstruction.AddElement(
+                        scContext.GetElement(new ScAddress(NativeMethods.sc_iterator3_value(iterator, element))));
                 }
-
             }
             else
             {
@@ -137,121 +173,104 @@ namespace ScEngineNet.ScElements
                 }
                 for (uint element = 0; element < 5; element++)
                 {
-                    this.currentConstruction.AddElement( this.scContext.GetElement(new ScAddress(NativeMethods.sc_iterator5_value(this.iterator, element))));
+                    currentConstruction.AddElement(
+                        scContext.GetElement(new ScAddress(NativeMethods.sc_iterator5_value(iterator, element))));
                 }
             }
             return true;
-
         }
 
 
-
         /// <summary>
-        /// Устанавливает перечислитель в его начальное положение, т. е. перед первым элементом коллекции.
+        ///     Устанавливает перечислитель в его начальное положение, т. е. перед первым элементом коллекции.
         /// </summary>
         /// <exception cref="System.ObjectDisposedException"></exception>
         /// <exception cref="ScMemoryNotInitializeException"></exception>
         /// <exception cref="ScContextInvalidException"></exception>
         public void Reset()
         {
-            if (this.Disposed == true) { throw new ObjectDisposedException(this.ToString(), disposalException_msg); }
-            if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
-            if (this.scContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
+            if (Disposed)
+            {
+                throw new ObjectDisposedException(ToString(), disposalExceptionMsg);
+            }
+            if (ScMemoryContext.IsMemoryInitialized() != true)
+            {
+                throw new ScMemoryNotInitializeException(memoryNotInitializedExceptionMsg);
+            }
+            if (scContext.PtrScMemoryContext == IntPtr.Zero)
+            {
+                throw new ScContextInvalidException(contextInvalidExceptionMsg);
+            }
 
             //делаем новый указатель на итератор
-            if (this.iterator3type != ScIterator3Type.sc_iterator3_unknown)
+            if (iterator3Type != ScIterator3Type.sc_iterator3_unknown)
             {
-                NativeMethods.sc_iterator3_free(this.iterator);
+                NativeMethods.sc_iterator3_free(iterator);
 
-                this.iterator = NativeMethods.sc_iterator3_new(this.scContext.PtrScMemoryContext, this.iterator3type, this.p1, this.p2, this.p3);
+                iterator = NativeMethods.sc_iterator3_new(scContext.PtrScMemoryContext, iterator3Type, p1, p2, p3);
             }
-            if (this.iterator5type != ScIterator5Type.sc_iterator5_unknown)
+            if (iterator5Type != ScIterator5Type.sc_iterator5_unknown)
             {
-                NativeMethods.sc_iterator5_free(this.iterator);
-                this.iterator = NativeMethods.sc_iterator5_new(this.scContext.PtrScMemoryContext, this.iterator5type, this.p1, this.p2, this.p3, this.p4, this.p5);
+                NativeMethods.sc_iterator5_free(iterator);
+                iterator = NativeMethods.sc_iterator5_new(scContext.PtrScMemoryContext, iterator5Type, p1, p2, p3, p4,
+                    p5);
             }
             currentConstruction = null;
-
         }
 
         #endregion
 
-        private bool Delete()
-        {
-            bool isDeleted = false;
-            if (this.iterator3type != ScIterator3Type.sc_iterator3_unknown)
-            {
-                NativeMethods.sc_iterator3_free(this.iterator);
-                this.iterator = IntPtr.Zero;
-            }
-            else
-            {
-                NativeMethods.sc_iterator5_free(this.iterator);
-                this.iterator = IntPtr.Zero;
-            }
-            return isDeleted;
-        }
-
-
         #region IDisposal
-        private bool disposed;
 
         /// <summary>
-        /// Gets a value indicating whether this <see cref="ScEnumerator"/> is disposed.
+        ///     Gets a value indicating whether this <see cref="ScEnumerator" /> is disposed.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if disposed; otherwise, <c>false</c>.
+        ///     <c>true</c> if disposed; otherwise, <c>false</c>.
         /// </value>
-        public bool Disposed
-        {
-            get { return disposed; }
-        }
+        public bool Disposed { get; private set; }
 
         /// <summary>
-        /// Releases unmanaged and - optionally - managed resources.
+        ///     Releases unmanaged and - optionally - managed resources.
         /// </summary>
-        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        /// <param name="disposing">
+        ///     <c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only
+        ///     unmanaged resources.
+        /// </param>
         protected virtual void Dispose(bool disposing)
         {
-         //   Console.WriteLine("call Dispose({0}) ScEnumerator with {1}", disposing, this.iterator);
+            //   Console.WriteLine("call Dispose({0}) ScEnumerator with {1}", disposing, this.iterator);
 
 
-            if (!disposed && ScMemoryContext.IsMemoryInitialized())
+            if (!Disposed && ScMemoryContext.IsMemoryInitialized())
             {
                 // Dispose of resources held by this instance.
-                this.Delete();
+                Delete();
                 // Suppress finalization of this disposed instance.
                 if (disposing)
                 {
-
                     GC.SuppressFinalize(this);
                 }
-                disposed = true;
+                Disposed = true;
             }
-
-
         }
 
         /// <summary>
-        /// Выполняет определяемые приложением задачи, связанные с высвобождением или сбросом неуправляемых ресурсов.
+        ///     Выполняет определяемые приложением задачи, связанные с высвобождением или сбросом неуправляемых ресурсов.
         /// </summary>
         public void Dispose()
         {
             Dispose(true);
-
         }
 
         /// <summary>
-        /// Finalizes an instance of the <see cref="ScEnumerator"/> class.
+        ///     Finalizes an instance of the <see cref="ScEnumerator" /> class.
         /// </summary>
         ~ScEnumerator()
         {
             Dispose(false);
         }
+
         #endregion
-
-
-
-
     }
 }

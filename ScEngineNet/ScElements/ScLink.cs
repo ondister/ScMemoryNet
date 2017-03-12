@@ -1,104 +1,119 @@
-﻿using ScEngineNet.Events;
+﻿using System;
+using ScEngineNet.Events;
 using ScEngineNet.LinkContent;
 using ScEngineNet.ScExceptions;
-using System;
-using System.Collections.Generic;
 
 namespace ScEngineNet.ScElements
 {
     /// <summary>
-    /// Элемент Sc-ссылка. В ней можно хранить любое содержимое. Создается в классе <see cref="ScMemoryContext" />
+    ///     Элемент Sc-ссылка. В ней можно хранить любое содержимое. Создается в классе <see cref="ScMemoryContext" />
     /// </summary>
     public class ScLink : ScElement
     {
+        internal ScLink(ScAddress linkAddress, ScMemoryContext scContext)
+            : base(linkAddress, scContext)
+        {
+            contentChangeEvent = new ScEvent(ScAddress, ScEventType.ScEventContentChanged);
+        }
+
         /// <summary>
-        /// Возвращает или устанавливает содержимое для ссылки. Тип содержимого устанавливается автоматически.
+        ///     Возвращает или устанавливает содержимое для ссылки. Тип содержимого устанавливается автоматически.
         /// </summary>
         /// <value>
-        /// Содержимое ссылки.
+        ///     Содержимое ссылки.
         /// </value>
         public ScLinkContent LinkContent
         {
             get
             {
-                if (this.Disposed == true) { throw new ObjectDisposedException("ScLink", disposalException_msg); }
-                if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
-                if (this.ScContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
-               
-                return base.ScContext.GetLinkContent( this);
+                if (Disposed)
+                {
+                    throw new ObjectDisposedException("ScLink", DisposalExceptionMsg);
+                }
+                if (ScMemoryContext.IsMemoryInitialized() != true)
+                {
+                    throw new ScMemoryNotInitializeException(MemoryNotInitializedExceptionMsg);
+                }
+                if (ScContext.PtrScMemoryContext == IntPtr.Zero)
+                {
+                    throw new ScContextInvalidException(ContextInvalidExceptionMsg);
+                }
+
+                return ScContext.GetLinkContent(this);
             }
             set
             {
-                if (this.Disposed == true) { throw new ObjectDisposedException("ScLink", disposalException_msg); }
-                if (ScMemoryContext.IsMemoryInitialized() != true) { throw new ScMemoryNotInitializeException(memoryNotInitializedException_msg); }
-                if (this.ScContext.PtrScMemoryContext == IntPtr.Zero) { throw new ScContextInvalidException(contextInvalidException_msg); }
-                
-                base.ScContext.SetLinkContent(value, this);
+                if (Disposed)
+                {
+                    throw new ObjectDisposedException("ScLink", DisposalExceptionMsg);
+                }
+                if (ScMemoryContext.IsMemoryInitialized() != true)
+                {
+                    throw new ScMemoryNotInitializeException(MemoryNotInitializedExceptionMsg);
+                }
+                if (ScContext.PtrScMemoryContext == IntPtr.Zero)
+                {
+                    throw new ScContextInvalidException(ContextInvalidExceptionMsg);
+                }
+
+                ScContext.SetLinkContent(value, this);
             }
         }
 
-
-
-        internal ScLink(ScAddress linkAddress, ScMemoryContext scContext)
-            : base(linkAddress,scContext)
+        /// <summary>
+        ///     Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing">
+        ///     <c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only
+        ///     unmanaged resources.
+        /// </param>
+        protected new virtual void Dispose(bool disposing)
         {
-            this.contentChangeEvent = new ScEvent(this.ScAddress, ScEventType.SC_EVENT_CONTENT_CHANGED);
+            contentChangeEvent.Dispose();
+            LinkContent.Dispose();
+            base.Dispose(disposing);
         }
 
-     
-
-
         #region ContentChangedEvent
-        private ScEvent contentChangeEvent;//не забываем добавить в конструктор начальную инициализацию
-        internal static readonly EventKey contentChangeEventKey = new EventKey();
+
+        private ScEvent contentChangeEvent; //не забываем добавить в конструктор начальную инициализацию
+        internal static readonly EventKey ContentChangeEventKey = new EventKey();
+
         /// <summary>
-        /// Occurs when [content changed].
+        ///     Occurs when [content changed].
         /// </summary>
         public event ElementEventHandler ContentChanged
         {
             add
             {
                 //subscribe           
-                this.contentChangeEvent = this.CreateEvent(ScEventType.SC_EVENT_CONTENT_CHANGED);
+                contentChangeEvent = CreateEvent(ScEventType.ScEventContentChanged);
                 contentChangeEvent.ElementEvent += contentChangeEvent_ElementEvent;
-                base.EventSet.Add(contentChangeEventKey, value);
+                EventSet.Add(ContentChangeEventKey, value);
             }
             remove
             {
                 //delete
-                base.EventSet.Remove(contentChangeEventKey, value);
-                this.contentChangeEvent.Dispose();
+                EventSet.Remove(ContentChangeEventKey, value);
+                contentChangeEvent.Dispose();
             }
         }
 
-        void contentChangeEvent_ElementEvent(object sender, ScEventArgs e)
+        private void contentChangeEvent_ElementEvent(object sender, ScEventArgs e)
         {
             OnContentChangeEvent(e);
         }
 
 
         /// <summary>
-        /// Raises the <see cref="E:ContentChangeEvent" /> event.
+        ///     Raises the <see cref="E:ContentChangeEvent" /> event.
         /// </summary>
-        /// <param name="args">The <see cref="ScEventArgs"/> instance containing the event data.</param>
+        /// <param name="args">The <see cref="ScEventArgs" /> instance containing the event data.</param>
         protected virtual void OnContentChangeEvent(ScEventArgs args)
         {
-            base.EventSet.Raise(contentChangeEventKey, (object)this, args);
+            EventSet.Raise(ContentChangeEventKey, this, args);
         }
 
         #endregion
-
-        /// <summary>
-        /// Releases unmanaged and - optionally - managed resources.
-        /// </summary>
-        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected virtual new void Dispose(bool disposing)
-        {
-            this.contentChangeEvent.Dispose();
-            this.LinkContent.Dispose();
-            base.Dispose(disposing);
-
-        }
-
     }
 }

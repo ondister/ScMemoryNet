@@ -70,7 +70,7 @@ namespace ScFullTextSearch
 
 
 
-            return ScResult.SC_RESULT_OK;
+            return ScResult.ScResultOk;
         }
 
         void classQuerryString_OutputArcAdded(object sender, ScEventArgs e)
@@ -105,7 +105,7 @@ namespace ScFullTextSearch
             //уничтожаем контекст
             context.Dispose();
 
-            return ScResult.SC_RESULT_OK;
+            return ScResult.ScResultOk;
         }
     }
 }

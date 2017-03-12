@@ -9,20 +9,13 @@ namespace ScEngineNet.Events
     /// <seealso cref="System.EventArgs" />
     public class ScEventArgs : EventArgs
     {
-        private readonly ScEventType eventType;
-        private readonly ScElement element;
-        private readonly ScArc arc;
-
         /// <summary>
         /// Возвращает тип события
         /// </summary>
         /// <value>
         /// Тип события <see cref="ScEventType"/>
         /// </value>
-        public ScEventType EventType
-        {
-            get { return eventType; }
-        }
+        public ScEventType EventType { get; }
 
         /// <summary>
         /// Возвращает элемент, подписанный на событие
@@ -30,10 +23,7 @@ namespace ScEngineNet.Events
         /// <value>
         /// The element.
         /// </value>
-        public ScElement Element
-        {
-            get { return this.element; }
-        }
+        public ScElement Element { get; }
 
         /// <summary>
         /// Возвращает входящую или исходящую дугу, если событие было подписано на добавление или удаление дуг.
@@ -41,16 +31,13 @@ namespace ScEngineNet.Events
         /// <value>
         /// Sc-дуга
         /// </value>
-        public ScArc Arc
-        {
-            get { return this.arc; }
-        }
+        public ScArc Arc { get; }
 
         internal ScEventArgs(ScEventType eventType, ScElement element, ScArc arc)
         {
-            this.eventType = eventType;
-            this.element = element;
-            this.arc = arc;
+            EventType = eventType;
+            Element = element;
+           Arc = arc;
         }
     }
 }

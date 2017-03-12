@@ -3,183 +3,188 @@
 namespace ScEngineNet.Native
 {
     /// <summary>
-    /// Тип элемента.
-    /// Суффикс a указывает на атомарность типа элемента, суффикс c указывает, что это тип составлен из нескольких
+    ///     Тип элемента.
+    ///     Суффикс a указывает на атомарность типа элемента, суффикс c указывает, что это тип составлен из нескольких
     /// </summary>
-    ///<remarks>
-    ///Для экономии памяти разработчик библиотеки scmemory продублировал значения перечислений для узлов и дуг.
-    ///Предполагается, что вы не будете ожидать от узла типа элемента "временная дуга".
-    ///Тем не менее не стоит забывать  о дублировании.
-    /// TupleNode_a = 0x80	        PositiveArc_a = 0x80
-    /// StructureNode_a = 0x100	    NegativeArc_a = 0x100
-    /// RoleNode_a = 0x200	        FuzzyArc_a = 0x200
-    /// NonRoleNode_a = 0x400	    TemporaryArc_a = 0x400
-    /// ClassNode_a = 0x800	        PermanentArc_a = 0x800
-    ///</remarks>
-
-
+    /// <remarks>
+    ///     Для экономии памяти разработчик библиотеки scmemory продублировал значения перечислений для узлов и дуг.
+    ///     Предполагается, что вы не будете ожидать от узла типа элемента "временная дуга".
+    ///     Тем не менее не стоит забывать  о дублировании.
+    ///     TupleNode_a = 0x80	        PositiveArc_a = 0x80
+    ///     StructureNode_a = 0x100	    NegativeArc_a = 0x100
+    ///     RoleNode_a = 0x200	        FuzzyArc_a = 0x200
+    ///     NonRoleNode_a = 0x400	    TemporaryArc_a = 0x400
+    ///     ClassNode_a = 0x800	        PermanentArc_a = 0x800
+    /// </remarks>
     [Flags]
     internal enum ElementTypes : ushort
     {
         /// <summary>
-        /// Неизвестный или не указан.
+        ///     Неизвестный или не указан.
         /// </summary>
         Unknown = 0x00,
 
         /// <summary>
-        /// SC-ссылка общего вида.
+        ///     SC-ссылка общего вида.
         /// </summary>
-        Link_a = 0x2,
+        LinkA = 0x2,
 
         /// <summary>
-        /// Константный тип SC-элемента.
+        ///     Константный тип SC-элемента.
         /// </summary>
-        Constant_a = 0x20,
+        ConstantA = 0x20,
 
         /// <summary>
-        /// Переменный тип SC-элемента.
+        ///     Переменный тип SC-элемента.
         /// </summary>
-        Variable_a = 0x40,
+        VariableA = 0x40,
 
         #region Nodes
-        /// <summary>
-        /// SC-узел общего вида.
-        /// </summary>
-        Node_a = 0x1,
 
         /// <summary>
-        /// SC-узел, обозначающий небинарную связку.
+        ///     SC-узел общего вида.
         /// </summary>
-        TupleNode_a = 0x80,
+        NodeA = 0x1,
 
         /// <summary>
-        /// SC-узел, обозначающий структуру.
+        ///     SC-узел, обозначающий небинарную связку.
         /// </summary>
-        StructureNode_a = 0x100,
+        TupleNodeA = 0x80,
 
         /// <summary>
-        /// SC-узел, обозначающий ролевое отношение.
+        ///     SC-узел, обозначающий структуру.
         /// </summary>
-        RoleNode_a = 0x200,
+        StructureNodeA = 0x100,
 
         /// <summary>
-        /// SC-узел, обозначающий неролевое отношение.
+        ///     SC-узел, обозначающий ролевое отношение.
         /// </summary>
-        NonRoleNode_a = 0x400,
+        RoleNodeA = 0x200,
 
         /// <summary>
-        /// SC-узел, не являющейся отношением.
+        ///     SC-узел, обозначающий неролевое отношение.
         /// </summary>
-        ClassNode_a = 0x800,
+        NonRoleNodeA = 0x400,
 
         /// <summary>
-        /// SC-узел, обозначающий абстрактный объект, не являющийся множеством.
+        ///     SC-узел, не являющейся отношением.
         /// </summary>
-        AbstractNode_a = 0x1000,
+        ClassNodeA = 0x800,
 
         /// <summary>
-        /// SC-узел, обозначающий материальный объект.
+        ///     SC-узел, обозначающий абстрактный объект, не являющийся множеством.
         /// </summary>
-        MaterialNode_a = 0x2000,
+        AbstractNodeA = 0x1000,
 
         /// <summary>
-        /// Константный SC-узел, обозначающий неролевое отношение.
+        ///     SC-узел, обозначающий материальный объект.
         /// </summary>
-        NonRoleConstantNode_c = (NonRoleNode_a | Constant_a | Node_a),
+        MaterialNodeA = 0x2000,
 
         /// <summary>
-        /// The class constant node_c
+        ///     Константный SC-узел, обозначающий неролевое отношение.
         /// </summary>
-        ClassConstantNode_c = (ClassNode_a | Constant_a | Node_a),
+        NonRoleConstantNodeC = (NonRoleNodeA | ConstantA | NodeA),
 
         /// <summary>
-        /// Константный SC-узел.
+        ///     The class constant node_c
         /// </summary>
-        ConstantNode_c = Node_a | Constant_a,
+        ClassConstantNodeC = (ClassNodeA | ConstantA | NodeA),
+
+        /// <summary>
+        ///     Константный SC-узел.
+        /// </summary>
+        ConstantNodeC = NodeA | ConstantA,
+
         #endregion
 
         #region Arcs
-        /// <summary>
-        /// SC-ребро общего вида.
-        /// </summary>
-        CommonEdge_a = 0x4,
 
         /// <summary>
-        /// SC-дуга общего вида.
+        ///     SC-ребро общего вида.
         /// </summary>
-        CommonArc_a = 0x8,
+        CommonEdgeA = 0x4,
 
         /// <summary>
-        /// SC-дуга принадлежности.
+        ///     SC-дуга общего вида.
         /// </summary>
-        AccessArc_a = 0x10,
+        CommonArcA = 0x8,
 
         /// <summary>
-        /// Позитивная SC-дуга.
+        ///     SC-дуга принадлежности.
         /// </summary>
-        PositiveArc_a = 0x80,
+        AccessArcA = 0x10,
 
         /// <summary>
-        /// Негативная SC-дуга.
+        ///     Позитивная SC-дуга.
         /// </summary>
-        NegativeArc_a = 0x100,
+        PositiveArcA = 0x80,
 
         /// <summary>
-        /// Нечеткая SC-дуга.
+        ///     Негативная SC-дуга.
         /// </summary>
-        FuzzyArc_a = 0x200,
+        NegativeArcA = 0x100,
 
         /// <summary>
-        /// Нестационарная SC-дуга.
+        ///     Нечеткая SC-дуга.
         /// </summary>
-        TemporaryArc_a = 0x400,
+        FuzzyArcA = 0x200,
 
         /// <summary>
-        /// Стационарная SC-дуга.
+        ///     Нестационарная SC-дуга.
         /// </summary>
-        PermanentArc_a = 0x800,
+        TemporaryArcA = 0x400,
 
         /// <summary>
-        /// Позитивная константная стационарная SC-дуга принадлежности.
+        ///     Стационарная SC-дуга.
         /// </summary>
-        PositiveConstantPermanentAccessArc_c = (AccessArc_a | Constant_a | PositiveArc_a | PermanentArc_a),
+        PermanentArcA = 0x800,
 
         /// <summary>
-        /// Позитивная константная стационарная SC-дуга общего вида.
+        ///     Позитивная константная стационарная SC-дуга принадлежности.
         /// </summary>
-        ConstantCommonArc_c = (CommonArc_a | Constant_a),
+        PositiveConstantPermanentAccessArcC = (AccessArcA | ConstantA | PositiveArcA | PermanentArcA),
+
+        /// <summary>
+        ///     Позитивная константная стационарная SC-дуга общего вида.
+        /// </summary>
+        ConstantCommonArcC = (CommonArcA | ConstantA),
+
         #endregion
 
         #region Masks
-        /// <summary>
-        /// Маска, означающая все SC-элементы.
-        /// </summary>
-        AnyElementMask_c = (Node_a | Link_a | CommonEdge_a | CommonArc_a | AccessArc_a),
 
         /// <summary>
-        /// Маска константности/переменности.
+        ///     Маска, означающая все SC-элементы.
         /// </summary>
-        ConstantOrVariableMask_c = (Constant_a | Variable_a),
+        AnyElementMaskC = (NodeA | LinkA | CommonEdgeA | CommonArcA | AccessArcA),
 
         /// <summary>
-        /// Маска позитивности/негативности/нечеткости.
+        ///     Маска константности/переменности.
         /// </summary>
-        PositivityMask_c = (PositiveArc_a | NegativeArc_a | FuzzyArc_a),
+        ConstantOrVariableMaskC = (ConstantA | VariableA),
 
         /// <summary>
-        /// Маска стационарности/нестационарности,
+        ///     Маска позитивности/негативности/нечеткости.
         /// </summary>
-        PermanencyMask_c = (PermanentArc_a | TemporaryArc_a),
+        PositivityMaskC = (PositiveArcA | NegativeArcA | FuzzyArcA),
 
         /// <summary>
-        /// Маска типов узлов.
+        ///     Маска стационарности/нестационарности,
         /// </summary>
-        NodeOrStructureMask_c = (TupleNode_a | StructureNode_a | RoleNode_a | NonRoleNode_a | ClassNode_a | AbstractNode_a | MaterialNode_a),
+        PermanencyMaskC = (PermanentArcA | TemporaryArcA),
 
         /// <summary>
-        /// Маска типов SC-коннекторов.
+        ///     Маска типов узлов.
         /// </summary>
-        ArcMask_c = (AccessArc_a | CommonArc_a | CommonEdge_a),
+        NodeOrStructureMaskC =
+            (TupleNodeA | StructureNodeA | RoleNodeA | NonRoleNodeA | ClassNodeA | AbstractNodeA | MaterialNodeA),
+
+        /// <summary>
+        ///     Маска типов SC-коннекторов.
+        /// </summary>
+        ArcMaskC = (AccessArcA | CommonArcA | CommonEdgeA)
+
         #endregion
     }
 }

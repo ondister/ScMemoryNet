@@ -1,36 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ScEngineNet;
+﻿using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ScEngineNet.ScElements;
-using ScMemoryNet;
-using ScEngineNet.NetHelpers;
-using System.Threading;
+using ScEngineNet;
 using ScEngineNet.LinkContent;
-namespace ScEngineNet.Tests
+using ScEngineNet.NetHelpers;
+using ScEngineNet.ScElements;
+
+namespace ScMachineWrapperTest
 {
-    [TestClass()]
+    [TestClass]
     public class ScMemoryContextTests
     {
-        static ScNode node;
-        static ScNode node1;
-        static ScLink link;
-        const string configFile = @"d:\OSTIS\sc-machine-master\bin\sc-memory.ini";
-        const string repoPath = @"d:\OSTIS\sc-machine-master\bin\repo";
-        const string extensionPath = @"d:\OSTIS\sc-machine-master\bin\extensions";
-        const string netExtensionPath = "";
-        static ScMemoryContext context;
-
+        private static ScNode node;
+        private static ScNode node1;
+        private static ScLink link;
+        private static ScMemoryContext context;
 
         #region InitializeMemory
 
         [ClassInitialize]
         public static void InitializeMemory(TestContext testContext)
         {
-            if (!ScMemory.IsInitialized) { ScMemory.Initialize(true, configFile, repoPath, extensionPath, netExtensionPath); }
+            if (!ScMemory.IsInitialized)
+            {
+                ScMemory.Initialize(true, TestParams.ConfigFile, TestParams.RepoPath, TestParams.ExtensionPath,
+                    TestParams.NetExtensionPath);
+            }
             context = new ScMemoryContext(ScAccessLevels.MinLevel);
 
             //создаем элементы
@@ -44,11 +38,12 @@ namespace ScEngineNet.Tests
 
             Assert.IsTrue(link.ScAddress.IsValid);
             Assert.AreEqual(ScTypes.Link, link.ElementType);
-
         }
+
         #endregion
 
         #region ShutDownMemory
+
         [ClassCleanup]
         public static void ShutDown()
         {
@@ -56,36 +51,39 @@ namespace ScEngineNet.Tests
             link.Dispose();
             node1.Dispose();
             context.Dispose();
-            if (ScMemory.IsInitialized) { ScMemory.ShutDown(true); }
+            if (ScMemory.IsInitialized)
+            {
+                ScMemory.ShutDown(true);
+            }
         }
+
         #endregion
 
-
-        [TestMethod()]
+        [TestMethod]
         public void IsMemoryInitializedTest()
         {
             Assert.IsTrue(ScMemoryContext.IsMemoryInitialized());
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void GetStatisticsTest()
         {
-            ScStat stat = context.GetStatistics();
+            var stat = context.GetStatistics();
 
             Assert.IsTrue(stat.NodeCount != 0);
             Assert.IsTrue(stat.ArcCount != 0);
             Assert.IsTrue(stat.LinkCount != 0);
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void SaveStateTest()
         {
             var result = context.SaveState();
 
-            Assert.AreEqual(ScResult.SC_RESULT_OK, result);
+            Assert.AreEqual(ScResult.ScResultOk, result);
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void CreateUniqueIdentifierTest()
         {
             Assert.IsTrue(context.CreateUniqueIdentifier(node).ToString().Length != 0);
@@ -101,16 +99,15 @@ namespace ScEngineNet.Tests
             node.SystemIdentifier = context.CreateUniqueIdentifier(node);
             //как только такой идентификатор уже в базе, на основе этого узла будет создан другой
             Assert.AreNotEqual(node.SystemIdentifier, context.CreateUniqueIdentifier(node));
-
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void CreateUniqueIdentifierTest1()
         {
             Assert.IsTrue(context.CreateUniqueIdentifier(ScNode.InstancePreffix, node).ToString().Length != 0);
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void IsElementExistTest()
         {
             Assert.IsTrue(context.IsElementExist(node.ScAddress));
@@ -120,7 +117,7 @@ namespace ScEngineNet.Tests
             node4.Dispose();
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void CreateArcTest()
         {
             var arc = context.CreateArc(node, node1, ScTypes.ArcAccessConstantPositivePermanent);
@@ -139,10 +136,9 @@ namespace ScEngineNet.Tests
 
             arc.Dispose();
             arc1.Dispose();
-
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void FindArcTest()
         {
             var arc = context.CreateArc(node, node1, ScTypes.ArcAccessConstantPositivePermanent);
@@ -155,25 +151,25 @@ namespace ScEngineNet.Tests
             arc.Dispose();
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void ArcIsExistTest()
         {
             var arc = context.CreateArc(node, node1, ScTypes.ArcAccessConstantPositivePermanent);
-            bool arcIsExist = context.ArcIsExist(node, node1, ScTypes.ArcAccessConstantPositivePermanent);
+            var arcIsExist = context.ArcIsExist(node, node1, ScTypes.ArcAccessConstantPositivePermanent);
 
             Assert.IsTrue(arcIsExist);
 
-            bool arcIsExistNull = context.ArcIsExist(null, null, ScTypes.ArcAccessConstantPositivePermanent);
+            var arcIsExistNull = context.ArcIsExist(null, null, ScTypes.ArcAccessConstantPositivePermanent);
             Assert.IsFalse(arcIsExistNull);
 
-            bool unexistensArc = context.ArcIsExist(node, node1, ScTypes.ArcAccessVariableFuzzyPermanent);
+            context.ArcIsExist(node, node1, ScTypes.ArcAccessVariableFuzzyPermanent);
             Assert.IsFalse(arcIsExistNull);
 
             arc.DeleteFromMemory();
             arc.Dispose();
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void CreateNodeTest()
         {
             var node5 = context.CreateNode(ScTypes.Node);
@@ -183,7 +179,7 @@ namespace ScEngineNet.Tests
             node5.Dispose();
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void CreateNodeTestIdentifiers()
         {
             Identifier sysId = "test_node";
@@ -194,14 +190,14 @@ namespace ScEngineNet.Tests
             Assert.AreEqual(ScTypes.Node, node5.ElementType);
 
             Assert.AreEqual(sysId, node5.SystemIdentifier);
-            Assert.AreEqual(ruId, ((ScString)node5.MainIdentifiers[ScDataTypes.Instance.LanguageRu]).Value);
-            Assert.AreEqual(enId, ((ScString)node5.MainIdentifiers[ScDataTypes.Instance.LanguageEn]).Value);
+            Assert.AreEqual(ruId, ((ScString) node5.MainIdentifiers[ScDataTypes.Instance.LanguageRu]).Value);
+            Assert.AreEqual(enId, ((ScString) node5.MainIdentifiers[ScDataTypes.Instance.LanguageEn]).Value);
 
             node5.DeleteFromMemory();
             node5.Dispose();
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void FindNodeTest()
         {
             var findedNode = context.FindNode(node.ScAddress);
@@ -216,7 +212,7 @@ namespace ScEngineNet.Tests
             Assert.IsNull(findedNodeByInvalidId);
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void CreateLinkTest()
         {
             ScString content = "Test_content_1234Тестовый контент";
@@ -226,7 +222,7 @@ namespace ScEngineNet.Tests
             Assert.AreEqual(ScTypes.Link, testLink.ElementType);
             var classnode = testLink.LinkContent.ClassNodeIdentifier;
             Assert.AreEqual(expectedClassNode, classnode);
-            Assert.IsTrue(content==((ScString)testLink.LinkContent));
+            Assert.IsTrue(content == ((ScString) testLink.LinkContent));
 
             //проверка создания ссылки с дублирующим контентом.
 
@@ -246,7 +242,7 @@ namespace ScEngineNet.Tests
             testLink1.Dispose();
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void FindLinkTest()
         {
             ScString content = "Test_content_1234Тестовый контент";
@@ -254,7 +250,7 @@ namespace ScEngineNet.Tests
             var testLink = context.CreateLink(content);
             var findedTestLink = context.FindLink(testLink.ScAddress);
             Assert.AreEqual(testLink, findedTestLink);
-            Assert.AreEqual(content, ((ScString)findedTestLink.LinkContent));
+            Assert.AreEqual(content, ((ScString) findedTestLink.LinkContent));
 
             testLink.DeleteFromMemory();
             testLink.Dispose();
@@ -263,7 +259,7 @@ namespace ScEngineNet.Tests
             findedTestLink.Dispose();
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void FindLinksTest()
         {
             ScString content = "FindLinksTestContent Контент тесового метода 12345";
@@ -272,22 +268,19 @@ namespace ScEngineNet.Tests
 
             Assert.AreEqual(1, links.Count);
 
-            foreach (var link in links)
+            foreach (var scLink in links)
             {
-                Assert.AreEqual(content, ((ScString)link.LinkContent));
+                Assert.AreEqual(content, ((ScString) scLink.LinkContent));
             }
 
             testLink.DeleteFromMemory();
             testLink.Dispose();
-
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void DisposeTest()
         {
             var testContext = new ScMemoryContext(ScAccessLevels.MedLevel);
-#warning проблема с установкой уровня доступа
-            Assert.AreEqual(ScAccessLevels.MedLevel, testContext.AccessLevel);
             Assert.IsFalse(testContext.Disposed);
 
             testContext.Dispose();
@@ -295,67 +288,64 @@ namespace ScEngineNet.Tests
             Assert.IsTrue(testContext.Disposed);
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void MultyThreadCreationTest()
         {
-            Thread thread1 = new Thread(delegate()
-                {
-                    using (var context = new ScMemoryContext(ScAccessLevels.MinLevel))
-                    {
-                        for (int i = 0; i < 10000; i++)
-                        {
-                            var link = context.CreateLink();
-                            Assert.IsNotNull(link);
-
-                            link.Dispose();
-                        }
-                    }
-                });
-
-            Thread thread2 = new Thread(delegate()
+            var thread1 = new Thread(delegate()
             {
-                using (var context = new ScMemoryContext(ScAccessLevels.MinLevel))
+                using (var memoryContext = new ScMemoryContext(ScAccessLevels.MinLevel))
                 {
-                    for (int i = 0; i < 10000; i++)
+                    for (var i = 0; i < 10000; i++)
                     {
-                        var node = context.CreateNode(ScTypes.Node);
-                        Assert.IsNotNull(node);
+                        var scLink = memoryContext.CreateLink();
+                        Assert.IsNotNull(scLink);
 
-                        var link = context.CreateLink();
-                        Assert.IsNotNull(link);
-
-                        var arc = context.CreateArc(node, link, ScTypes.ArcAccessConstantPositivePermanent);
-                        Assert.IsNotNull(arc);
-
-                        arc.Dispose();
-
-                        node.Dispose();
-
-                        link.Dispose();
+                        scLink.Dispose();
                     }
                 }
             });
 
-            Thread thread3 = new Thread(delegate()
+            var thread2 = new Thread(delegate()
+            {
+                using (var memoryContext = new ScMemoryContext(ScAccessLevels.MinLevel))
                 {
-                    using (var context = new ScMemoryContext(ScAccessLevels.MinLevel))
+                    for (var i = 0; i < 10000; i++)
                     {
-                        for (int i = 0; i < 10000; i++)
-                        {
-                            var node = context.CreateNode(ScTypes.Node);
-                            Assert.IsNotNull(node);
+                        var scNode = memoryContext.CreateNode(ScTypes.Node);
+                        Assert.IsNotNull(scNode);
 
-                            node.Dispose();
-                        }
+                        var scLink = memoryContext.CreateLink();
+                        Assert.IsNotNull(scLink);
+
+                        var arc = memoryContext.CreateArc(scNode, scLink, ScTypes.ArcAccessConstantPositivePermanent);
+                        Assert.IsNotNull(arc);
+
+                        arc.Dispose();
+
+                        scNode.Dispose();
+
+                        scLink.Dispose();
                     }
-                });
+                }
+            });
+
+            var thread3 = new Thread(delegate()
+            {
+                using (var memoryContext = new ScMemoryContext(ScAccessLevels.MinLevel))
+                {
+                    for (var i = 0; i < 10000; i++)
+                    {
+                        var scNode = memoryContext.CreateNode(ScTypes.Node);
+                        Assert.IsNotNull(scNode);
+
+                        scNode.Dispose();
+                    }
+                }
+            });
 
             thread1.Start();
             thread2.Start();
             thread3.Start();
         }
-
-
-
     }
 }

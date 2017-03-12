@@ -13,12 +13,7 @@ namespace ScEngineNet.ScElements
         /// </summary>
         public static readonly ScAddress Invalid = new ScAddress(0, 0);
 
-        private readonly WScAddress wScAddress;
-
-        internal WScAddress WScAddress
-        {
-            get { return wScAddress; }
-        }
+        internal WScAddress WScAddress { get; }
 
         /// <summary>
         /// Возвращает известность адреса
@@ -27,24 +22,19 @@ namespace ScEngineNet.ScElements
         {
             get
             {
-                return !this.Equals(ScAddress.Invalid);
+                return !Equals(Invalid);
             }
         }
 
         /// <summary>
         /// Сегмент.
         /// </summary>
-        public ushort Segment
-        { get { return segment; } }
+        public ushort Segment { get; }
 
         /// <summary>
         /// Смещение.
         /// </summary>
-        public ushort Offset
-        { get { return offset; } }
-
-        private readonly ushort segment;
-        private readonly ushort offset;
+        public ushort Offset { get; }
 
         /// <summary>
         /// Инициализирует новый sc-адрес, используя смещение и сегмент.
@@ -53,16 +43,16 @@ namespace ScEngineNet.ScElements
         /// <param name="offset">смещение</param>
         public ScAddress(ushort segment, ushort offset)
         {
-            this.segment = segment;
-            this.offset = offset;
-            this.wScAddress = new WScAddress() { Offset = offset, Segment = segment };
+           Segment = segment;
+           Offset = offset;
+           WScAddress = new WScAddress() { Offset = offset, Segment = segment };
         }
 
         internal ScAddress(WScAddress wScAddress)
         {
-            this.segment = wScAddress.Segment;
-            this.offset = wScAddress.Offset;
-            this.wScAddress = wScAddress;
+            Segment = wScAddress.Segment;
+            Offset = wScAddress.Offset;
+            WScAddress = wScAddress;
         }
 
         /// <summary>
@@ -74,7 +64,7 @@ namespace ScEngineNet.ScElements
         /// <filterpriority>2</filterpriority>
         public override string ToString()
         {
-            return string.Format("segment: {0}, offset: {1}", segment, offset);
+            return string.Format("segment: {0}, offset: {1}", Segment, Offset);
         }
 
         #region Реализация сравнения
@@ -88,7 +78,7 @@ namespace ScEngineNet.ScElements
             if (obj == null)
                 return false;
 
-            return obj.Offset == this.Offset && obj.Segment == this.Segment;
+            return obj.Offset == Offset && obj.Segment == Segment;
         }
 
         /// <summary>
@@ -97,12 +87,10 @@ namespace ScEngineNet.ScElements
         /// <param name="obj">объект <see cref="T:System.Object"/></param>
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            var scAddress = obj as ScAddress;
+            if ((ScAddress) scAddress == null)
                 return false;
-            ScAddress scAddress = obj as ScAddress;
-            if (scAddress as ScAddress == null)
-                return false;
-            return scAddress.Offset == this.Offset && scAddress.Segment == this.Segment;
+            return scAddress.Offset == Offset && scAddress.Segment == Segment;
         }
 
         /// <summary>
@@ -110,7 +98,7 @@ namespace ScEngineNet.ScElements
         /// </summary>
         public override int GetHashCode()
         {
-            return Convert.ToInt32(this.Offset.ToString() + this.Segment.ToString());
+            return Convert.ToInt32(Offset.ToString() + Segment.ToString());
         }
 
         /// <summary>
@@ -121,7 +109,7 @@ namespace ScEngineNet.ScElements
         /// <returns>Возвращает True, если адреса равны</returns>
         public static bool operator ==(ScAddress scAddress1, ScAddress scAddress2)
         {
-            bool isEqual = false;
+            var isEqual = false;
             if (((object)scAddress1 != null) && ((object)scAddress2 != null))
             {
                 isEqual = scAddress1.Equals(scAddress2);

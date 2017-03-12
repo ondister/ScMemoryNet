@@ -1,26 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ScMemoryNet;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-namespace ScMemoryNet.Tests
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ScEngineNet;
+
+namespace ScMachineWrapperTest
 {
     [TestClass()]
     public class ScMemoryTests
     {
-        const string configFile = @"d:\OSTIS\sc-machine-master\bin\sc-memory.ini";
-        const string repoPath = @"d:\OSTIS\sc-machine-master\bin\repo";
-        const string extensionPath = @"d:\OSTIS\sc-machine-master\bin\extensions";
-        const string netExtensionPath = "";
+
 
 
         [TestInitialize]
         public void InitializeTest()
         {
             Assert.IsFalse(ScMemory.IsInitialized);
-            if (!ScMemory.IsInitialized) { ScMemory.Initialize(true, configFile, repoPath, extensionPath, netExtensionPath); }
+            if (!ScMemory.IsInitialized) { ScMemory.Initialize(true, TestParams.ConfigFile, TestParams.RepoPath, TestParams.ExtensionPath, TestParams.NetExtensionPath); }
         }
 
         [TestMethod]
