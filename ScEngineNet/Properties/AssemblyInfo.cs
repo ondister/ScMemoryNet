@@ -34,5 +34,4 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: InternalsVisibleTo("ScMachineWrapperTest")]
-[assembly: InternalsVisibleTo("Demo")]
+[assembly: InternalsVisibleTo("ScMachineWrapperTest, PublicKey=002400000480000094000000060200000024000052534131000400000100010025547be8da12dbb94012f6fc282a62b80b50c97813cdaf2d580efbc80244dd0491ca57b7f9af8ae6316f6c274c89a0fcbab58d7c6a1429c129c9bae54969782e62f712abcadbc98756f0db8edde339340ba689102cf20f4235decc791750ccc75d47619228a531aaddb855373d9c6af4a8a1e770003726159cccf3e19874a1e6")]

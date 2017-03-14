@@ -24,7 +24,7 @@ namespace ScEngineNet.ScElements
         /// <summary>
         ///     Значение.
         /// </summary>
-        public string Value { get; }
+        public string Value { get; private set; }
 
         /// <summary>
         ///     Определяет равен ли заданный объект <see cref="Identifier" /> текущему объекту

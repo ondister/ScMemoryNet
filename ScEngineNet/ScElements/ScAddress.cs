@@ -13,7 +13,7 @@ namespace ScEngineNet.ScElements
         /// </summary>
         public static readonly ScAddress Invalid = new ScAddress(0, 0);
 
-        internal WScAddress WScAddress { get; }
+        internal WScAddress WScAddress { get; private set; }
 
         /// <summary>
         /// Возвращает известность адреса
@@ -29,12 +29,12 @@ namespace ScEngineNet.ScElements
         /// <summary>
         /// Сегмент.
         /// </summary>
-        public ushort Segment { get; }
+        public ushort Segment { get; private set; }
 
         /// <summary>
         /// Смещение.
         /// </summary>
-        public ushort Offset { get; }
+        public ushort Offset { get; private set; }
 
         /// <summary>
         /// Инициализирует новый sc-адрес, используя смещение и сегмент.

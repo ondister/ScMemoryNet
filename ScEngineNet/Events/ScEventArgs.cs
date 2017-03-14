@@ -15,7 +15,7 @@ namespace ScEngineNet.Events
         /// <value>
         /// Тип события <see cref="ScEventType"/>
         /// </value>
-        public ScEventType EventType { get; }
+        public ScEventType EventType { get; private set; }
 
         /// <summary>
         /// Возвращает элемент, подписанный на событие
@@ -23,7 +23,7 @@ namespace ScEngineNet.Events
         /// <value>
         /// The element.
         /// </value>
-        public ScElement Element { get; }
+        public ScElement Element { get; private set; }
 
         /// <summary>
         /// Возвращает входящую или исходящую дугу, если событие было подписано на добавление или удаление дуг.
@@ -31,7 +31,7 @@ namespace ScEngineNet.Events
         /// <value>
         /// Sc-дуга
         /// </value>
-        public ScArc Arc { get; }
+        public ScArc Arc { get; private set; }
 
         internal ScEventArgs(ScEventType eventType, ScElement element, ScArc arc)
         {

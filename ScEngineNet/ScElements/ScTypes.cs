@@ -10,7 +10,7 @@ namespace ScEngineNet.ScElements
             ElementType = elementType;
         }
 
-        internal ElementTypes ElementType { get; }
+        internal ElementTypes ElementType { get; private set; }
 
         public override int GetHashCode()
         {

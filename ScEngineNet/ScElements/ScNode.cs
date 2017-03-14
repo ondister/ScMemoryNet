@@ -27,7 +27,7 @@ namespace ScEngineNet.ScElements
         /// <value>
         ///     Коллекция основных идентификаторов.
         /// </value>
-        public MainIdentifiers MainIdentifiers { get; }
+        public MainIdentifiers MainIdentifiers { get; private set; }
 
         /// <summary>
         ///     Возвращает системный идентификатор узла

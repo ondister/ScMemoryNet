@@ -31,6 +31,7 @@ namespace ScEngineNet.ScElements
         {
             ScContext = scContext;
             ScAddress = scAddress;
+            EventSet = new EventSet();
 
             scOutputArcAddedEvent = new ScEvent(ScAddress, ScEventType.ScEventAddOutputArc);
             scOutputArcRemovedEvent = new ScEvent(ScAddress, ScEventType.ScEventRemoveOutputArc);
@@ -41,7 +42,7 @@ namespace ScEngineNet.ScElements
             scElementRemovedEvent = new ScEvent(ScAddress, ScEventType.ScEventRemoveElement);
         }
 
-        internal ScMemoryContext ScContext { get; }
+        internal ScMemoryContext ScContext { get; private set; }
 
         /// <summary>
         ///     Вовращает тип элемента
@@ -304,8 +305,8 @@ namespace ScEngineNet.ScElements
         #endregion
 
         #region Events
-
-        internal EventSet EventSet { get; } = new EventSet();
+       
+        internal EventSet EventSet { get; private set; }
 
         #region OutputArcAdded
 

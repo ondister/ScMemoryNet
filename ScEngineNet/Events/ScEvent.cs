@@ -43,7 +43,7 @@ namespace ScEngineNet.Events
         /// <value>
         ///     The element address.
         /// </value>
-        public ScAddress ElementAddress { get; }
+        public ScAddress ElementAddress { get; private set; }
 
         /// <summary>
         ///     Возвращает тип события.
@@ -51,7 +51,7 @@ namespace ScEngineNet.Events
         /// <value>
         ///     Тип события <see cref="ScEventType" />
         /// </value>
-        public ScEventType EventType { get; }
+        public ScEventType EventType { get; private set; }
 
         internal IntPtr WScEvent { get; private set; }
 
