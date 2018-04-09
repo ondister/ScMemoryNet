@@ -26,7 +26,12 @@ namespace ScEngineNet.NetHelpers
                 Date,
                 DateTime,
                 Time,
-                Bitmap
+                TimeInterval,
+                Bitmap,
+                LanguageEn,
+                LanguageRu,
+                Rtf,
+                Wkt
             };
         }
 
@@ -88,6 +93,9 @@ namespace ScEngineNet.NetHelpers
                 CreateKeyNode(context, ScTypes.NodeConstantClass, Date);
                 CreateKeyNode(context, ScTypes.NodeConstantClass, Time);
                 CreateKeyNode(context, ScTypes.NodeConstantClass, DateTime);
+                CreateKeyNode(context, ScTypes.NodeConstantClass, TimeInterval);
+                CreateKeyNode(context, ScTypes.NodeConstantClass, Rtf);
+                CreateKeyNode(context, ScTypes.NodeConstantClass, Wkt);
             }
             return true;
         }
@@ -102,7 +110,7 @@ namespace ScEngineNet.NetHelpers
         /// </value>
         public Identifier NumericInt
         {
-            get { return "numeric_int"; }
+            get { return "binary_int32"; }
         }
 
         /// <summary>
@@ -113,7 +121,7 @@ namespace ScEngineNet.NetHelpers
         /// </value>
         public Identifier NumericDouble
         {
-            get { return "numeric_double"; }
+            get { return "binary_float"; }
         }
 
         /// <summary>
@@ -124,7 +132,7 @@ namespace ScEngineNet.NetHelpers
         /// </value>
         public Identifier NumericLong
         {
-            get { return "numeric_long"; }
+            get { return "binary_int64"; }
         }
 
         /// <summary>
@@ -135,7 +143,7 @@ namespace ScEngineNet.NetHelpers
         /// </value>
         public Identifier NumericByte
         {
-            get { return "numeric_byte"; }
+            get { return "binary_int8"; }
         }
 
         /// <summary>
@@ -211,6 +219,24 @@ namespace ScEngineNet.NetHelpers
         public Identifier Bitmap
         {
             get { return "type_bitmap"; }
+        }
+
+        public Identifier TimeInterval
+        {
+            get { return "type_time_interval"; }
+        }
+
+        public Identifier Rtf
+        {
+            get { return "type_rtf"; }
+        }
+
+        /// <summary>
+        /// Описание географического объекта на языке Wkt
+        /// </summary>
+        public Identifier Wkt
+        {
+            get { return "type_wkt"; }
         }
 
         #endregion

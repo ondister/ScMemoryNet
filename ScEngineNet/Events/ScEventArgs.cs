@@ -25,6 +25,15 @@ namespace ScEngineNet.Events
         /// </value>
         public ScElement Element { get; private set; }
 
+
+        /// <summary>
+        /// Возвращает элемент, на другом конце дуги
+        /// </summary>
+        /// <value>
+        /// The element.
+        /// </value>
+        public ScElement OtherElement { get; private set; }
+
         /// <summary>
         /// Возвращает входящую или исходящую дугу, если событие было подписано на добавление или удаление дуг.
         /// </summary>
@@ -33,11 +42,12 @@ namespace ScEngineNet.Events
         /// </value>
         public ScArc Arc { get; private set; }
 
-        internal ScEventArgs(ScEventType eventType, ScElement element, ScArc arc)
+        internal ScEventArgs(ScEventType eventType, ScElement element, ScArc arc, ScElement otherElement)
         {
             EventType = eventType;
             Element = element;
-           Arc = arc;
+            Arc = arc;
+            OtherElement = otherElement;
         }
     }
 }

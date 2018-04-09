@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using ScEngineNet.ExtensionsNet;
 using ScEngineNet.Native;
 using ScEngineNet.NetHelpers;
 using ScEngineNet.ScElements;
+using ScMemoryNet.Models.ScNetExtension;
 
 namespace ScEngineNet
 {
@@ -82,7 +82,7 @@ namespace ScEngineNet
 
                 NativeMethods.sc_memory_initialize(parameters.ScParams);
                 //только если указанная директория существует
-                if (Directory.Exists(parameters.NetExtensionsPath))
+                if (Directory.Exists(parameters.NetExtensionsPath) )
                 {
                     LoadExtensionsNets(parameters.NetExtensionsPath);
                 }
@@ -102,10 +102,11 @@ namespace ScEngineNet
 
         private static void LoadExtensionsNets(string netExtensionsPath)
         {
-            var files = Directory.GetFiles(netExtensionsPath, "*.dll");
+            var files = Directory.GetFiles(netExtensionsPath, "*_netextension.dll");
             Console.WriteLine("** Message: Initialize .net extensions from " + netExtensionsPath);
             foreach (var fName in files)
             {
+               
                 var assembly = Assembly.LoadFrom(fName);
                 foreach (var t in assembly.GetExportedTypes())
                 {
@@ -113,7 +114,7 @@ namespace ScEngineNet
                     {
                         var exNet = (IScExtensionNet)assembly.CreateInstance(t.FullName);
 
-                        if (exNet != null && exNet.Initialize() == ScResult.ScResultOk)
+                        if (exNet != null && exNet.Initialize())
                         {
                             listExtensionsNet.Add(exNet);
                             Console.WriteLine("** Message: .net module: {0} initialized ", fName);
@@ -129,7 +130,7 @@ namespace ScEngineNet
             foreach (var exNet in listExtensionsNet)
             {
 
-                if (exNet.ShutDown() == ScResult.ScResultOk)
+                if (exNet.ShutDown())
                 {
                     Console.WriteLine("** Message: .net module: {0} unloaded", exNet.NetExtensionName);
                 }
@@ -146,8 +147,7 @@ namespace ScEngineNet
         {
             var isShutDown = false;
 
-
-
+            
             //уничтожение объектов с указателями в памяти перед закрытием памяти
 
 

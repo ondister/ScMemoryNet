@@ -10,14 +10,14 @@ namespace ScEngineNet.LinkContent
     /// <summary>
     ///     Базовый класс для содержимого sc-ссылки
     /// </summary>
-    public abstract class ScLinkContent : IDisposable, IEquatable<ScLinkContent>
+    public abstract class ScLinkContent :  IEquatable<ScLinkContent>, IDisposable
     {
         private static readonly Dictionary<Identifier, Func<byte[], ScLinkContent>> ScLinkContentConstructors = new Dictionary
             <Identifier, Func<byte[], ScLinkContent>>
         {
             {ScDataTypes.Instance.TypeString, bytes => new ScString(bytes)},
-            {ScDataTypes.Instance.LanguageEn, bytes => new ScString(bytes)},
-            {ScDataTypes.Instance.LanguageRu, bytes => new ScString(bytes)},
+            {ScDataTypes.Instance.LanguageEn, bytes => new ScLangEn(bytes)},
+            {ScDataTypes.Instance.LanguageRu, bytes => new ScLangRu(bytes)},
             {ScDataTypes.Instance.TypeBinary, bytes => new ScBinary(bytes)},
             {ScDataTypes.Instance.NumericInt, bytes => new ScInt32(bytes)},
             {ScDataTypes.Instance.NumericDouble, bytes => new ScDouble(bytes)},
@@ -27,15 +27,19 @@ namespace ScEngineNet.LinkContent
             {ScDataTypes.Instance.Date, bytes => new ScDate(bytes)},
             {ScDataTypes.Instance.DateTime, bytes => new ScDateTime(bytes)},
             {ScDataTypes.Instance.Time, bytes => new ScTime(bytes)},
-            {ScDataTypes.Instance.Bitmap, bytes => new ScBitmap(bytes)}
+            {ScDataTypes.Instance.TimeInterval, bytes => new ScTimeInterval(bytes)},
+            {ScDataTypes.Instance.Bitmap, bytes => new ScBitmap(bytes)},
+            {ScDataTypes.Instance.Rtf, bytes => new ScRtf(bytes)},
+            {ScDataTypes.Instance.Wkt, bytes => new ScWkt(bytes)}
         };
 
+      
         private static readonly Dictionary<Identifier, Func<IntPtr, ScLinkContent>> ScLinkIntPtrConstructors = new Dictionary
             <Identifier, Func<IntPtr, ScLinkContent>>
         {
             {ScDataTypes.Instance.TypeString, streamIntPtr => new ScString(streamIntPtr)},
-            {ScDataTypes.Instance.LanguageRu, streamIntPtr => new ScString(streamIntPtr)},
-            {ScDataTypes.Instance.LanguageEn, streamIntPtr => new ScString(streamIntPtr)},
+            {ScDataTypes.Instance.LanguageRu, streamIntPtr => new ScLangRu(streamIntPtr)},
+            {ScDataTypes.Instance.LanguageEn, streamIntPtr => new ScLangEn(streamIntPtr)},
             {ScDataTypes.Instance.TypeBinary, streamIntPtr => new ScBinary(streamIntPtr)},
             {ScDataTypes.Instance.NumericInt, streamIntPtr => new ScInt32(streamIntPtr)},
             {ScDataTypes.Instance.NumericDouble, streamIntPtr => new ScDouble(streamIntPtr)},
@@ -45,7 +49,10 @@ namespace ScEngineNet.LinkContent
             {ScDataTypes.Instance.Date, streamIntPtr => new ScDate(streamIntPtr)},
             {ScDataTypes.Instance.DateTime, streamIntPtr => new ScDateTime(streamIntPtr)},
             {ScDataTypes.Instance.Time, streamIntPtr => new ScTime(streamIntPtr)},
-            {ScDataTypes.Instance.Bitmap, streamIntPtr => new ScBitmap(streamIntPtr)}
+            {ScDataTypes.Instance.TimeInterval, streamIntPtr => new ScTimeInterval(streamIntPtr)},
+            {ScDataTypes.Instance.Bitmap, streamIntPtr => new ScBitmap(streamIntPtr)},
+            {ScDataTypes.Instance.Rtf, streamIntPtr => new ScRtf(streamIntPtr)},
+            {ScDataTypes.Instance.Wkt, streamIntPtr => new ScWkt(streamIntPtr)}
         };
 
         private IntPtr scStream;
@@ -111,8 +118,7 @@ namespace ScEngineNet.LinkContent
         internal ScLinkContent(byte[] bytes)
         {
             Bytes = bytes;
-            scStream = NativeMethods.sc_stream_memory_new(Bytes, (uint) bytes.Length, ScStreamFlag.SC_STREAM_FLAG_READ,
-                false);
+            scStream = NativeMethods.sc_stream_memory_new(Bytes, (uint) bytes.Length, ScStreamFlag.SC_STREAM_FLAG_READ,false);
         }
 
         /// <summary>
@@ -129,6 +135,8 @@ namespace ScEngineNet.LinkContent
             this(new byte[0])
         {
         }
+
+
 
         #endregion
 
@@ -225,6 +233,7 @@ namespace ScEngineNet.LinkContent
 
         #region Конвертация
 
+
         /// <summary>
         ///     Returns a <see cref="System.String" /> that represents this instance.
         /// </summary>
@@ -236,7 +245,7 @@ namespace ScEngineNet.LinkContent
         {
             return ScEngineNet.TextEncoding.GetString(bytes);
         }
-
+        
 
         /// <summary>
         ///     To the int32.
@@ -289,6 +298,23 @@ namespace ScEngineNet.LinkContent
             return result;
         }
 
+
+        public static double ToDouble(byte[] bytes)
+        {
+            double result;
+            if (bytes.Length == 8)
+            {
+                result = BitConverter.ToDouble(bytes, 0);
+            }
+            else
+            {
+                var stringData = ToString(bytes);
+                result = Double.Parse(stringData);
+            }
+            return result;
+        }
+
+
         /// <summary>
         ///     To the long.
         /// </summary>
@@ -304,6 +330,21 @@ namespace ScEngineNet.LinkContent
             else
             {
                 var stringData = ToString(content.Bytes);
+                result = long.Parse(stringData);
+            }
+            return result;
+        }
+
+        public static long ToLong(byte[] bytes)
+        {
+            long result;
+            if (bytes.Length == 8)
+            {
+                result = BitConverter.ToInt64(bytes, 0);
+            }
+            else
+            {
+                var stringData = ToString(bytes);
                 result = long.Parse(stringData);
             }
             return result;
@@ -407,14 +448,17 @@ namespace ScEngineNet.LinkContent
             return !scLinkContent1.Equals(scLinkContent2);
         }
 
-        #endregion
+       #endregion
 
         #region IDisposal
 
         private void StreamFree()
         {
-            NativeMethods.sc_stream_free(scStream);
-            scStream = IntPtr.Zero;
+            if (ScMemoryContext.IsMemoryInitialized())
+            {
+                NativeMethods.sc_stream_free(scStream);
+               // scStream = IntPtr.Zero;
+            }
         }
 
         /// <summary>
@@ -437,7 +481,7 @@ namespace ScEngineNet.LinkContent
             //  Console.WriteLine("call Dispose({0}) ScLinkContent with {1}", disposing, this.scStream);
 
 
-            if (!Disposed && ScMemoryContext.IsMemoryInitialized())
+            if (!Disposed)
             {
                 // Dispose of resources held by this instance.
                 StreamFree();
@@ -467,5 +511,9 @@ namespace ScEngineNet.LinkContent
         }
 
         #endregion
+
+
+        public abstract override string ToString();
+
     }
 }

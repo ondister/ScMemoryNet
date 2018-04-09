@@ -17,17 +17,18 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\ostis-master\sc-machine\bin\</OutputPath>
+    <OutputPath>..\DEBUG\bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\SapfirProject_ostis\Sapfir.Servers\[RELEASE]\SemanticServer\</OutputPath>
+    <OutputPath>..\RELEASE\bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -45,26 +46,27 @@
     <AssemblyOriginatorKeyFile>ScEngineKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net">
-      <HintPath>..\packages\log4net.2.0.7\lib\net45-full\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LinkContent\ComparerTypeEnum.cs" />
+    <Compile Include="LinkContent\ComparerTypeEnumExtension.cs" />
     <Compile Include="LinkContent\ScBitmap.cs" />
+    <Compile Include="LinkContent\ScDataTypeComparer.cs" />
+    <Compile Include="LinkContent\ScWkt.cs" />
+    <Compile Include="LinkContent\ScLangEn.cs" />
+    <Compile Include="LinkContent\ScRtf.cs" />
+    <Compile Include="LinkContent\ScLangRu.cs" />
+    <Compile Include="LinkContent\ScTimeInterval.cs" />
     <Compile Include="LinkContent\ScDateTime.cs" />
     <Compile Include="LinkContent\ScTime.cs" />
     <Compile Include="LinkContent\ScDate.cs" />
     <Compile Include="NetHelpers\ScKeyNodes.cs" />
     <Compile Include="NetHelpers\ScDataTypes.cs" />
     <Compile Include="Events\EventSet.cs" />
+    <Compile Include="ScElements\SapfirContext.cs" />
     <Compile Include="ScElements\ScIterator.cs" />
     <Compile Include="ScElements\ScTypes.cs" />
     <Compile Include="ScExceptions\ScContextInvalidException.cs" />
@@ -77,7 +79,6 @@
     <Compile Include="LinkContent\ScString.cs" />
     <Compile Include="ScElements\MainIdentifiers.cs" />
     <Compile Include="ScElements\ScAccessLevels.cs" />
-    <Compile Include="ExtensionsNet\IScExtensionNet.cs" />
     <Compile Include="ScElements\Identifier.cs" />
     <Compile Include="ScElements\ScAddress.cs" />
     <Compile Include="Events\ScEventArgs.cs" />
@@ -121,8 +122,13 @@
     <Compile Include="Native\ScStreamSeekOrigin.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="ScEngineKey.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ScEngineNet.Models.ScNetExtension\ScMemoryNet.Models.ScNetExtension.csproj">
+      <Project>{f320a9ff-7d40-40f5-bd67-f65227553d8e}</Project>
+      <Name>ScMemoryNet.Models.ScNetExtension</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

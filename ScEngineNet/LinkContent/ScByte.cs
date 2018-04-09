@@ -19,6 +19,13 @@ namespace ScEngineNet.LinkContent
         {
             get { return ScDataTypes.Instance.NumericByte; }
         }
+
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
+
+
         /// <summary>
         /// Возвращает значение ссылки. В данном случае byte
         /// </summary>

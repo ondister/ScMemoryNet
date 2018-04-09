@@ -19,6 +19,9 @@ namespace ScEngineNet.LinkContent
         {
             get { return ScDataTypes.Instance.TypeString; }
         }
+
+      
+
         /// <summary>
         /// Возвращает значение ссылки. В данном случае string
         /// </summary>
@@ -70,5 +73,9 @@ namespace ScEngineNet.LinkContent
             return value.Value;
         }
 
+        public override string ToString()
+        {
+            return Value;
+        }
     }
 }

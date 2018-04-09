@@ -22,6 +22,12 @@ namespace ScEngineNet.LinkContent
             get { return ScDataTypes.Instance.TypeBinary; }
         }
 
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
+
+
         /// <summary>
         /// Получает значение. В данном случае массив байт
         /// </summary>

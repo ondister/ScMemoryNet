@@ -12,6 +12,7 @@ namespace ScEngineNet.ScElements
 
         internal ElementTypes ElementType { get; private set; }
 
+     
         public override int GetHashCode()
         {
             return (int) ElementType;
@@ -306,6 +307,7 @@ namespace ScEngineNet.ScElements
             get { return (ElementType & ElementTypes.VariableA) != 0; }
         }
 
+     
         #endregion
 
         #region Equals

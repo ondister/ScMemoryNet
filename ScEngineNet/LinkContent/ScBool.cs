@@ -21,6 +21,12 @@ namespace ScEngineNet.LinkContent
             get { return ScDataTypes.Instance.TypeBool; }
         }
 
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
+
+
         /// <summary>
         /// Возвращает значение ссылки. В данном случае или True или False
         /// </summary>

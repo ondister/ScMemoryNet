@@ -20,6 +20,12 @@ namespace ScEngineNet.LinkContent
             get { return ScDataTypes.Instance.NumericDouble; }
         }
 
+        public override string ToString()
+        {
+            return Value.ToString(ScEngineNet.CultureInfo);
+        }
+
+
         /// <summary>
         /// Возвращает значение ссылки. В данном случае double
         /// </summary>

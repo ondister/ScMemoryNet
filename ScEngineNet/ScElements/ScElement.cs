@@ -329,7 +329,10 @@ namespace ScEngineNet.ScElements
             {
                 //delete
                 EventSet.Remove(OutputArcAddedEventKey, value);
-                scOutputArcAddedEvent.Dispose();
+                if (scOutputArcAddedEvent.UnSubscribe())
+                {
+                   // scOutputArcAddedEvent.Dispose();
+                }
             }
         }
 
@@ -370,7 +373,10 @@ namespace ScEngineNet.ScElements
             {
                 //delete
                 EventSet.Remove(OutputArcRemovedEventKey, value);
-                scOutputArcRemovedEvent.Dispose();
+                if (scOutputArcRemovedEvent.UnSubscribe())
+                {
+                  //  scOutputArcRemovedEvent.Dispose();
+                }
             }
         }
 
@@ -412,7 +418,10 @@ namespace ScEngineNet.ScElements
             {
                 //delete
                 EventSet.Remove(InputArcRemovedEventKey, value);
-                scInputArcRemovedEvent.Dispose();
+                if (scInputArcRemovedEvent.UnSubscribe())
+                {
+                   // scInputArcRemovedEvent.Dispose();
+                }
             }
         }
 
@@ -453,7 +462,10 @@ namespace ScEngineNet.ScElements
             {
                 //delete
                 EventSet.Remove(InputArcAddedEventKey, value);
-                scInputArcAddedEvent.Dispose();
+                if (scInputArcAddedEvent.UnSubscribe())
+                {
+                  //  scInputArcAddedEvent.Dispose();
+                }
             }
         }
 
@@ -494,7 +506,10 @@ namespace ScEngineNet.ScElements
             {
                 //delete
                 EventSet.Remove(ElementRemovedEventKey, value);
-                scElementRemovedEvent.Dispose();
+                if (scElementRemovedEvent.UnSubscribe())
+                {
+                   // scElementRemovedEvent.Dispose();
+                }
             }
         }
 
@@ -503,7 +518,7 @@ namespace ScEngineNet.ScElements
         {
             OnElementRemoved(e);
 
-            scElementRemovedEvent.Dispose();
+          //  scElementRemovedEvent.Dispose();
         }
 
 
@@ -544,19 +559,10 @@ namespace ScEngineNet.ScElements
 
             if (!Disposed && ScMemoryContext.IsMemoryInitialized())
             {
-                // Dispose of resources held by this instance.
-
-
+              
                 // Suppress finalization of this disposed instance.
                 if (disposing)
                 {
-                    scOutputArcAddedEvent.Dispose();
-                    scOutputArcRemovedEvent.Dispose();
-
-                    scInputArcAddedEvent.Dispose();
-                    scInputArcRemovedEvent.Dispose();
-
-                    scElementRemovedEvent.Dispose();
                     GC.SuppressFinalize(this);
                 }
                 Disposed = true;

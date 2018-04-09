@@ -40,6 +40,12 @@ namespace ScEngineNet.LinkContent
             get { return ScDataTypes.Instance.DateTime; }
         }
 
+        public override string ToString()
+        {
+            return Value.ToString(ScEngineNet.CultureInfo);
+        }
+
+
         /// <summary>
         ///     Возвращает значение ссылки. В данном случае DateTime
         /// </summary>
@@ -79,6 +85,14 @@ namespace ScEngineNet.LinkContent
         public static implicit operator DateTime(ScDateTime value)
         {
             return value.Value;
+        }
+
+        public static  DateTime ToDateTime(byte[] bytes)
+        {
+            var stringContent = ToString(bytes);
+            DateTime date;
+            DateTime.TryParse(stringContent, ScEngineNet.CultureInfo, DateTimeStyles.None, out date);
+            return date;
         }
     }
 }

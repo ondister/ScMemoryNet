@@ -55,7 +55,6 @@ namespace ScEngineNet.ScElements
                 {
                     throw new ScContextInvalidException(ContextInvalidExceptionMsg);
                 }
-
                 ScContext.SetLinkContent(value, this);
             }
         }
@@ -69,7 +68,7 @@ namespace ScEngineNet.ScElements
         /// </param>
         protected new virtual void Dispose(bool disposing)
         {
-            contentChangeEvent.Dispose();
+          //  contentChangeEvent.Dispose();
             LinkContent.Dispose();
             base.Dispose(disposing);
         }
@@ -95,7 +94,7 @@ namespace ScEngineNet.ScElements
             {
                 //delete
                 EventSet.Remove(ContentChangeEventKey, value);
-                contentChangeEvent.Dispose();
+                //contentChangeEvent.Dispose();
             }
         }
 
@@ -115,5 +114,10 @@ namespace ScEngineNet.ScElements
         }
 
         #endregion
+
+        public override string ToString()
+        {
+            return LinkContent.ToString();
+        }
     }
 }

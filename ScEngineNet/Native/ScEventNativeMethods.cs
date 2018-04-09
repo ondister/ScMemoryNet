@@ -7,15 +7,15 @@ namespace ScEngineNet.Native
 {
     //   typedef sc_result (*fEventCallbackEx)(const sc_event *event, sc_addr arg, sc_addr other_el);
     [UnmanagedFunctionPointer(ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
-    internal delegate ScResult fEventCallbackEx(ref WScEvent scEvent, WScAddress arg, WScAddress other_el);
+    internal  delegate ScResult fEventCallbackEx(IntPtr scEvent, WScAddress arg, WScAddress otherEl);
 
     /// Backward compatibility
     [UnmanagedFunctionPointer(ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
-    internal delegate ScResult fEventCallback(ref WScEvent scEvent, WScAddress arg);
+    internal delegate ScResult fEventCallback(IntPtr scEvent, WScAddress arg);
 
     //typedef sc_result (*fDeleteCallback)(const sc_event *event);
     [UnmanagedFunctionPointer(ScEngineNet.DefaultCallingConvention, CharSet = ScEngineNet.DefaultCharset)]
-    internal delegate ScResult fDeleteCallback(ref WScEvent scEvent);
+    internal delegate ScResult fDeleteCallback(IntPtr scEvent);
 
     internal static partial class NativeMethods
     {

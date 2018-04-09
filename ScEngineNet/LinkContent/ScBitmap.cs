@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
 using ScEngineNet.NetHelpers;
 using ScEngineNet.ScElements;
 
@@ -12,7 +9,7 @@ namespace ScEngineNet.LinkContent
     /// </summary>
     public class ScBitmap : ScLinkContent
     {
-        internal ScBitmap(byte[] bytes) :
+        public ScBitmap(byte[] bytes) :
             base(bytes)
         {
         }
@@ -22,14 +19,7 @@ namespace ScEngineNet.LinkContent
         {
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ScBitmap" /> class.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        public ScBitmap(Bitmap value) :
-            base(BitmapToBytes(value))
-        {
-        }
+       
 
         /// <summary>
         ///     Ключевой узел, определяющий тип содержимого
@@ -42,30 +32,26 @@ namespace ScEngineNet.LinkContent
             get { return ScDataTypes.Instance.Bitmap; }
         }
 
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
+
+
         /// <summary>
         ///     Возвращает значение ссылки. В данном случае Bitmap
         /// </summary>
         /// <value>
         ///     Значение
         /// </value>
-        public Bitmap Value
+        public byte[] Value
         {
             get
             {
-                var stream = new MemoryStream(Bytes);
-                var bitmap = (Bitmap) Image.FromStream(stream);
-                return bitmap;
+              return Bytes;
             }
         }
 
-        private static byte[] BitmapToBytes(Bitmap bitmap)
-        {
-            var stream = new MemoryStream();
-            bitmap.Save(stream, ImageFormat.Jpeg);
-            stream.Position = 0;
-            var array = stream.ToArray();
-            return array;
-        }
 
         /// <summary>
         ///     Performs an implicit conversion from <see cref="System.Drawing.Bitmap" /> to <see cref="ScBitmap" />.
@@ -74,7 +60,7 @@ namespace ScEngineNet.LinkContent
         /// <returns>
         ///     The result of the conversion.
         /// </returns>
-        public static implicit operator ScBitmap(Bitmap value)
+        public static implicit operator ScBitmap(byte[] value)
         {
             return new ScBitmap(value);
         }
@@ -86,7 +72,7 @@ namespace ScEngineNet.LinkContent
         /// <returns>
         ///     The result of the conversion.
         /// </returns>
-        public static implicit operator Bitmap(ScBitmap value)
+        public static implicit operator byte[](ScBitmap value)
         {
             return value.Value;
         }

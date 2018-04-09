@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using ScEngineNet.Native;
 using ScEngineNet.ScElements;
 using ScEngineNet.ScExceptions;
@@ -22,19 +23,24 @@ namespace ScEngineNet.Events
     /// <summary>
     ///     Событие для элемента. Создается посредством вызова метода CreateEvent класса <see cref="ScMemoryContext" />
     /// </summary>
-    internal class ScEvent : IDisposable
+    internal class ScEvent 
     {
-        private const string disposalExceptionMsg = "Был вызван метод Dispose и cсылка на объект в памяти уже удалена";
+        private const string disposalExceptionMsg = "Был вызван метод Dispose и cсылка на объект ScEvent в памяти уже удалена";
         private const string memoryNotInitializedExceptionMsg = "Библиотека ScMemory.Net не инициализирована";
         private const string contextInvalidExceptionMsg = "Указанная ссылка на ScContext не действительна";
-        private fEventCallbackEx cb;
-        private ScMemoryContext context;
-        private fDeleteCallback db;
+        private  fEventCallbackEx cb;
+        private  fDeleteCallback db;
+        private  ScMemoryContext context;
+
 
         internal ScEvent(ScAddress elementAddress, ScEventType eventType)
         {
             ElementAddress = elementAddress;
             EventType = eventType;
+            cb = ECallback;
+            db = DCallback;
+            GC.KeepAlive(cb);
+            GC.KeepAlive(db);
         }
 
         /// <summary>
@@ -65,7 +71,7 @@ namespace ScEngineNet.Events
         /// </summary>
         public event ElementDeleteHandler ElementDelete;
 
-        internal void OnElementEvent(ScEventType eventType, ScAddress elementAddress, ScAddress arcAddress)
+        internal  void OnElementEvent(ScEventType eventType, ScAddress elementAddress, ScAddress arcAddress, ScAddress otherElementAddress)
         {
             if (Disposed)
             {
@@ -85,12 +91,12 @@ namespace ScEngineNet.Events
                 if (eventType != ScEventType.ScEventRemoveElement)
                 {
                     var args = new ScEventArgs(eventType, context.GetElement(elementAddress),
-                        new ScArc(arcAddress, context));
+                        new ScArc(arcAddress, context), context.GetElement(otherElementAddress));
                     ElementEvent(this, args);
                 }
                 else
                 {
-                    var args = new ScEventArgs(eventType, null, null);
+                    var args = new ScEventArgs(eventType, null, null,null);
                     ElementEvent(null, args);
                 }
             }
@@ -113,7 +119,7 @@ namespace ScEngineNet.Events
 
             if (ElementDelete != null)
             {
-                var args = new ScEventArgs(ScEventType.ScEventRemoveElement, null, null);
+                var args = new ScEventArgs(ScEventType.ScEventRemoveElement, null, null,null);
                 ElementDelete(null, args);
             }
         }
@@ -121,9 +127,7 @@ namespace ScEngineNet.Events
         internal bool Subscribe(ScMemoryContext context)
         {
             this.context = context;
-
-            cb = ECallback;
-            db = DCallback;
+           
             if (Disposed)
             {
                 throw new ObjectDisposedException(ToString(), disposalExceptionMsg);
@@ -137,23 +141,40 @@ namespace ScEngineNet.Events
                 throw new ScContextInvalidException(contextInvalidExceptionMsg);
             }
 
+            var pointPtr = new IntPtr();
+
             WScEvent = NativeMethods.sc_event_new_ex(this.context.PtrScMemoryContext, ElementAddress.WScAddress,
-                EventType, IntPtr.Zero, cb, db);
+                EventType, pointPtr, cb, db);
             return WScEvent != IntPtr.Zero;
         }
 
-        //TODO:otherElement тоже переместить в события
-        private ScResult ECallback(ref WScEvent scEvent, WScAddress arg, WScAddress otherElement)
-        {
-            OnElementEvent(scEvent.Type, new ScAddress(scEvent.Element), new ScAddress(arg));
+         private  ScResult ECallback(IntPtr scEvent, WScAddress arg, WScAddress otherElement)
+         {
+             
+                 var scEnventStructure = (WScEvent)Marshal.PtrToStructure(scEvent, typeof(WScEvent));
+
+                 OnElementEvent(scEnventStructure.Type, new ScAddress(scEnventStructure.Element), new ScAddress(arg),new ScAddress(otherElement));
+             
             return ScResult.ScResultOk;
         }
 
-        private ScResult DCallback(ref WScEvent scEvent)
+        private ScResult DCallback(IntPtr scEvent)
         {
-            OnElementDelete(new ScAddress(scEvent.Element));
+         var scEnventStructure = (WScEvent) Marshal.PtrToStructure(scEvent, typeof (WScEvent));
+                OnElementDelete(new ScAddress(scEnventStructure.Element));
             return ScResult.ScResultOk;
         }
+
+
+        internal bool UnSubscribe()
+        {
+            var result = NativeMethods.sc_event_destroy(WScEvent) == ScResult.ScResultOk;
+            cb = null;
+            db = null;
+            WScEvent = IntPtr.Zero;
+            return result;
+        }
+
 
         #region IDisposal
 
@@ -163,21 +184,7 @@ namespace ScEngineNet.Events
         /// <returns></returns>
         private bool Delete()
         {
-            var isDelete = false;
-            if (ScMemoryContext.IsMemoryInitialized() && WScEvent != IntPtr.Zero)
-            {
-                if (EventType != ScEventType.ScEventRemoveElement)
-                {
-                    isDelete = NativeMethods.sc_event_destroy(WScEvent) == ScResult.ScResultOk;
-                    cb = null;
-                    db = null;
-                   WScEvent = IntPtr.Zero;
-                }
-            }
-            else
-            {
-                isDelete = true;
-            }
+            var isDelete = !ScMemoryContext.IsMemoryInitialized() && WScEvent != IntPtr.Zero;
             return isDelete;
         }
 

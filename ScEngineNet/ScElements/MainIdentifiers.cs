@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ScEngineNet.LinkContent;
 
@@ -50,7 +51,7 @@ namespace ScEngineNet.ScElements
             {
                 var container = scContext.CreateIterator(scContext.FindNode(classNodeIdentifier),
                     ScTypes.ArcAccessConstantPositivePermanent, link);
-                if (container.Count() != 0)
+                if (container.Any())
                 {
                     var scLink = container.ElementAt(0)[2] as ScLink;
                     if (scLink != null)
@@ -66,16 +67,38 @@ namespace ScEngineNet.ScElements
 
         private void SetIdentifier(Identifier classNodeIdentifier, ScLinkContent identifier)
         {
-            if (GetIdentifier(classNodeIdentifier) == "")
+            var mainIdtf = scContext.FindNode("nrel_main_idtf");
+
+            if (GetIdentifier(classNodeIdentifier) != "")
             {
-                var mainIdtf = scContext.FindNode("nrel_main_idtf");
+                //delete identifier
+                var links = GetLinks();
+
+                foreach (var link in links)
+                {
+                    var container = scContext.CreateIterator(scContext.FindNode(classNodeIdentifier),
+                        ScTypes.ArcAccessConstantPositivePermanent, link);
+                    if (container.Any())
+                    {
+                        var baseIterator = scContext.CreateIterator(node, ScTypes.ArcCommonConstant, link,
+                            ScTypes.ArcAccessConstantPositivePermanent, mainIdtf);
+                        foreach (var construction in baseIterator)
+                        {
+                            construction[1].DeleteFromMemory();
+                            construction[3].DeleteFromMemory();
+                            Console.WriteLine("Idtf Deleted");
+                        }
+                    }
+                }
+            }
+
+            //add identifier
                 var idtfLink = scContext.CreateLink(identifier);
                 var commonArc = scContext.CreateArc(node, idtfLink, ScTypes.ArcCommonConstant);
                 //another arcs
                 scContext.CreateArc(mainIdtf, commonArc, ScTypes.ArcAccessConstantPositivePermanent);
                 scContext.CreateArc(scContext.FindNode(classNodeIdentifier), idtfLink,
                     ScTypes.ArcAccessConstantPositivePermanent);
-            }
         }
     }
 }

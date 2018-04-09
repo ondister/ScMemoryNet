@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using ScEngineNet.Native;
 
@@ -19,6 +20,7 @@ namespace ScEngineNet.ScElements
         private readonly ScIteratorParam p5;
         private readonly ScMemoryContext scContext;
 
+      
         private ScIterator(ScMemoryContext scContext)
         {
             this.scContext = scContext;
@@ -60,6 +62,8 @@ namespace ScEngineNet.ScElements
             p1 = new ScIteratorParam {IsType = false, Address = e1.ScAddress.WScAddress};
             p2 = new ScIteratorParam {IsType = true, Type = t1.ElementType};
             p3 = new ScIteratorParam {IsType = true, Type = t2.ElementType};
+
+        
         }
 
         internal ScIterator(ScMemoryContext scContext, ScTypes t1, ScTypes t2, ScElement e1)
@@ -71,6 +75,8 @@ namespace ScEngineNet.ScElements
             p1 = new ScIteratorParam {IsType = true, Type = t1.ElementType};
             p2 = new ScIteratorParam {IsType = true, Type = t2.ElementType};
             p3 = new ScIteratorParam {IsType = false, Address = e1.ScAddress.WScAddress};
+
+           
         }
 
         internal ScIterator(ScMemoryContext scContext, ScElement e1, ScTypes t1, ScElement e2)
@@ -82,6 +88,8 @@ namespace ScEngineNet.ScElements
             p1 = new ScIteratorParam {IsType = false, Address = e1.ScAddress.WScAddress};
             p2 = new ScIteratorParam {IsType = true, Type = t1.ElementType};
             p3 = new ScIteratorParam {IsType = false, Address = e2.ScAddress.WScAddress};
+
+           
         }
 
         internal ScIterator(ScMemoryContext scContext, ScTypes t1, ScTypes t2, ScElement e1, ScTypes t3, ScTypes t4)
@@ -95,6 +103,8 @@ namespace ScEngineNet.ScElements
             p3 = new ScIteratorParam {IsType = false, Address = e1.ScAddress.WScAddress};
             p4 = new ScIteratorParam {IsType = true, Type = t3.ElementType};
             p5 = new ScIteratorParam {IsType = true, Type = t4.ElementType};
+
+          
         }
 
         internal ScIterator(ScMemoryContext scContext, ScTypes t1, ScTypes t2, ScElement e1, ScTypes t3, ScElement e2)
@@ -108,6 +118,9 @@ namespace ScEngineNet.ScElements
             p3 = new ScIteratorParam {IsType = false, Address = e1.ScAddress.WScAddress};
             p4 = new ScIteratorParam {IsType = true, Type = t3.ElementType};
             p5 = new ScIteratorParam {IsType = false, Address = e2.ScAddress.WScAddress};
+
+           
+
         }
 
         internal ScIterator(ScMemoryContext scContext, ScElement e1, ScTypes t1, ScTypes t2, ScTypes t3, ScTypes t4)
@@ -121,6 +134,7 @@ namespace ScEngineNet.ScElements
             p3 = new ScIteratorParam {IsType = true, Type = t2.ElementType};
             p4 = new ScIteratorParam {IsType = true, Type = t3.ElementType};
             p5 = new ScIteratorParam {IsType = true, Type = t4.ElementType};
+
         }
 
         internal ScIterator(ScMemoryContext scContext, ScElement e1, ScTypes t1, ScTypes t2, ScTypes t3, ScElement e2)
@@ -134,6 +148,8 @@ namespace ScEngineNet.ScElements
             p3 = new ScIteratorParam {IsType = true, Type = t2.ElementType};
             p4 = new ScIteratorParam {IsType = true, Type = t3.ElementType};
             p5 = new ScIteratorParam {IsType = false, Address = e2.ScAddress.WScAddress};
+
+          
         }
 
         internal ScIterator(ScMemoryContext scContext, ScElement e1, ScTypes t1, ScElement e2, ScTypes t2, ScTypes t3)
@@ -147,6 +163,8 @@ namespace ScEngineNet.ScElements
             p3 = new ScIteratorParam {IsType = false, Address = e2.ScAddress.WScAddress};
             p4 = new ScIteratorParam {IsType = true, Type = t2.ElementType};
             p5 = new ScIteratorParam {IsType = true, Type = t3.ElementType};
+
+          
         }
 
         internal ScIterator(ScMemoryContext scContext, ScElement e1, ScTypes t1, ScElement e2, ScTypes t2, ScElement e3)
@@ -160,6 +178,7 @@ namespace ScEngineNet.ScElements
             p3 = new ScIteratorParam {IsType = false, Address = e2.ScAddress.WScAddress};
             p4 = new ScIteratorParam {IsType = true, Type = t2.ElementType};
             p5 = new ScIteratorParam {IsType = false, Address = e3.ScAddress.WScAddress};
+
         }
 
         #endregion

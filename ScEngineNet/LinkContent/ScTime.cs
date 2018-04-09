@@ -40,6 +40,12 @@ namespace ScEngineNet.LinkContent
             get { return ScDataTypes.Instance.Time; }
         }
 
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
+
+
         /// <summary>
         ///     Возвращает значение ссылки. В данном случае DateTime
         /// </summary>
