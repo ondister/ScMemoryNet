@@ -3,15 +3,17 @@ using System.Collections.Generic;
 
 namespace ScEngineNet.Events
 {
-
     // Этот класс нужен для поддержания безопасности типа
     // и кода при использовании EventSet
-    internal sealed class EventKey : Object { }
+    internal sealed class EventKey : Object
+    {
+    }
+
     internal sealed class EventSet
     {
         // Закрытый словарь служит для отображения EventKey -> Delegate
-
         private readonly Dictionary<EventKey, Delegate> mEvents = new Dictionary<EventKey, Delegate>();
+
         // Добавление отображения EventKey -> Delegate, если его не существует
         // И компоновка делегата с существующим ключом EventKey
         public void Add(EventKey eventKey, Delegate handler)
@@ -23,6 +25,7 @@ namespace ScEngineNet.Events
                 mEvents[eventKey] = Delegate.Combine(d, handler);
             }
         }
+
         // Удаление делегата из EventKey (если он существует)
         // и разрыв связи EventKey -> Delegate при удалении
         // последнего делегата
@@ -38,11 +41,18 @@ namespace ScEngineNet.Events
                     d = Delegate.Remove(d, handler);
                     // Если делегат остается, то установить новый ключ EventKey, 
                     // иначе – удалить EventKey
-                    if (d != null) mEvents[eventKey] = d;
-                    else mEvents.Remove(eventKey);
+                    if (d != null)
+                    {
+                        mEvents[eventKey] = d;
+                    }
+                    else
+                    {
+                        mEvents.Remove(eventKey);
+                    }
                 }
             }
         }
+
         // Информирование о событии для обозначенного ключа EventKey
         public void Raise(EventKey eventKey, Object sender, EventArgs e)
         {
@@ -65,7 +75,5 @@ namespace ScEngineNet.Events
                 d.DynamicInvoke(new Object[] { sender, e });
             }
         }
-
-
     }
 }
