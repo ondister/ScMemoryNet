@@ -14,14 +14,17 @@
         /// Добавление исходящей дуги
         /// </summary>
         ScEventAddOutputArc = 0,
+
         /// <summary>
         /// Добавление входящей дуги
         /// </summary>
         ScEventAddInputArc = 1,
+
         /// <summary>
         /// Удаление исходящей дуги
         /// </summary>
         ScEventRemoveOutputArc = 2,
+
         /// <summary>
         /// Удаление входящей дуги
         /// </summary>
