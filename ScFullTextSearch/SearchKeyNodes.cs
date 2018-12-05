@@ -75,16 +75,10 @@ namespace ScFullTextSearch
         {
             get
             {
-                if (instance == null)
+                lock (syncRoot)
                 {
-                    lock (syncRoot)
-                    {
-                        if (instance == null)
-                            instance = new SearchKeyNodes();
-                    }
+                    return instance ?? (instance = new SearchKeyNodes());
                 }
-
-                return instance;
             }
         }
 
