@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+
 using ScEngineNet.ExtensionsNet;
 using ScEngineNet.Native;
 using ScEngineNet.NetHelpers;
@@ -49,7 +50,6 @@ namespace ScEngineNet
         /// </exception>
         public static void Initialize(bool clearBeforeInit, string configFile, string repoPath, string extensionsPath, string netExtensionsPath)
         {
-
             var parameters = new ScMemoryParams(clearBeforeInit, configFile, repoPath, extensionsPath, netExtensionsPath);
            Initialize(parameters);
         }
@@ -74,12 +74,11 @@ namespace ScEngineNet
             if (!File.Exists(parameters.ConfigFile)) { throw new Exception("Отсутствует указанный конфигурационный файл"); }
             if (!Directory.Exists(parameters.RepoPath)) { throw new Exception("Отсутствует указанная директория репозитория"); }
             if (!Directory.Exists(parameters.ExtensionsPath)) { throw new Exception("Отсутствует указанная директория расширений"); }
-            
+
             listExtensionsNet = new List<IScExtensionNet>();
-          
+
             if (ScMemoryContext.IsMemoryInitialized() == false)
             {
-
                 NativeMethods.sc_memory_initialize(parameters.ScParams);
                 //только если указанная директория существует
                 if (Directory.Exists(parameters.NetExtensionsPath))
@@ -94,11 +93,7 @@ namespace ScEngineNet
             {
                 throw new Exception("Память уже инициализирована. Нельзя использовать одновременно несколько экземпляров памяти. Лучше создайте новый ScMemoryContext");
             }
-
         }
-
-
-
 
         private static void LoadExtensionsNets(string netExtensionsPath)
         {
@@ -118,7 +113,6 @@ namespace ScEngineNet
                             listExtensionsNet.Add(exNet);
                             Console.WriteLine("** Message: .net module: {0} initialized ", fName);
                         }
-
                     }
                 }
             }
@@ -128,7 +122,6 @@ namespace ScEngineNet
         {
             foreach (var exNet in listExtensionsNet)
             {
-
                 if (exNet.ShutDown() == ScResult.ScResultOk)
                 {
                     Console.WriteLine("** Message: .net module: {0} unloaded", exNet.NetExtensionName);
@@ -146,10 +139,7 @@ namespace ScEngineNet
         {
             var isShutDown = false;
 
-
-
             //уничтожение объектов с указателями в памяти перед закрытием памяти
-
 
             //закрытие расширений и закрытие библиотеки
             if (ScMemoryContext.IsMemoryInitialized())
@@ -160,15 +150,7 @@ namespace ScEngineNet
                 }
             }
 
-
             return isShutDown;
         }
-
-
-
-
-
-
-
     }
 }
