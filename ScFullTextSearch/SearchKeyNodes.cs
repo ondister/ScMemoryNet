@@ -1,7 +1,6 @@
-﻿using ScEngineNet;
+﻿using System;
+
 using ScEngineNet.ScElements;
-using System;
-using System.Collections.Generic;
 
 namespace ScFullTextSearch
 {
