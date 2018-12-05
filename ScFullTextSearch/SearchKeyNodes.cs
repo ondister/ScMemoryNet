@@ -12,37 +12,45 @@ namespace ScFullTextSearch
         private static volatile SearchKeyNodes instance;
         private static object syncRoot = new Object();
 
-
         private SearchKeyNodes()
         {
         }
-      
 
         #region keynodes
-       
 
         public Identifier ClassLinkForTokenize
         { get { return "class_link_for_tokenize"; } }
+
         public Identifier ClassTokenizedLink
         { get { return "class_tokenized_link"; } }
+
         public Identifier ClassSimpleToken
         { get { return "class_simple_token"; } }
+
         public Identifier ClassWord
         { get { return "class_word"; } }
+
         public Identifier ClassWordLemma
         { get { return "class_word_lemma"; } }
+
         public Identifier ClassWordVariant
         { get { return "class_word_variant"; } }
+
         public Identifier NrelTokenStartPosition
         { get { return "nrel_token_start_position"; } }
+
         public Identifier NrelTokenEndPosition
         { get { return "nrel_token_end_position"; } }
+
         public Identifier NrelWordLemma
         { get { return "nrel_word_lemma"; } }
+
         public Identifier NrelWordVariant
         { get { return "nrel_word_variant"; } }
+
         public Identifier NrelToken
         { get { return "nrel_token"; } }
+
         public Identifier NrelTokenWord
         { get { return "nrel_token_word"; } }
 
@@ -54,6 +62,7 @@ namespace ScFullTextSearch
 
         public Identifier NrelQuerryResponse
         { get { return "nrel_querry_response"; } }
+
         #endregion
 
         /// <summary>
@@ -84,13 +93,13 @@ namespace ScFullTextSearch
             Console.WriteLine("Create ScFulltextSearch KeyNode: {0}", identifier);
             return context.CreateNode(elementType, identifier);
         }
+
         /// <summary>
         /// Создает ключевые узлы
         /// </summary>
         /// <returns></returns>
         internal bool CreateKeyNodes()
         {
-
             using (var context = new ScMemoryContext(ScAccessLevels.MinLevel))
             {
                 this.CreateKeyNode(context, ScTypes.NodeConstantClass, this.ClassLinkForTokenize);
@@ -111,9 +120,5 @@ namespace ScFullTextSearch
             }
             return true;
         }
-
-
-     
-
     }
 }
