@@ -33,7 +33,7 @@ namespace ScFullTextSearch
         {
             //инициализируем морфологический движок
             Morphology.Initialize();
-            
+
             //создаем ключевые узлы
             SearchKeyNodes.Instance.CreateKeyNodes();
 
@@ -42,7 +42,7 @@ namespace ScFullTextSearch
 
             //подписываемся на событие добавление к узлу class_link_for_tokenize дуги и ссылки
             this.classLinkForTokenize = context.FindNode(SearchKeyNodes.Instance.ClassLinkForTokenize);
-            
+
             if (this.classLinkForTokenize.ScAddress != ScAddress.Invalid)
             {
                 this.classLinkForTokenize.OutputArcAdded += ForTokenizeString_OutputArcAdded;
@@ -67,8 +67,6 @@ namespace ScFullTextSearch
                 Console.WriteLine("KeyNode {0} not found", SearchKeyNodes.Instance.ClassQuerryString);
             }
             ftSearchEngine = new FTSearchEngine();
-
-
 
             return ScResult.ScResultOk;
         }
@@ -95,7 +93,6 @@ namespace ScFullTextSearch
 
         public ScResult ShutDown()
         {
-            
             //отписываемся от события добавление к узлу for_tokenize_string дуги и ссылки
             this.classLinkForTokenize.OutputArcAdded -= ForTokenizeString_OutputArcAdded;
             this.classQuerryString.OutputArcAdded -= classQuerryString_OutputArcAdded;
