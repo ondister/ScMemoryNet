@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 
 namespace ScEngineNet.Events
 {
@@ -17,39 +16,42 @@ namespace ScEngineNet.Events
         // И компоновка делегата с существующим ключом EventKey
         public void Add(EventKey eventKey, Delegate handler)
         {
-            Monitor.Enter(mEvents);
-            Delegate d;
-            mEvents.TryGetValue(eventKey, out d);
-            mEvents[eventKey] = Delegate.Combine(d, handler);
-            Monitor.Exit(mEvents);
+            lock (mEvents)
+            {
+                Delegate d;
+                mEvents.TryGetValue(eventKey, out d);
+                mEvents[eventKey] = Delegate.Combine(d, handler);
+            }
         }
         // Удаление делегата из EventKey (если он существует)
         // и разрыв связи EventKey -> Delegate при удалении
         // последнего делегата
         public void Remove(EventKey eventKey, Delegate handler)
         {
-            Monitor.Enter(mEvents);
-            // Вызов TryGetValue предотвращает выдачу исключения
-            // при попытке удаления делегата с отсутствующим ключом EventKey.
-            Delegate d;
-            if (mEvents.TryGetValue(eventKey, out d))
+            lock (mEvents)
             {
-                d = Delegate.Remove(d, handler);
-                // Если делегат остается, то установить новый ключ EventKey, 
-                // иначе – удалить EventKey
-                if (d != null) mEvents[eventKey] = d;
-                else mEvents.Remove(eventKey);
+                // Вызов TryGetValue предотвращает выдачу исключения
+                // при попытке удаления делегата с отсутствующим ключом EventKey.
+                Delegate d;
+                if (mEvents.TryGetValue(eventKey, out d))
+                {
+                    d = Delegate.Remove(d, handler);
+                    // Если делегат остается, то установить новый ключ EventKey, 
+                    // иначе – удалить EventKey
+                    if (d != null) mEvents[eventKey] = d;
+                    else mEvents.Remove(eventKey);
+                }
             }
-            Monitor.Exit(mEvents);
         }
         // Информирование о событии для обозначенного ключа EventKey
         public void Raise(EventKey eventKey, Object sender, EventArgs e)
         {
             // Не выдавать исключение при отсутствии ключа EventKey
             Delegate d;
-            Monitor.Enter(mEvents);
-            mEvents.TryGetValue(eventKey, out d);
-            Monitor.Exit(mEvents);
+            lock (mEvents)
+            {
+                mEvents.TryGetValue(eventKey, out d);
+            }
             if (d != null)
             {
                 // Из-за того что словарь может содержать несколько разных типов 
