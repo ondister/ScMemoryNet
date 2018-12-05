@@ -40,16 +40,10 @@ namespace ScEngineNet.NetHelpers
         {
             get
             {
-                if (instance == null)
+                lock (syncRoot)
                 {
-                    lock (syncRoot)
-                    {
-                        if (instance == null)
-                            instance = new ScKeyNodes();
-                    }
+                    return instance ?? (instance = new ScKeyNodes());
                 }
-
-                return instance;
             }
         }
 
