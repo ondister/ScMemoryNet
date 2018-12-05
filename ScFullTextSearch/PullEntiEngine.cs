@@ -13,16 +13,11 @@ namespace ScFullTextSearch
 {
     public class PullEntiEngine
     {
-
         public PullEntiEngine()
-        {
-
-
-        }
+        { }
 
         public void AddLink(ScLink Link)
         {
-
             this.ProcessLink(Link);
 
             //Заменяем класс ссылки после токенизации
@@ -42,7 +37,6 @@ namespace ScFullTextSearch
 
                 classLinkForTokenize.Dispose();
                 classTokenizedLink.Dispose();
-
             }
         }
 
@@ -63,12 +57,10 @@ namespace ScFullTextSearch
                         element = this.CreateTokenConstruction(context, element, tokensList[tokenIndex]);
                 }
             }
-
         }
 
         private ScElement CreateTokenConstruction(ScMemoryContext context, ScElement element, MorphToken Token)
         {
-
             //создаем конструкцию токена. см. файл token_construction в папке docs
 
             var classSimpleToken = context.FindNode(SearchKeyNodes.Instance.ClassSimpleToken);
@@ -95,7 +87,6 @@ namespace ScFullTextSearch
                      .AddInputArc(ScTypes.ArcAccessConstantPositivePermanent, nrelTokenEndPosition);
 
             //привязываемся к существующей словарной форме или создаем новую
-         
             ScNode wordConcept = null;
             wordConcept = this.FindWordByLemma(context, Token.Lemma);
             if ((object)wordConcept==null)//Если не удалось найти  словарное слово по лемме то создаем его
@@ -103,7 +94,7 @@ namespace ScFullTextSearch
                 wordConcept = this.CreateWordConcept(context, Token);
                 Console.WriteLine("Создаем новое словарное слово {0}.", Token.Lemma);
             }
-               
+
             //прикрепляем словарное слово к токену
             if ((object)wordConcept != null)
             {
@@ -116,7 +107,6 @@ namespace ScFullTextSearch
                 Console.WriteLine("Связь слова и токена не установлена. Так как не удалось найти слово по лемме {0}.",Token.Lemma);
             }
 
-
             classSimpleToken.Dispose();
             nrelToken.Dispose();
             nrelTokenEndPosition.Dispose();
@@ -127,7 +117,6 @@ namespace ScFullTextSearch
 
         public ScNode CreateWordConcept(ScMemoryContext context, MorphToken Token)
         {
-
             ScNode nodeWord = this.CreateClassNodeInstance(context, context.FindNode(SearchKeyNodes.Instance.ClassWord));
 
             //добавляем лемму
@@ -176,11 +165,7 @@ namespace ScFullTextSearch
                 if ((object)node != null) { break; }
             }
 
-            
-
             return node;
         }
-
-
     }
 }
