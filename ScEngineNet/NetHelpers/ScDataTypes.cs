@@ -48,16 +48,10 @@ namespace ScEngineNet.NetHelpers
         {
             get
             {
-                if (instance == null)
+                lock (syncRoot)
                 {
-                    lock (syncRoot)
-                    {
-                        if (instance == null)
-                            instance = new ScDataTypes();
-                    }
+                    return instance ?? (instance = new ScDataTypes());
                 }
-
-                return instance;
             }
         }
 
