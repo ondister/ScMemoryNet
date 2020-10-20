@@ -1,5 +1,5 @@
 ﻿namespace ScEngineNet.Native
-{
+{#warning enums to byte 
     /// <summary>
     /// Перечислитель указывает направление поиска в потоке. Не используется.
     /// </summary>
